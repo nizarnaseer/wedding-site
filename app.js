@@ -1064,6 +1064,20 @@ function submitBooking(e) {
     const waUrl = `https://wa.me/${PHOTOGRAPHER}?text=${encodeURIComponent(waMsg)}`;
     window.open(waUrl, '_blank');
 
+    /* 3️⃣ Auto-add to Google Calendar */
+    fetch('/api/add-calendar-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title:       `[${ref}] ${name} — ${activePackage.name}`,
+        date:        selectedDates[0],
+        startTime:   document.getElementById('evtTime_0')?.value || '',
+        description: `Ref: ${ref}\nClient: ${name}\nPhone: ${phone}\nEmail: ${email}\nPackage: ${activePackage.name}\nLocation: ${location || 'TBD'}\nNotes: ${notes || 'None'}\nApprove: ${approveLink}`,
+        location:    location || '',
+        ref,
+      }),
+    }).catch(() => {});
+
     const how = w3fKey
       ? 'Email + WhatsApp notification sent. You\'ll hear back within 24 hours.'
       : 'WhatsApp has opened — tap Send to notify the photographer.';
@@ -1140,6 +1154,20 @@ function submitBooking(e) {
 
     /* WhatsApp */
     window.open(`https://wa.me/${PHOTOGRAPHER}?text=${encodeURIComponent(waMsg)}`, '_blank');
+
+    /* Auto-add to Google Calendar */
+    fetch('/api/add-calendar-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title:       `[${ref}] ${name} — ${activePackage.name}`,
+        date:        selectedDates[0],
+        startTime:   document.getElementById('evtTime_0')?.value || '',
+        description: `Ref: ${ref}\nClient: ${name}\nPhone: ${phone}\nEmail: ${email}\nPackage: ${activePackage.name}\nLocation: ${location || 'TBD'}\nNotes: ${notes || 'None'}`,
+        location:    location || '',
+        ref,
+      }),
+    }).catch(() => {});
 
     document.getElementById('confirmMsg').textContent =
       `Thank you, ${first}! Your ${activePackage.name} (${selectedDates.length} day${selectedDates.length>1?'s':''}) is confirmed. ` +

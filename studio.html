@@ -33,14 +33,23 @@
     .section-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;margin-bottom:40px;}
 
     .concepts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
-    .concept-card{background:var(--dark2);border:2px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .3s;position:relative;}
-    .concept-card:hover,.concept-card.selected{border-color:var(--gold);transform:translateY(-4px);}
+
+    .concept-card{background:var(--dark2);border:2px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .3s;position:relative;display:flex;flex-direction:column;}
+    .concept-card:hover{border-color:rgba(201,169,110,0.5);transform:translateY(-4px);box-shadow:0 12px 40px rgba(201,169,110,0.12);}
+    .concept-card.selected{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,169,110,0.25);}
     .concept-card.selected::after{content:'✓ Selected';position:absolute;top:12px;right:12px;background:var(--gold);color:#000;font-size:0.68rem;font-weight:700;letter-spacing:1px;padding:4px 10px;border-radius:20px;}
+    .concept-card.booked-out{opacity:0.45;pointer-events:none;}
+    .concept-card.booked-out::before{content:'FULLY BOOKED';position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;letter-spacing:2px;color:#ef4444;border-radius:14px;z-index:2;}
     .concept-img{width:100%;height:200px;object-fit:cover;display:block;}
     .concept-img-placeholder{width:100%;height:200px;display:flex;align-items:center;justify-content:center;font-size:3rem;}
-    .concept-body{padding:16px 18px;}
+    .concept-body{padding:16px 18px;flex:1;display:flex;flex-direction:column;}
     .concept-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:6px;}
-    .concept-desc{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+    .concept-desc{font-size:0.78rem;color:var(--muted);line-height:1.5;flex:1;}
+    .concept-btn{display:block;width:100%;margin-top:14px;padding:11px;background:rgba(201,169,110,0.1);border:1px solid rgba(201,169,110,0.3);border-radius:10px;color:var(--gold);font-size:0.8rem;font-weight:700;letter-spacing:1px;text-align:center;cursor:pointer;transition:all .2s;text-transform:uppercase;}
+    .concept-card:hover .concept-btn{background:rgba(201,169,110,0.2);}
+    .concept-card.selected .concept-btn{background:var(--gold);color:#000;border-color:var(--gold);}
+    .concept-availability{font-size:0.7rem;color:var(--muted);margin-top:6px;text-align:center;min-height:16px;}
+
 
     /* BOOKING FORM */
     .booking-card{background:var(--dark2);border:1px solid var(--border);border-radius:20px;padding:40px;max-width:680px;margin:0 auto;}
@@ -95,39 +104,48 @@
 
 <!-- CONCEPTS -->
 <section>
-  <p class="section-label">Choose Your Style</p>
-  <h2 class="section-title">Studio Concepts</h2>
+  <p class="section-label">Step 1 — Choose Your Style</p>
+  <h2 class="section-title">Pick a Concept</h2>
+  <p style="color:var(--muted);font-size:0.85rem;margin-bottom:32px;margin-top:-24px;">Click a concept to select it. Then choose your date &amp; time slot below.</p>
   <div class="concepts-grid" id="conceptsGrid">
 
-    <div class="concept-card" data-concept="A" onclick="selectConcept('A','Minimalist White',this)">
+    <div class="concept-card" id="card-A" data-concept="A" data-name="Minimalist White" onclick="selectConcept('A','Minimalist White',this)">
       <div class="concept-img-placeholder" style="background:linear-gradient(135deg,#f5f0eb,#e8e0d8);">🤍</div>
       <div class="concept-body">
         <div class="concept-name">Concept A — Minimalist White</div>
         <div class="concept-desc">Clean white cyclorama backdrop with soft diffused natural light. Timeless, elegant, and perfect for all family sizes.</div>
+        <div class="concept-btn">Select This Concept →</div>
+        <div class="concept-availability" id="avail-A"></div>
       </div>
     </div>
 
-    <div class="concept-card" data-concept="B" onclick="selectConcept('B','Royal Gold',this)">
+    <div class="concept-card" id="card-B" data-concept="B" data-name="Royal Gold" onclick="selectConcept('B','Royal Gold',this)">
       <div class="concept-img-placeholder" style="background:linear-gradient(135deg,#2a1f0e,#4a3520);">✨</div>
       <div class="concept-body">
         <div class="concept-name">Concept B — Royal Gold</div>
         <div class="concept-desc">Luxurious dark backdrop with warm golden accents. Draped fabric and ornate props that evoke regal celebration.</div>
+        <div class="concept-btn">Select This Concept →</div>
+        <div class="concept-availability" id="avail-B"></div>
       </div>
     </div>
 
-    <div class="concept-card" data-concept="C" onclick="selectConcept('C','Tropical Botanica',this)">
+    <div class="concept-card" id="card-C" data-concept="C" data-name="Tropical Botanica" onclick="selectConcept('C','Tropical Botanica',this)">
       <div class="concept-img-placeholder" style="background:linear-gradient(135deg,#0d1f0d,#1a3a1a);">🌿</div>
       <div class="concept-body">
         <div class="concept-name">Concept C — Tropical Botanica</div>
         <div class="concept-desc">Lush tropical greenery and botanical arrangements. Vibrant, fresh, and full of life — a stunning contrast to traditional baju raya.</div>
+        <div class="concept-btn">Select This Concept →</div>
+        <div class="concept-availability" id="avail-C"></div>
       </div>
     </div>
 
-    <div class="concept-card" data-concept="D" onclick="selectConcept('D','Classic Dark',this)">
+    <div class="concept-card" id="card-D" data-concept="D" data-name="Classic Dark" onclick="selectConcept('D','Classic Dark',this)">
       <div class="concept-img-placeholder" style="background:linear-gradient(135deg,#0a0a0a,#1a1a1a);">🖤</div>
       <div class="concept-body">
         <div class="concept-name">Concept D — Classic Dark</div>
         <div class="concept-desc">Dramatic dark studio with cinematic moody lighting. Bold, sophisticated, and unforgettable for those who dare to stand out.</div>
+        <div class="concept-btn">Select This Concept →</div>
+        <div class="concept-availability" id="avail-D"></div>
       </div>
     </div>
 
@@ -137,78 +155,60 @@
 <hr class="divider"/>
 
 <!-- BOOKING FORM -->
-<section style="padding-top:0;">
-  <p class="section-label">Reserve Your Slot</p>
+<section style="padding-top:0;" id="bookingSection">
+  <p class="section-label">Step 2 — Reserve Your Slot</p>
   <h2 class="section-title" style="margin-bottom:32px;">Book a Session</h2>
 
   <div class="booking-card">
     <div id="bookingForm">
 
-      <div class="deposit-notice">
-        <h4>⚠️ Booking Policy</h4>
-        <p>
-          A <strong>RM 50 deposit</strong> is required to confirm your session slot.<br/>
-          <strong>No-shows or cancellations within 24 hours</strong> — deposit is non-refundable and will not be returned.<br/>
-          <strong style="color:#c9a96e;">💰 Balance payment to be settled upon arrival at the studio</strong> on your session day.
-        </p>
+      <!-- Concept selected banner -->
+      <div id="noConceptWarning" style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.3);border-radius:10px;padding:12px 16px;font-size:0.82rem;color:#eab308;margin-bottom:16px;">
+        ⬆ Please select a concept above before choosing your time slot.
+      </div>
+      <div class="concept-selected-display" id="conceptDisplay" style="display:none;margin-bottom:16px;">
+        📸 Selected: <strong id="conceptDisplayText">—</strong>
+        <a onclick="clearConcept()" style="float:right;font-size:0.72rem;color:var(--muted);cursor:pointer;">Change ✕</a>
       </div>
 
-      <div class="concept-selected-display" id="conceptDisplay">📸 Selected: —</div>
+      <div class="deposit-notice">
+        <h4>⚠️ Booking Policy</h4>
+        <p>A <strong>RM 50 deposit</strong> is required to confirm your slot.<br/>
+        <strong>No-shows or cancellations within 24 hours</strong> — deposit is non-refundable.<br/>
+        <strong style="color:#c9a96e;">💰 Balance settled upon arrival at the studio.</strong></p>
+      </div>
 
       <div class="form-grid">
-        <div class="form-group">
-          <label>First Name *</label>
-          <input type="text" id="sFirst" placeholder="Ahmad" required/>
-        </div>
-        <div class="form-group">
-          <label>Last Name *</label>
-          <input type="text" id="sLast" placeholder="Abdullah" required/>
-        </div>
-        <div class="form-group">
-          <label>WhatsApp Number *</label>
-          <input type="tel" id="sPhone" placeholder="011-2345678" required/>
-        </div>
-        <div class="form-group">
-          <label>Email *</label>
-          <input type="email" id="sEmail" placeholder="email@example.com" required/>
-        </div>
+        <div class="form-group"><label>First Name *</label><input type="text" id="sFirst" placeholder="Ahmad" required/></div>
+        <div class="form-group"><label>Last Name *</label><input type="text" id="sLast" placeholder="Abdullah" required/></div>
+        <div class="form-group"><label>WhatsApp Number *</label><input type="tel" id="sPhone" placeholder="011-2345678" required/></div>
+        <div class="form-group"><label>Email *</label><input type="email" id="sEmail" placeholder="email@example.com" required/></div>
         <div class="form-group">
           <label>Session Date *</label>
-          <select id="sDate" required>
+          <select id="sDate" required onchange="refreshTimeSlots()">
             <option value="">— Select date —</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Time Slot *</label>
+          <label>Time Slot * <span id="slotHint" style="font-size:0.65rem;color:var(--muted);"></span></label>
           <select id="sTime" required>
-            <option value="">— Select time —</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Studio Concept *</label>
-          <select id="sConcept" required>
-            <option value="">— Select concept —</option>
-            <option value="A - Minimalist White">Concept A — Minimalist White</option>
-            <option value="B - Royal Gold">Concept B — Royal Gold</option>
-            <option value="C - Tropical Botanica">Concept C — Tropical Botanica</option>
-            <option value="D - Classic Dark">Concept D — Classic Dark</option>
+            <option value="">— Select date &amp; concept first —</option>
           </select>
         </div>
         <div class="form-group">
           <label>Number of Pax *</label>
           <select id="sPax" required>
             <option value="">— Select —</option>
-            <option>1–2 pax</option>
-            <option>3–5 pax</option>
-            <option>6–10 pax</option>
-            <option>10+ pax</option>
+            <option>1–2 pax</option><option>3–5 pax</option><option>6–10 pax</option><option>10+ pax</option>
           </select>
         </div>
-        <div class="form-group full">
-          <label>Special Requests / Notes</label>
+        <div class="form-group full"><label>Special Requests / Notes</label>
           <textarea id="sNotes" placeholder="e.g. We have a baby, need prayer mat, colour theme preference…"></textarea>
         </div>
       </div>
+
+      <!-- Hidden field — auto-set when concept card is clicked -->
+      <input type="hidden" id="sConcept" />
 
       <button class="btn-book" onclick="submitStudio()">Reserve My Session — RM 50 Deposit</button>
       <p style="font-size:0.72rem;color:var(--muted);text-align:center;margin-top:12px;">You will receive WhatsApp confirmation with payment details.</p>
@@ -237,89 +237,114 @@
     { key: 'D', name: 'Classic Dark' },
   ];
 
+  // All time labels (9am–6pm 30-min slots)
+  const ALL_TIMES = [];
+  (function(){
+    var fmt = function(hh,mm){ var ap=hh<12?'AM':'PM'; var h12=hh===0?12:hh>12?hh-12:hh; return h12+':'+String(mm).padStart(2,'0')+' '+ap; };
+    for(var h=9;h<18;h++) for(var m of [0,30]){
+      var hE=m===30?h+1:h, mE=m===30?0:30;
+      ALL_TIMES.push(fmt(h,m)+' – '+fmt(hE,mE));
+    }
+  })();
+
   // Load booked slots from API
   fetch('/api/get-studio-slots')
     .then(r => r.json())
-    .then(d => { bookedSlots = d.slots || []; })
+    .then(d => { bookedSlots = d.slots || []; refreshAvailabilityBadges(); })
     .catch(() => {});
 
-  // Build DATE dropdown — next 90 days, skip Fridays
+  // Build DATE dropdown
   var dateSel = document.getElementById('sDate');
-  var today   = new Date(); today.setHours(0,0,0,0);
-  for (var di = 1; di <= 90; di++) {
-    var d = new Date(today); d.setDate(today.getDate() + di);
-    if (d.getDay() === 5) continue;
-    var opt = document.createElement('option');
-    opt.value = d.toISOString().split('T')[0];
-    opt.textContent = d.toLocaleDateString('en-MY', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-    dateSel.appendChild(opt);
+  var today = new Date(); today.setHours(0,0,0,0);
+  for(var di=1;di<=90;di++){
+    var dd=new Date(today); dd.setDate(today.getDate()+di);
+    if(dd.getDay()===5) continue;
+    var oo=document.createElement('option');
+    oo.value=dd.toISOString().split('T')[0];
+    oo.textContent=dd.toLocaleDateString('en-MY',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    dateSel.appendChild(oo);
   }
 
-  // Build TIME dropdown 9 AM – 5:30 PM, 30-min slots
-  var slotSel = document.getElementById('sTime');
-  var timeFmt = function(hh, mm) {
-    var ampm = hh < 12 ? 'AM' : 'PM';
-    var h12  = hh === 0 ? 12 : hh > 12 ? hh - 12 : hh;
-    return h12 + ':' + String(mm).padStart(2,'0') + ' ' + ampm;
-  };
-  for (var h = 9; h < 18; h++) {
-    for (var m of [0, 30]) {
-      var hEnd = m === 30 ? h + 1 : h, mEnd = m === 30 ? 0 : 30;
-      var label = timeFmt(h,m) + ' – ' + timeFmt(hEnd,mEnd);
-      var so = document.createElement('option'); so.value = label; so.textContent = label;
-      slotSel.appendChild(so);
-    }
-  }
-
-  // When date or time changes — update concept availability
-  document.getElementById('sDate').addEventListener('change', updateConceptAvailability);
-  document.getElementById('sTime').addEventListener('change', updateConceptAvailability);
-
-  function updateConceptAvailability() {
-    var date = document.getElementById('sDate').value;
-    var time = document.getElementById('sTime').value;
-    if (!date || !time) return;
-
-    var conceptSel = document.getElementById('sConcept');
-    // Reset all options
-    Array.from(conceptSel.options).forEach(function(opt) {
-      if (!opt.value) return;
-      var key  = opt.value.charAt(0);
-      var slotKey = date + '|' + time + '|' + opt.value;
-      var taken   = bookedSlots.some(function(s) { return s.key === slotKey; });
-      opt.disabled = taken;
-      opt.textContent = taken
-        ? 'Concept ' + key + ' — ' + CONCEPTS.find(c => c.key === key)?.name + ' ✗ Fully Booked'
-        : 'Concept ' + key + ' — ' + CONCEPTS.find(c => c.key === key)?.name;
-    });
-
-    // Also update the cards
-    CONCEPTS.forEach(function(c) {
-      var slotKey = date + '|' + time + '|' + c.key + ' - ' + c.name;
-      var taken   = bookedSlots.some(function(s) { return s.key === slotKey; });
-      var card    = document.querySelector('[data-concept="' + c.key + '"]');
-      if (!card) return;
-      if (taken) {
-        card.classList.add('booked'); card.style.opacity = '0.4'; card.style.pointerEvents = 'none';
-        card.setAttribute('title', 'This concept is fully booked for the selected time');
-      } else {
-        card.classList.remove('booked'); card.style.opacity = ''; card.style.pointerEvents = '';
-        card.removeAttribute('title');
-      }
-    });
-  }
-
+  // -- Concept card selection --
   function selectConcept(key, name, el) {
-    var date = document.getElementById('sDate').value;
-    var time = document.getElementById('sTime').value;
-    if (!date || !time) { alert('Please select a date and time slot first.'); return; }
     selectedConceptKey = key + ' - ' + name;
     document.querySelectorAll('.concept-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
-    document.getElementById('conceptDisplay').style.display = 'block';
-    document.getElementById('conceptDisplay').textContent = '📸 Selected: Concept ' + key + ' — ' + name;
     document.getElementById('sConcept').value = selectedConceptKey;
+    document.getElementById('conceptDisplayText').textContent = 'Concept ' + key + ' — ' + name;
+    document.getElementById('conceptDisplay').style.display = 'block';
+    document.getElementById('noConceptWarning').style.display = 'none';
+    // Scroll to booking form
+    document.getElementById('bookingSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Refresh time slots for this concept
+    refreshTimeSlots();
   }
+
+  function clearConcept() {
+    selectedConceptKey = '';
+    document.getElementById('sConcept').value = '';
+    document.querySelectorAll('.concept-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('conceptDisplay').style.display = 'none';
+    document.getElementById('noConceptWarning').style.display = 'block';
+    resetTimeSlots();
+  }
+
+  // -- Time slot dropdown: shows available/booked per concept+date --
+  function refreshTimeSlots() {
+    var date    = document.getElementById('sDate').value;
+    var concept = document.getElementById('sConcept').value;
+    var sel     = document.getElementById('sTime');
+    var hint    = document.getElementById('slotHint');
+    sel.innerHTML = '';
+    if (!date || !concept) {
+      sel.innerHTML = '<option value="">— Select date &amp; concept first —</option>';
+      return;
+    }
+    var available = 0;
+    var defOpt = document.createElement('option'); defOpt.value=''; defOpt.textContent='— Select a time slot —'; sel.appendChild(defOpt);
+    ALL_TIMES.forEach(function(label) {
+      var slotKey = date + '|' + label + '|' + concept;
+      var booked  = bookedSlots.some(function(s){ return s.key === slotKey; });
+      var opt = document.createElement('option');
+      opt.value = label;
+      opt.textContent = booked ? label + ' — BOOKED' : label;
+      opt.disabled = booked;
+      if(booked) opt.style.color='#555';
+      else available++;
+      sel.appendChild(opt);
+    });
+    hint.textContent = available + ' slot' + (available!==1?'s':'') + ' available';
+    hint.style.color = available > 0 ? '#22c55e' : '#ef4444';
+  }
+
+  function resetTimeSlots() {
+    var sel = document.getElementById('sTime');
+    sel.innerHTML = '<option value="">— Select date &amp; concept first —</option>';
+    var hint = document.getElementById('slotHint'); if(hint) hint.textContent = '';
+  }
+
+  // Show availability count badge on each concept card (for selected date)
+  function refreshAvailabilityBadges() {
+    var date = document.getElementById('sDate').value;
+    CONCEPTS.forEach(function(c) {
+      var el = document.getElementById('avail-' + c.key);
+      if (!el) return;
+      if (!date) { el.textContent = ''; return; }
+      var conceptKey = c.key + ' - ' + c.name;
+      var booked = ALL_TIMES.filter(function(t){ return bookedSlots.some(function(s){ return s.key === date+'|'+t+'|'+conceptKey; }); }).length;
+      var free   = ALL_TIMES.length - booked;
+      el.textContent = free > 0 ? free + ' slots available' : 'Fully booked';
+      el.style.color  = free > 0 ? '#22c55e' : '#ef4444';
+      var card = document.getElementById('card-' + c.key);
+      if (card) card.classList.toggle('booked-out', free === 0);
+    });
+  }
+
+  // Date change triggers both time slot refresh + availability badges
+  document.getElementById('sDate').addEventListener('change', function(){
+    refreshTimeSlots();
+    refreshAvailabilityBadges();
+  });
 
   function genRef() { return 'STD-' + Date.now().toString().slice(-6); }
 
@@ -385,6 +410,21 @@
       '━━━━━━━━━━━━━━\n💳 Send client RM 50 deposit link\n📅 Add to Calendar: ' + gcalLink;
 
     window.open('https://wa.me/' + PHOTOGRAPHER_WA + '?text=' + encodeURIComponent(ownerMsg), '_blank');
+
+    // 2b. Auto-add to Google Calendar
+    fetch('/api/add-calendar-event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title:       `[STD:${ref}] ${name} — ${concept}`,
+        date:        date,
+        startTime:   time.split('–')[0].trim(),  // e.g. "9:00 AM"
+        endTime:     time.split('–')[1]?.trim() || '',
+        description: `Studio Session\nRef: ${ref}\nClient: ${name}\nPhone: ${phone}\nEmail: ${email}\nConcept: ${concept}\nPax: ${pax}\nNotes: ${notes}`,
+        location:    'Nizar Naseer Studio',
+        ref,
+      }),
+    }).catch(() => {});
 
     // 3. Email via Web3Forms
     fetch('https://api.web3forms.com/submit', {
