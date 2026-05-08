@@ -403,26 +403,59 @@ function deleteAlbum(i) {
   renderAlbums();
 }
 
-/* ── Save to Cloud (instant, no git push needed) ── */
+/* ── Save to GitHub (auto-deploys via Vercel in ~30s) ── */
 async function saveToCloud() {
   const btn = document.getElementById('saveCloudBtn');
-  btn.textContent = '⏳ Saving…';
+
+  // Get/prompt for GitHub token
+  let token = localStorage.getItem('gh_token');
+  let repo  = localStorage.getItem('gh_repo') || 'nizarnaseer/wedding-site';
+  if (!token) {
+    token = prompt('Enter your GitHub Personal Access Token:\n(Get from github.com/settings/tokens — tick "repo" scope)\n\nThis is saved locally on your device only.');
+    if (!token) return;
+    localStorage.setItem('gh_token', token.trim());
+  }
+
+  btn.textContent = '⏳ Saving to GitHub…';
   btn.disabled = true;
+
   try {
-    const r = await fetch('/api/save-gallery', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ albums }),
+    // Get current file SHA (needed for update)
+    const headers = {
+      'Authorization': `token ${token}`,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json',
+    };
+    const fileRes = await fetch(`https://api.github.com/repos/${repo}/contents/gallery.json`, { headers });
+    const fileData = fileRes.ok ? await fileRes.json() : null;
+    const sha = fileData?.sha;
+
+    // Commit updated gallery.json
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify({ albums }, null, 2))));
+    const body = { message: 'update gallery photos', content, ...(sha ? { sha } : {}) };
+    const commitRes = await fetch(`https://api.github.com/repos/${repo}/contents/gallery.json`, {
+      method: 'PUT', headers, body: JSON.stringify(body),
     });
-    const j = await r.json();
-    if (j.ok) {
-      btn.textContent = '✅ Saved & Live!';
-      setTimeout(() => { btn.textContent = '☁️ Save to Cloud'; btn.disabled = false; }, 3000);
-    } else throw new Error(j.error);
+
+    if (commitRes.ok) {
+      btn.textContent = '✅ Saved! Deploying…';
+      setTimeout(() => {
+        btn.textContent = '✅ Live in ~30s';
+        setTimeout(() => { btn.textContent = '☁️ Save to Cloud'; btn.disabled = false; }, 5000);
+      }, 2000);
+    } else {
+      const err = await commitRes.json();
+      throw new Error(err.message || 'GitHub commit failed');
+    }
   } catch(e) {
-    btn.textContent = '❌ Error — try again';
+    btn.textContent = '❌ Failed — try again';
     btn.disabled = false;
-    alert('Save failed: ' + e.message + '\n\nMake sure Upstash is configured in Vercel environment variables.');
+    if (e.message.includes('Bad credentials')) {
+      localStorage.removeItem('gh_token');
+      alert('Invalid token. Please try again with a valid GitHub Personal Access Token.');
+    } else {
+      alert('Error: ' + e.message);
+    }
   }
 }
 
