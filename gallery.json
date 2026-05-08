@@ -1,20 +1,6 @@
 {
   "albums": [
     {
-      "id": "test",
-      "title": "test",
-      "date": "test",
-      "category": "Event",
-      "layout": "span2",
-      "coverGradient": "linear-gradient(135deg,#1a1208,#2a1e0a)",
-      "teasers": [
-        {
-          "src": "https://res.cloudinary.com/dh5vjsskl/image/upload/v1778244343/doa8n7ui8pe4zzwkdssp.jpg",
-          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
-        }
-      ]
-    },
-    {
       "id": "zarif-anis",
       "title": "Zarif Weds Anis",
       "date": "14 December 2024 · Dewan Sri Penang",
