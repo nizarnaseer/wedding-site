@@ -85,10 +85,25 @@ document.getElementById('mobileClose').addEventListener('click', () => {
 ══════════════════════════════════════ */
 let ALBUMS = [];
 
-fetch('gallery.json?v=' + Date.now())
+fetch('/api/get-gallery')
   .then(r => r.json())
-  .then(data => { ALBUMS = data.albums || []; buildGallery(); })
-  .catch(() => buildGallery());
+  .then(data => {
+    if (data.albums && data.albums.length > 0) {
+      ALBUMS = data.albums;
+      buildGallery();
+    } else {
+      // Fallback to static gallery.json
+      return fetch('gallery.json?v=' + Date.now())
+        .then(r => r.json())
+        .then(d => { ALBUMS = d.albums || []; buildGallery(); });
+    }
+  })
+  .catch(() => {
+    fetch('gallery.json?v=' + Date.now())
+      .then(r => r.json())
+      .then(d => { ALBUMS = d.albums || []; buildGallery(); })
+      .catch(() => buildGallery());
+  });
 
 document.querySelectorAll('.mobile-link').forEach(l =>
   l.addEventListener('click', () => document.getElementById('mobileMenu').classList.remove('open'))

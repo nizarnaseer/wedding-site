@@ -121,7 +121,8 @@ select.form-input option{background:#13131a}
   <div class="toolbar">
     <div class="toolbar-left">
       <button class="btn btn-gold" onclick="openAddModal()">+ New Album</button>
-      <button class="btn btn-outline" onclick="downloadGalleryJson()">⬇ Download gallery.json</button>
+      <button class="btn btn-gold" id="saveCloudBtn" onclick="saveToCloud()" style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff">☁️ Save to Cloud</button>
+      <button class="btn btn-outline" onclick="downloadGalleryJson()">⬇ Backup JSON</button>
     </div>
     <span style="font-size:0.78rem;color:var(--muted)" id="albumCount"></span>
   </div>
@@ -206,11 +207,16 @@ const CFG2 = window.STUDIO_CONFIG || {};
 let albums = [];
 let editPhotos = []; // { src, preview }
 
-/* ── Load gallery.json ── */
-fetch('gallery.json?v=' + Date.now())
+/* ── Load gallery from API (live data) ── */
+fetch('/api/get-gallery')
   .then(r => r.json())
-  .then(d => { albums = d.albums || []; renderAlbums(); })
-  .catch(() => { albums = []; renderAlbums(); });
+  .then(d => {
+    if (d.albums && d.albums.length > 0) { albums = d.albums; renderAlbums(); return; }
+    return fetch('gallery.json?v=' + Date.now()).then(r => r.json()).then(d2 => { albums = d2.albums || []; renderAlbums(); });
+  })
+  .catch(() => {
+    fetch('gallery.json?v=' + Date.now()).then(r => r.json()).then(d => { albums = d.albums || []; renderAlbums(); }).catch(() => renderAlbums());
+  });
 
 /* ── Cloudinary config from localStorage ── */
 function getCloud() {
@@ -397,7 +403,31 @@ function deleteAlbum(i) {
   renderAlbums();
 }
 
+/* ── Save to Cloud (instant, no git push needed) ── */
+async function saveToCloud() {
+  const btn = document.getElementById('saveCloudBtn');
+  btn.textContent = '⏳ Saving…';
+  btn.disabled = true;
+  try {
+    const r = await fetch('/api/save-gallery', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ albums }),
+    });
+    const j = await r.json();
+    if (j.ok) {
+      btn.textContent = '✅ Saved & Live!';
+      setTimeout(() => { btn.textContent = '☁️ Save to Cloud'; btn.disabled = false; }, 3000);
+    } else throw new Error(j.error);
+  } catch(e) {
+    btn.textContent = '❌ Error — try again';
+    btn.disabled = false;
+    alert('Save failed: ' + e.message + '\n\nMake sure Upstash is configured in Vercel environment variables.');
+  }
+}
+
 /* ── Download gallery.json ── */
+
 function downloadGalleryJson() {
   const json = JSON.stringify({ albums }, null, 2);
   const a = document.createElement('a');
