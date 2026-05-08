@@ -389,12 +389,15 @@ async function loadCalendarBusy() {
 
     busyDates.clear();
     (data.items || []).forEach(event => {
-      const start = (event.start.date  || event.start.dateTime  || '').split('T')[0];
-      const end   = (event.end.date    || event.end.dateTime    || '').split('T')[0];
+      const allDay = !!event.start.date;   // all-day events use .date not .dateTime
+      const start  = (event.start.date || event.start.dateTime || '').split('T')[0];
+      const end    = (event.end.date   || event.end.dateTime   || '').split('T')[0];
       if (!start) return;
       let d = new Date(start + 'T00:00:00');
-      const e = new Date((end || start) + 'T00:00:00');
-      while (d <= e) {
+      const e = new Date(end  + 'T00:00:00');
+      // Google Calendar all-day end date is exclusive (day after last day)
+      // Timed events: include end date
+      while (allDay ? d < e : d <= e) {
         busyDates.add(toYMD(new Date(d)));
         d.setDate(d.getDate() + 1);
       }
