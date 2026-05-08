@@ -78,6 +78,18 @@ document.getElementById('navBurger').addEventListener('click', () => {
 document.getElementById('mobileClose').addEventListener('click', () => {
   document.getElementById('mobileMenu').classList.remove('open');
 });
+/* ══════════════════════════════════════
+   GALLERY — loaded from gallery.json
+   Manage albums at: weddingclicks.us/gallery-manager.html
+   Photos on Cloudinary CDN — zero Vercel storage.
+══════════════════════════════════════ */
+let ALBUMS = [];
+
+fetch('gallery.json?v=' + Date.now())
+  .then(r => r.json())
+  .then(data => { ALBUMS = data.albums || []; buildGallery(); })
+  .catch(() => buildGallery());
+
 document.querySelectorAll('.mobile-link').forEach(l =>
   l.addEventListener('click', () => document.getElementById('mobileMenu').classList.remove('open'))
 );
@@ -90,133 +102,6 @@ const revealObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 
 function addReveal(el) { el.classList.add('reveal'); revealObserver.observe(el); }
-
-/* ══════════════════════════════════════
-   GALLERY ALBUMS
-   DROP YOUR REAL PHOTOS into images/<album-id>/ named 01.jpg, 02.jpg...
-   The gallery auto-detects them. If a photo is missing, Unsplash shows.
- ══════════════════════════════════════ */
-// Unsplash fallbacks shown when local photo not uploaded yet
-const W1 = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=900&auto=format&fit=crop';
-const W2 = 'https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop';
-const W3 = 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&auto=format&fit=crop';
-const W4 = 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&auto=format&fit=crop';
-const P1 = 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&auto=format&fit=crop';
-const P2 = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&auto=format&fit=crop';
-const P3 = 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900&auto=format&fit=crop';
-const E1 = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&auto=format&fit=crop';
-const E2 = 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=900&auto=format&fit=crop';
-
-const ALBUMS = [
-  {
-    id: 'zarif-anis',
-    title: 'Zarif Weds Anis',
-    date: '14 December 2024 · Dewan Sri Penang',
-    category: 'Wedding',
-    layout: 'span2',
-    coverGradient: 'linear-gradient(135deg,#1a1208,#2a1e0a)',
-    teasers: [
-      { src: 'images/zarif-anis/01.jpg', fallback: W1, g: 'linear-gradient(135deg,#1a1208,#2a1e0a)' },
-      { src: 'images/zarif-anis/02.jpg', fallback: W2, g: 'linear-gradient(135deg,#1a1210,#2a1e12)' },
-      { src: 'images/zarif-anis/03.jpg', fallback: W3, g: 'linear-gradient(135deg,#120a1a,#1e1228)' },
-      { src: 'images/zarif-anis/04.jpg', fallback: W4, g: 'linear-gradient(135deg,#1a0e0a,#2a180e)' },
-      { src: 'images/zarif-anis/05.jpg', fallback: W2, g: 'linear-gradient(135deg,#0a1a10,#0e2416)' },
-    ],
-  },
-  {
-    id: 'portrait-farah',
-    title: 'Farah · Studio Portrait',
-    date: 'March 2025 · Kuala Lumpur',
-    category: 'Portrait',
-    layout: 'tall',
-    coverGradient: 'linear-gradient(135deg,#0a0f1a,#0f1a2a)',
-    teasers: [
-      { src: 'images/portrait-farah/01.jpg', fallback: P1, g: 'linear-gradient(135deg,#0a0f1a,#0f1a2a)' },
-      { src: 'images/portrait-farah/02.jpg', fallback: P3, g: 'linear-gradient(135deg,#0a150f,#0f2018)' },
-      { src: 'images/portrait-farah/03.jpg', fallback: P2, g: 'linear-gradient(135deg,#0a0a1a,#10102a)' },
-    ],
-  },
-  {
-    id: 'editorial-vogue',
-    title: 'Avant-Garde Editorial',
-    date: 'January 2025 · Galeri Petronas',
-    category: 'Editorial',
-    layout: '',
-    coverGradient: 'linear-gradient(135deg,#0f0a1a,#1a0f2a)',
-    teasers: [
-      { src: 'images/editorial-vogue/01.jpg', fallback: E1, g: 'linear-gradient(135deg,#0f0a1a,#1a0f2a)' },
-      { src: 'images/editorial-vogue/02.jpg', fallback: E2, g: 'linear-gradient(135deg,#1a0a10,#280f18)' },
-      { src: 'images/editorial-vogue/03.jpg', fallback: P3, g: 'linear-gradient(135deg,#0a0f1a,#0a1528)' },
-      { src: 'images/editorial-vogue/04.jpg', fallback: E1, g: 'linear-gradient(135deg,#1a1a0a,#282810)' },
-    ],
-  },
-  {
-    id: 'haziq-hana',
-    title: 'Haziq & Hana · Nikah',
-    date: '5 April 2025 · Masjid Wilayah, KL',
-    category: 'Wedding',
-    layout: '',
-    coverGradient: 'linear-gradient(135deg,#1a1208,#120e06)',
-    teasers: [
-      { src: 'images/haziq-hana/01.jpg', fallback: W3, g: 'linear-gradient(135deg,#1a1208,#120e06)' },
-      { src: 'images/haziq-hana/02.jpg', fallback: W4, g: 'linear-gradient(135deg,#1a1210,#201412)' },
-      { src: 'images/haziq-hana/03.jpg', fallback: W1, g: 'linear-gradient(135deg,#1a0a0a,#281010)' },
-      { src: 'images/haziq-hana/04.jpg', fallback: W2, g: 'linear-gradient(135deg,#0a1a14,#0e2818)' },
-    ],
-  },
-  {
-    id: 'portrait-khairul',
-    title: 'Khairul · Executive Portrait',
-    date: 'February 2025 · KLCC Gardens',
-    category: 'Portrait',
-    layout: '',
-    coverGradient: 'linear-gradient(135deg,#0a151a,#0a1a15)',
-    teasers: [
-      { src: 'images/portrait-khairul/01.jpg', fallback: P2, g: 'linear-gradient(135deg,#0a151a,#0a1a15)' },
-      { src: 'images/portrait-khairul/02.jpg', fallback: P1, g: 'linear-gradient(135deg,#0a0f18,#0f1820)' },
-      { src: 'images/portrait-khairul/03.jpg', fallback: P3, g: 'linear-gradient(135deg,#101a0a,#162410)' },
-    ],
-  },
-  {
-    id: 'editorial-urban',
-    title: 'Urban Stories · KL',
-    date: 'October 2024 · Chow Kit, Kuala Lumpur',
-    category: 'Editorial',
-    layout: 'span2',
-    coverGradient: 'linear-gradient(135deg,#1a0a0f,#2a0f1a)',
-    teasers: [
-      { src: 'images/editorial-urban/01.jpg', fallback: E2, g: 'linear-gradient(135deg,#1a0a0f,#2a0f1a)' },
-      { src: 'images/editorial-urban/02.jpg', fallback: E1, g: 'linear-gradient(135deg,#1a100a,#2a1810)' },
-      { src: 'images/editorial-urban/03.jpg', fallback: P3, g: 'linear-gradient(135deg,#0f0f1a,#18182a)' },
-    ],
-  },
-  {
-    id: 'izzatul-azim',
-    title: 'Izzatul & Azim · Sanding',
-    date: '22 November 2024 · Nilai Springs',
-    category: 'Wedding',
-    layout: '',
-    coverGradient: 'linear-gradient(135deg,#121a08,#1a2408)',
-    teasers: [
-      { src: 'images/izzatul-azim/01.jpg', fallback: W4, g: 'linear-gradient(135deg,#121a08,#1a2408)' },
-      { src: 'images/izzatul-azim/02.jpg', fallback: W2, g: 'linear-gradient(135deg,#1a1808,#28200a)' },
-      { src: 'images/izzatul-azim/03.jpg', fallback: W3, g: 'linear-gradient(135deg,#0a1810,#0e2418)' },
-    ],
-  },
-  {
-    id: 'portrait-liyana',
-    title: 'Liyana · Natural Light',
-    date: 'April 2025 · Bukit Nanas Forest',
-    category: 'Portrait',
-    layout: '',
-    coverGradient: 'linear-gradient(135deg,#0f1a1a,#0a1515)',
-    teasers: [
-      { src: 'images/portrait-liyana/01.jpg', fallback: P3, g: 'linear-gradient(135deg,#0f1a1a,#0a1515)' },
-      { src: 'images/portrait-liyana/02.jpg', fallback: P1, g: 'linear-gradient(135deg,#0a1a12,#0e2018)' },
-      { src: 'images/portrait-liyana/03.jpg', fallback: P2, g: 'linear-gradient(135deg,#1a1a0a,#24240e)' },
-    ],
-  },
-];
 
 
 

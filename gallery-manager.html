@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Gallery Manager — Nizar Naseer Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0b;--card:#111114;--border:rgba(255,255,255,0.08);--gold:#c9a96e;--gold2:#e8c98a;--text:#e8e6e0;--muted:#7a7870}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+header{padding:24px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;background:rgba(0,0,0,0.4);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+header h1{font-size:1.1rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+header span{color:var(--muted);font-size:0.8rem}
+.container{max-width:1100px;margin:0 auto;padding:32px 24px}
+.toolbar{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.toolbar-left{display:flex;gap:10px;flex-wrap:wrap}
+.btn{padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-size:0.85rem;font-weight:600;letter-spacing:0.5px;transition:all .2s}
+.btn-gold{background:var(--gold);color:#000}
+.btn-gold:hover{background:var(--gold2)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.btn-danger{background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2)}
+.btn-danger:hover{background:rgba(239,68,68,0.25)}
+.btn-sm{padding:6px 12px;font-size:0.78rem}
+
+/* Setup Banner */
+.setup-banner{background:rgba(201,169,110,0.08);border:1px solid rgba(201,169,110,0.25);border-radius:12px;padding:18px 22px;margin-bottom:28px;display:flex;align-items:flex-start;gap:14px}
+.setup-banner svg{flex-shrink:0;color:var(--gold);margin-top:2px}
+.setup-banner h3{font-size:0.9rem;color:var(--gold);margin-bottom:6px}
+.setup-banner p{font-size:0.8rem;color:var(--muted);line-height:1.6}
+.setup-banner a{color:var(--gold);text-decoration:none}
+.setup-input-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.setup-input{flex:1;min-width:200px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:0.83rem;outline:none}
+.setup-input:focus{border-color:var(--gold)}
+
+/* Album grid */
+.albums-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.album-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s}
+.album-card:hover{border-color:rgba(201,169,110,0.3)}
+.album-cover{height:160px;background:linear-gradient(135deg,#1a1208,#2a1e0a);background-size:cover;background-position:center;position:relative}
+.album-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent);display:flex;align-items:flex-end;padding:12px}
+.album-cover-badge{font-size:0.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);background:rgba(0,0,0,0.5);padding:3px 8px;border-radius:4px;backdrop-filter:blur(4px)}
+.album-body{padding:14px 16px}
+.album-title{font-size:0.95rem;font-weight:600;margin-bottom:4px}
+.album-meta{font-size:0.75rem;color:var(--muted);margin-bottom:10px}
+.album-photos{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.photo-thumb{width:40px;height:40px;border-radius:5px;background:rgba(255,255,255,0.06);background-size:cover;background-position:center;border:1px solid var(--border)}
+.photo-thumb.add-btn{display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:1.2rem;transition:all .2s}
+.photo-thumb.add-btn:hover{border-color:var(--gold);color:var(--gold)}
+.album-actions{display:flex;gap:8px}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.modal-overlay.open{display:flex}
+.modal{background:#13131a;border:1px solid var(--border);border-radius:18px;width:90%;max-width:580px;max-height:90vh;overflow-y:auto;padding:28px}
+.modal h2{font-size:1.1rem;font-weight:600;color:var(--gold);margin-bottom:22px;letter-spacing:1px}
+.form-row{margin-bottom:16px}
+.form-row label{display:block;font-size:0.78rem;color:var(--muted);margin-bottom:6px;letter-spacing:0.5px;text-transform:uppercase}
+.form-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:0.88rem;outline:none;font-family:inherit}
+.form-input:focus{border-color:var(--gold)}
+select.form-input option{background:#13131a}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Upload Zone */
+.upload-zone{border:2px dashed var(--border);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-top:6px;position:relative}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--gold);background:rgba(201,169,110,0.05)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-zone p{color:var(--muted);font-size:0.85rem}
+.upload-zone span{color:var(--gold);font-weight:600}
+.upload-progress{margin-top:14px;display:none}
+.progress-item{display:flex;align-items:center;gap:10px;padding:8px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:6px;font-size:0.8rem}
+.progress-bar-wrap{flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden}
+.progress-bar{height:100%;background:var(--gold);border-radius:2px;transition:width .3s;width:0%}
+.progress-status{font-size:0.7rem;color:var(--muted);min-width:50px;text-align:right}
+
+/* Uploaded photos preview */
+.photos-list{margin-top:14px}
+.photo-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:6px}
+.photo-row img{width:40px;height:40px;object-fit:cover;border-radius:6px;background:rgba(255,255,255,0.05)}
+.photo-url{flex:1;font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.photo-del{background:none;border:none;color:#f87171;cursor:pointer;font-size:1rem;padding:4px}
+
+/* URL paste */
+.url-input-row{display:flex;gap:8px;margin-top:10px}
+.url-input-row .form-input{flex:1}
+
+/* Push reminder */
+.push-reminder{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);border-radius:10px;padding:14px 16px;margin-top:20px;font-size:0.82rem;color:#86efac}
+.push-reminder code{background:rgba(0,0,0,0.4);padding:2px 6px;border-radius:4px;font-size:0.78rem;display:block;margin-top:8px;line-height:1.8;color:#d4d4d4}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>📸 Gallery Manager</h1>
+    <span>Nizar Naseer Studio · Admin</span>
+  </div>
+  <a href="index.html" style="margin-left:auto;color:var(--muted);font-size:0.82rem;text-decoration:none">← Back to site</a>
+</header>
+
+<div class="container">
+
+  <!-- Cloudinary Setup -->
+  <div class="setup-banner" id="setupBanner">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div style="flex:1">
+      <h3>☁️ Cloudinary Setup (one-time, free)</h3>
+      <p>Photos are stored on <strong>Cloudinary's free CDN</strong> — not Vercel. Zero storage cost on your hosting.<br>
+      1. Sign up free at <a href="https://cloudinary.com" target="_blank">cloudinary.com</a> → get your <strong>Cloud Name</strong><br>
+      2. Go to Settings → Upload → Add upload preset → set to <strong>Unsigned</strong> → copy preset name<br>
+      3. Enter both below and click Save — then you can upload photos directly here.</p>
+      <div class="setup-input-row">
+        <input class="setup-input" id="cloudName" placeholder="Cloud Name (e.g. dxyz123)"/>
+        <input class="setup-input" id="uploadPreset" placeholder="Upload Preset (e.g. nizar_gallery)"/>
+        <button class="btn btn-gold btn-sm" onclick="saveCloudinary()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <button class="btn btn-gold" onclick="openAddModal()">+ New Album</button>
+      <button class="btn btn-outline" onclick="downloadGalleryJson()">⬇ Download gallery.json</button>
+    </div>
+    <span style="font-size:0.78rem;color:var(--muted)" id="albumCount"></span>
+  </div>
+
+  <div class="albums-grid" id="albumsGrid"></div>
+
+  <div class="push-reminder" id="pushReminder" style="display:none">
+    ✅ gallery.json downloaded! Push it live:
+    <code>cd /Users/nizarnaseer/Documents/photography-portfolio<br>git add gallery.json<br>git commit -m "update gallery"<br>git push</code>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2 id="modalTitle">New Album</h2>
+    <input type="hidden" id="editingId"/>
+
+    <div class="form-row-2">
+      <div class="form-row">
+        <label>Album Title</label>
+        <input class="form-input" id="fTitle" placeholder="e.g. Zarif Weds Anis"/>
+      </div>
+      <div class="form-row">
+        <label>Category</label>
+        <select class="form-input" id="fCategory">
+          <option>Wedding</option>
+          <option>Tunang</option>
+          <option>Portrait</option>
+          <option>Editorial</option>
+          <option>Studio Raya</option>
+          <option>Event</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row-2">
+      <div class="form-row">
+        <label>Date & Venue</label>
+        <input class="form-input" id="fDate" placeholder="14 Dec 2024 · Dewan Sri Penang"/>
+      </div>
+      <div class="form-row">
+        <label>Layout</label>
+        <select class="form-input" id="fLayout">
+          <option value="">Normal</option>
+          <option value="span2">Wide (span 2 columns)</option>
+          <option value="tall">Tall</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label>Upload Photos (stored on Cloudinary CDN — free)</label>
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" accept="image/*" multiple id="fileInput" onchange="handleFiles(this.files)"/>
+        <p>🖼️ Drag & drop photos here or <span>click to browse</span></p>
+        <p style="font-size:0.72rem;margin-top:6px;color:var(--muted)">JPEG, PNG, WEBP · Multiple files supported</p>
+      </div>
+      <div class="upload-progress" id="uploadProgress"></div>
+    </div>
+
+    <div class="form-row">
+      <label>Or paste photo URL directly</label>
+      <div class="url-input-row">
+        <input class="form-input" id="urlInput" placeholder="https://res.cloudinary.com/... or any image URL"/>
+        <button class="btn btn-outline btn-sm" onclick="addUrlPhoto()">Add</button>
+      </div>
+    </div>
+
+    <div class="photos-list" id="photosList"></div>
+
+    <div style="display:flex;gap:10px;margin-top:22px">
+      <button class="btn btn-gold" style="flex:1" onclick="saveAlbum()">Save Album</button>
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script>
+const CFG2 = window.STUDIO_CONFIG || {};
+let albums = [];
+let editPhotos = []; // { src, preview }
+
+/* ── Load gallery.json ── */
+fetch('gallery.json?v=' + Date.now())
+  .then(r => r.json())
+  .then(d => { albums = d.albums || []; renderAlbums(); })
+  .catch(() => { albums = []; renderAlbums(); });
+
+/* ── Cloudinary config from localStorage ── */
+function getCloud() {
+  return {
+    name:   localStorage.getItem('cld_name')   || CFG2.cloudinary_cloud_name   || '',
+    preset: localStorage.getItem('cld_preset') || CFG2.cloudinary_upload_preset || '',
+  };
+}
+function saveCloudinary() {
+  const n = document.getElementById('cloudName').value.trim();
+  const p = document.getElementById('uploadPreset').value.trim();
+  if (!n || !p) { alert('Please enter both Cloud Name and Upload Preset'); return; }
+  localStorage.setItem('cld_name', n);
+  localStorage.setItem('cld_preset', p);
+  document.getElementById('setupBanner').style.display = 'none';
+  alert('✅ Cloudinary saved! You can now upload photos.');
+}
+window.addEventListener('load', () => {
+  const c = getCloud();
+  if (c.name && c.preset) document.getElementById('setupBanner').style.display = 'none';
+  else {
+    document.getElementById('cloudName').value   = c.name;
+    document.getElementById('uploadPreset').value = c.preset;
+  }
+});
+
+/* ── Render albums ── */
+function renderAlbums() {
+  const grid = document.getElementById('albumsGrid');
+  document.getElementById('albumCount').textContent = albums.length + ' albums';
+  grid.innerHTML = albums.map((a, i) => {
+    const cover = a.teasers?.[0]?.src || a.teasers?.[0]?.fallback || '';
+    const bg = cover ? `background-image:url('${cover}')` : `background:${a.coverGradient}`;
+    return `
+    <div class="album-card">
+      <div class="album-cover" style="${bg};background-size:cover;background-position:center">
+        <div class="album-cover-overlay">
+          <span class="album-cover-badge">${a.category}</span>
+        </div>
+      </div>
+      <div class="album-body">
+        <div class="album-title">${a.title}</div>
+        <div class="album-meta">${a.date} · ${a.teasers?.length || 0} photos</div>
+        <div class="album-actions">
+          <button class="btn btn-outline btn-sm" onclick="openEditModal(${i})">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteAlbum(${i})">🗑 Delete</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Modal ── */
+function openAddModal() {
+  editPhotos = [];
+  document.getElementById('editingId').value = '';
+  document.getElementById('modalTitle').textContent = 'New Album';
+  document.getElementById('fTitle').value = '';
+  document.getElementById('fDate').value = '';
+  document.getElementById('fCategory').value = 'Wedding';
+  document.getElementById('fLayout').value = '';
+  document.getElementById('photosList').innerHTML = '';
+  document.getElementById('uploadProgress').innerHTML = '';
+  document.getElementById('uploadProgress').style.display = 'none';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function openEditModal(i) {
+  const a = albums[i];
+  editPhotos = (a.teasers || []).map(t => ({ src: t.src || t.fallback, preview: t.src || t.fallback }));
+  document.getElementById('editingId').value = i;
+  document.getElementById('modalTitle').textContent = 'Edit Album';
+  document.getElementById('fTitle').value    = a.title;
+  document.getElementById('fDate').value     = a.date;
+  document.getElementById('fCategory').value = a.category;
+  document.getElementById('fLayout').value   = a.layout || '';
+  renderPhotosList();
+  document.getElementById('uploadProgress').innerHTML = '';
+  document.getElementById('uploadProgress').style.display = 'none';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+/* ── Photo list UI ── */
+function renderPhotosList() {
+  document.getElementById('photosList').innerHTML = editPhotos.map((p, i) => `
+    <div class="photo-row">
+      <img src="${p.preview}" onerror="this.src=''" alt="photo"/>
+      <span class="photo-url">${p.src}</span>
+      <button class="photo-del" onclick="removePhoto(${i})">✕</button>
+    </div>`).join('');
+}
+function removePhoto(i) {
+  editPhotos.splice(i, 1);
+  renderPhotosList();
+}
+function addUrlPhoto() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) return;
+  editPhotos.push({ src: url, preview: url });
+  document.getElementById('urlInput').value = '';
+  renderPhotosList();
+}
+
+/* ── Cloudinary Upload ── */
+async function handleFiles(files) {
+  const c = getCloud();
+  if (!c.name || !c.preset) {
+    alert('⚠️ Please set up Cloudinary first (top of page). Photos will be stored there for free.');
+    return;
+  }
+  const prog = document.getElementById('uploadProgress');
+  prog.style.display = 'block';
+  for (const file of files) {
+    const id = 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    prog.insertAdjacentHTML('beforeend', `
+      <div class="progress-item" id="${id}">
+        <span style="flex:0 0 120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${file.name}</span>
+        <div class="progress-bar-wrap"><div class="progress-bar" id="bar_${id}"></div></div>
+        <span class="progress-status" id="st_${id}">Uploading…</span>
+      </div>`);
+    try {
+      const url = await uploadToCloudinary(file, c.name, c.preset, id);
+      document.getElementById('bar_' + id).style.width = '100%';
+      document.getElementById('st_' + id).textContent  = '✅ Done';
+      editPhotos.push({ src: url, preview: url });
+      renderPhotosList();
+    } catch(e) {
+      document.getElementById('st_' + id).textContent = '❌ Error';
+      console.error(e);
+    }
+  }
+}
+function uploadToCloudinary(file, cloudName, preset, id) {
+  return new Promise((resolve, reject) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', preset);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`);
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) {
+        document.getElementById('bar_' + id).style.width = Math.round(e.loaded/e.total*90) + '%';
+      }
+    };
+    xhr.onload = () => {
+      const r = JSON.parse(xhr.responseText);
+      if (r.secure_url) resolve(r.secure_url);
+      else reject(new Error(r.error?.message || 'Upload failed'));
+    };
+    xhr.onerror = () => reject(new Error('Network error'));
+    xhr.send(fd);
+  });
+}
+
+/* ── Save album ── */
+function slugify(str) {
+  return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+function saveAlbum() {
+  const title    = document.getElementById('fTitle').value.trim();
+  const date     = document.getElementById('fDate').value.trim();
+  const category = document.getElementById('fCategory').value;
+  const layout   = document.getElementById('fLayout').value;
+  if (!title) { alert('Please enter an album title'); return; }
+  if (editPhotos.length === 0) { alert('Please add at least one photo'); return; }
+
+  const teasers = editPhotos.map(p => ({ src: p.src, g: 'linear-gradient(135deg,#1a1208,#2a1e0a)' }));
+  const album = { id: slugify(title), title, date, category, layout, coverGradient: 'linear-gradient(135deg,#1a1208,#2a1e0a)', teasers };
+
+  const idx = document.getElementById('editingId').value;
+  if (idx !== '') albums[parseInt(idx)] = album;
+  else albums.unshift(album);
+
+  renderAlbums();
+  closeModal();
+}
+
+/* ── Delete ── */
+function deleteAlbum(i) {
+  if (!confirm(`Delete "${albums[i].title}"? This only removes it from gallery.json — photos on Cloudinary stay safe.`)) return;
+  albums.splice(i, 1);
+  renderAlbums();
+}
+
+/* ── Download gallery.json ── */
+function downloadGalleryJson() {
+  const json = JSON.stringify({ albums }, null, 2);
+  const a = document.createElement('a');
+  a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
+  a.download = 'gallery.json';
+  a.click();
+  document.getElementById('pushReminder').style.display = 'block';
+}
+
+/* ── Drag & drop ── */
+const zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+</script>
+</body>
+</html>
