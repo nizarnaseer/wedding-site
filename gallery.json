@@ -1,6 +1,20 @@
 {
   "albums": [
     {
+      "id": "test",
+      "title": "test",
+      "date": "test",
+      "category": "Event",
+      "layout": "span2",
+      "coverGradient": "linear-gradient(135deg,#1a1208,#2a1e0a)",
+      "teasers": [
+        {
+          "src": "https://res.cloudinary.com/dh5vjsskl/image/upload/v1778244343/doa8n7ui8pe4zzwkdssp.jpg",
+          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
+        }
+      ]
+    },
+    {
       "id": "zarif-anis",
       "title": "Zarif Weds Anis",
       "date": "14 December 2024 · Dewan Sri Penang",
@@ -8,11 +22,31 @@
       "layout": "span2",
       "coverGradient": "linear-gradient(135deg,#1a1208,#2a1e0a)",
       "teasers": [
-        { "src": "images/zarif-anis/01.jpg", "fallback": "https://images.unsplash.com/photo-1519741497674-611481863552?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#1a1208,#2a1e0a)" },
-        { "src": "images/zarif-anis/02.jpg", "fallback": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#1a1210,#2a1e12)" },
-        { "src": "images/zarif-anis/03.jpg", "fallback": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#120a1a,#1e1228)" },
-        { "src": "images/zarif-anis/04.jpg", "fallback": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#1a0e0a,#2a180e)" },
-        { "src": "images/zarif-anis/05.jpg", "fallback": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#0a1a10,#0e2416)" }
+        {
+          "src": "images/zarif-anis/01.jpg",
+          "fallback": "https://images.unsplash.com/photo-1519741497674-611481863552?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
+        },
+        {
+          "src": "images/zarif-anis/02.jpg",
+          "fallback": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#1a1210,#2a1e12)"
+        },
+        {
+          "src": "images/zarif-anis/03.jpg",
+          "fallback": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#120a1a,#1e1228)"
+        },
+        {
+          "src": "images/zarif-anis/04.jpg",
+          "fallback": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#1a0e0a,#2a180e)"
+        },
+        {
+          "src": "images/zarif-anis/05.jpg",
+          "fallback": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#0a1a10,#0e2416)"
+        }
       ]
     },
     {
@@ -23,9 +57,21 @@
       "layout": "tall",
       "coverGradient": "linear-gradient(135deg,#0a0f1a,#0f1a2a)",
       "teasers": [
-        { "src": "images/portrait-farah/01.jpg", "fallback": "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#0a0f1a,#0f1a2a)" },
-        { "src": "images/portrait-farah/02.jpg", "fallback": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#0a150f,#0f2018)" },
-        { "src": "images/portrait-farah/03.jpg", "fallback": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#0a0a1a,#10102a)" }
+        {
+          "src": "images/portrait-farah/01.jpg",
+          "fallback": "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#0a0f1a,#0f1a2a)"
+        },
+        {
+          "src": "images/portrait-farah/02.jpg",
+          "fallback": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#0a150f,#0f2018)"
+        },
+        {
+          "src": "images/portrait-farah/03.jpg",
+          "fallback": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#0a0a1a,#10102a)"
+        }
       ]
     },
     {
@@ -36,10 +82,26 @@
       "layout": "",
       "coverGradient": "linear-gradient(135deg,#1a1208,#120e06)",
       "teasers": [
-        { "src": "images/haziq-hana/01.jpg", "fallback": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#1a1208,#120e06)" },
-        { "src": "images/haziq-hana/02.jpg", "fallback": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#1a1210,#201412)" },
-        { "src": "images/haziq-hana/03.jpg", "fallback": "https://images.unsplash.com/photo-1519741497674-611481863552?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#1a0a0a,#281010)" },
-        { "src": "images/haziq-hana/04.jpg", "fallback": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#0a1a14,#0e2818)" }
+        {
+          "src": "images/haziq-hana/01.jpg",
+          "fallback": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#1a1208,#120e06)"
+        },
+        {
+          "src": "images/haziq-hana/02.jpg",
+          "fallback": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#1a1210,#201412)"
+        },
+        {
+          "src": "images/haziq-hana/03.jpg",
+          "fallback": "https://images.unsplash.com/photo-1519741497674-611481863552?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#1a0a0a,#281010)"
+        },
+        {
+          "src": "images/haziq-hana/04.jpg",
+          "fallback": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#0a1a14,#0e2818)"
+        }
       ]
     },
     {
@@ -50,9 +112,21 @@
       "layout": "",
       "coverGradient": "linear-gradient(135deg,#121a08,#1a2408)",
       "teasers": [
-        { "src": "images/izzatul-azim/01.jpg", "fallback": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#121a08,#1a2408)" },
-        { "src": "images/izzatul-azim/02.jpg", "fallback": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#1a1808,#28200a)" },
-        { "src": "images/izzatul-azim/03.jpg", "fallback": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&auto=format&fit=crop", "g": "linear-gradient(135deg,#0a1810,#0e2418)" }
+        {
+          "src": "images/izzatul-azim/01.jpg",
+          "fallback": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#121a08,#1a2408)"
+        },
+        {
+          "src": "images/izzatul-azim/02.jpg",
+          "fallback": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#1a1808,#28200a)"
+        },
+        {
+          "src": "images/izzatul-azim/03.jpg",
+          "fallback": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#0a1810,#0e2418)"
+        }
       ]
     }
   ]
