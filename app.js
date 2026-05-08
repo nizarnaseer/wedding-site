@@ -993,6 +993,13 @@ function submitBooking(e) {
     });
     const approveLink = `${approveBase}?${approveParams.toString()}`;
 
+    // Google Calendar quick-add link (photographer clicks to add event)
+    const gcalDate = selectedDates[0].replace(/-/g, ''); // YYYYMMDD
+    const gcalTitle = encodeURIComponent(`[${ref}] ${name} — ${activePackage.name}`);
+    const gcalDetail = encodeURIComponent(`Ref: ${ref}\nClient: ${name}\nPhone: ${phone}\nPackage: ${activePackage.name}\nNotes: ${notes || 'None'}\nApprove: ${approveLink}`);
+    const gcalLoc = encodeURIComponent(location || '');
+    const gcalLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${gcalTitle}&dates=${gcalDate}/${gcalDate}&details=${gcalDetail}&location=${gcalLoc}`;
+
     const waMsg =
       `🔔 *New Booking Enquiry*\n` +
       `━━━━━━━━━━━━━━\n` +
@@ -1047,6 +1054,7 @@ function submitBooking(e) {
           '📝 Notes':          notes || 'None',
           // ── ACTION ──
           '✅ APPROVE LINK':  approveLink,
+          '📅 ADD TO CALENDAR': gcalLink,
           message:         `ENQUIRY ${ref} | ${name} | ${displayPhone}\n${activePackage.name} | RM ${totalAmt.toLocaleString()}\nDate: ${datesBlock}\nApprove: ${approveLink}`,
         }),
       }).catch(() => {});

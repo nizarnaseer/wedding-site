@@ -99,7 +99,7 @@
   <h2 class="section-title">Studio Concepts</h2>
   <div class="concepts-grid" id="conceptsGrid">
 
-    <div class="concept-card" onclick="selectConcept('A','Minimalist White')">
+    <div class="concept-card" data-concept="A" onclick="selectConcept('A','Minimalist White',this)">
       <div class="concept-img-placeholder" style="background:linear-gradient(135deg,#f5f0eb,#e8e0d8);">🤍</div>
       <div class="concept-body">
         <div class="concept-name">Concept A — Minimalist White</div>
@@ -107,7 +107,7 @@
       </div>
     </div>
 
-    <div class="concept-card" onclick="selectConcept('B','Royal Gold')">
+    <div class="concept-card" data-concept="B" onclick="selectConcept('B','Royal Gold',this)">
       <div class="concept-img-placeholder" style="background:linear-gradient(135deg,#2a1f0e,#4a3520);">✨</div>
       <div class="concept-body">
         <div class="concept-name">Concept B — Royal Gold</div>
@@ -115,7 +115,7 @@
       </div>
     </div>
 
-    <div class="concept-card" onclick="selectConcept('C','Tropical Botanica')">
+    <div class="concept-card" data-concept="C" onclick="selectConcept('C','Tropical Botanica',this)">
       <div class="concept-img-placeholder" style="background:linear-gradient(135deg,#0d1f0d,#1a3a1a);">🌿</div>
       <div class="concept-body">
         <div class="concept-name">Concept C — Tropical Botanica</div>
@@ -123,7 +123,7 @@
       </div>
     </div>
 
-    <div class="concept-card" onclick="selectConcept('D','Classic Dark')">
+    <div class="concept-card" data-concept="D" onclick="selectConcept('D','Classic Dark',this)">
       <div class="concept-img-placeholder" style="background:linear-gradient(135deg,#0a0a0a,#1a1a1a);">🖤</div>
       <div class="concept-body">
         <div class="concept-name">Concept D — Classic Dark</div>
@@ -223,49 +223,99 @@
   </div>
 </section>
 
+<script src="config.js"></script>
 <script>
-  const W3F_KEY = '6be870cf-b9ec-42bd-a26f-8d5f09087bf3';
+  const W3F_KEY = (window.STUDIO_CONFIG || {}).web3forms_key || '6be870cf-b9ec-42bd-a26f-8d5f09087bf3';
   const PHOTOGRAPHER_WA = '601118736810';
   let selectedConceptKey = '';
+  let bookedSlots = []; // loaded from API
 
-  // Build DATE dropdown — next 90 days, skip Fridays (Jumaat)
+  const CONCEPTS = [
+    { key: 'A', name: 'Minimalist White' },
+    { key: 'B', name: 'Royal Gold' },
+    { key: 'C', name: 'Tropical Botanica' },
+    { key: 'D', name: 'Classic Dark' },
+  ];
+
+  // Load booked slots from API
+  fetch('/api/get-studio-slots')
+    .then(r => r.json())
+    .then(d => { bookedSlots = d.slots || []; })
+    .catch(() => {});
+
+  // Build DATE dropdown — next 90 days, skip Fridays
   var dateSel = document.getElementById('sDate');
-  var today   = new Date();
-  today.setHours(0,0,0,0);
+  var today   = new Date(); today.setHours(0,0,0,0);
   for (var di = 1; di <= 90; di++) {
-    var d = new Date(today);
-    d.setDate(today.getDate() + di);
-    if (d.getDay() === 5) continue; // skip Friday
+    var d = new Date(today); d.setDate(today.getDate() + di);
+    if (d.getDay() === 5) continue;
     var opt = document.createElement('option');
     opt.value = d.toISOString().split('T')[0];
     opt.textContent = d.toLocaleDateString('en-MY', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
     dateSel.appendChild(opt);
   }
 
-  // Build TIME dropdown 9 AM – 6 PM, 30-min slots
+  // Build TIME dropdown 9 AM – 5:30 PM, 30-min slots
   var slotSel = document.getElementById('sTime');
+  var timeFmt = function(hh, mm) {
+    var ampm = hh < 12 ? 'AM' : 'PM';
+    var h12  = hh === 0 ? 12 : hh > 12 ? hh - 12 : hh;
+    return h12 + ':' + String(mm).padStart(2,'0') + ' ' + ampm;
+  };
   for (var h = 9; h < 18; h++) {
     for (var m of [0, 30]) {
-      var hEnd = m === 30 ? h + 1 : h;
-      var mEnd = m === 30 ? 0   : 30;
-      var fmt  = function(hh, mm) {
-        var ampm = hh < 12 ? 'AM' : 'PM';
-        var h12  = hh === 0 ? 12 : hh > 12 ? hh - 12 : hh;
-        return h12 + ':' + String(mm).padStart(2,'0') + ' ' + ampm;
-      };
-      var label = fmt(h,m) + ' – ' + fmt(hEnd,mEnd);
-      var slotOpt = document.createElement('option');
-      slotOpt.value = label;
-      slotOpt.textContent = label;
-      slotSel.appendChild(slotOpt);
+      var hEnd = m === 30 ? h + 1 : h, mEnd = m === 30 ? 0 : 30;
+      var label = timeFmt(h,m) + ' – ' + timeFmt(hEnd,mEnd);
+      var so = document.createElement('option'); so.value = label; so.textContent = label;
+      slotSel.appendChild(so);
     }
   }
 
+  // When date or time changes — update concept availability
+  document.getElementById('sDate').addEventListener('change', updateConceptAvailability);
+  document.getElementById('sTime').addEventListener('change', updateConceptAvailability);
 
-  function selectConcept(key, name) {
+  function updateConceptAvailability() {
+    var date = document.getElementById('sDate').value;
+    var time = document.getElementById('sTime').value;
+    if (!date || !time) return;
+
+    var conceptSel = document.getElementById('sConcept');
+    // Reset all options
+    Array.from(conceptSel.options).forEach(function(opt) {
+      if (!opt.value) return;
+      var key  = opt.value.charAt(0);
+      var slotKey = date + '|' + time + '|' + opt.value;
+      var taken   = bookedSlots.some(function(s) { return s.key === slotKey; });
+      opt.disabled = taken;
+      opt.textContent = taken
+        ? 'Concept ' + key + ' — ' + CONCEPTS.find(c => c.key === key)?.name + ' ✗ Fully Booked'
+        : 'Concept ' + key + ' — ' + CONCEPTS.find(c => c.key === key)?.name;
+    });
+
+    // Also update the cards
+    CONCEPTS.forEach(function(c) {
+      var slotKey = date + '|' + time + '|' + c.key + ' - ' + c.name;
+      var taken   = bookedSlots.some(function(s) { return s.key === slotKey; });
+      var card    = document.querySelector('[data-concept="' + c.key + '"]');
+      if (!card) return;
+      if (taken) {
+        card.classList.add('booked'); card.style.opacity = '0.4'; card.style.pointerEvents = 'none';
+        card.setAttribute('title', 'This concept is fully booked for the selected time');
+      } else {
+        card.classList.remove('booked'); card.style.opacity = ''; card.style.pointerEvents = '';
+        card.removeAttribute('title');
+      }
+    });
+  }
+
+  function selectConcept(key, name, el) {
+    var date = document.getElementById('sDate').value;
+    var time = document.getElementById('sTime').value;
+    if (!date || !time) { alert('Please select a date and time slot first.'); return; }
     selectedConceptKey = key + ' - ' + name;
     document.querySelectorAll('.concept-card').forEach(c => c.classList.remove('selected'));
-    event.currentTarget.classList.add('selected');
+    el.classList.add('selected');
     document.getElementById('conceptDisplay').style.display = 'block';
     document.getElementById('conceptDisplay').textContent = '📸 Selected: Concept ' + key + ' — ' + name;
     document.getElementById('sConcept').value = selectedConceptKey;
@@ -273,71 +323,93 @@
 
   function genRef() { return 'STD-' + Date.now().toString().slice(-6); }
 
-  function submitStudio() {
+  async function submitStudio() {
     const first   = document.getElementById('sFirst').value.trim();
     const last    = document.getElementById('sLast').value.trim();
-    const phone   = document.getElementById('sPhone').value.trim();
+    const phoneRaw = document.getElementById('sPhone').value.trim();
     const email   = document.getElementById('sEmail').value.trim();
     const date    = document.getElementById('sDate').value;
     const time    = document.getElementById('sTime').value;
     const concept = document.getElementById('sConcept').value;
     const pax     = document.getElementById('sPax').value;
     const notes   = document.getElementById('sNotes').value.trim() || 'None';
+    // Normalize phone
+    const phoneClean = phoneRaw.replace(/[\s\-\+\(\)]/g,'');
+    const phone = phoneClean.startsWith('60') ? '0' + phoneClean.slice(2)
+                : phoneClean.startsWith('0')  ? phoneClean
+                : '0' + phoneClean;
 
     if (!first || !last || !phone || !email || !date || !time || !concept || !pax) {
-      alert('Please fill in all required fields.');
-      return;
+      alert('Please fill in all required fields including concept.'); return;
     }
 
     const name  = first + ' ' + last;
     const ref   = genRef();
     const dateF = new Date(date + 'T00:00:00').toLocaleDateString('en-MY', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-    const cleanPhone = phone.replace(/[\s\-\+\(\)]/g,'');
-    const clientWA   = cleanPhone.startsWith('60') ? cleanPhone : '60' + cleanPhone.replace(/^0/,'');
+    const clientWA = '60' + phone.replace(/^0/,'');
 
-    // WhatsApp to photographer
+    // 1. Check & book slot via API
+    const btn = document.querySelector('.btn-book');
+    btn.textContent = '⏳ Checking availability…';
+    btn.disabled = true;
+    try {
+      const bookRes = await fetch('/api/book-studio-slot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date, time, concept, ref, name }),
+      });
+      const bookJ = await bookRes.json();
+      if (!bookJ.ok) {
+        btn.textContent = 'Reserve My Session — RM 50 Deposit';
+        btn.disabled = false;
+        alert('⚠️ Sorry! This concept (' + concept + ') at ' + time + ' on ' + dateF + ' was just booked by another client.\n\nPlease choose a different concept or time slot.');
+        updateConceptAvailability(); // refresh availability
+        return;
+      }
+      // Update local cache
+      bookedSlots.push({ key: date+'|'+time+'|'+concept, date, time, concept, ref, name });
+    } catch(e) {
+      // API unavailable — proceed anyway (graceful fallback)
+      console.warn('Slot check unavailable:', e.message);
+    }
+
+    // 2. WhatsApp to photographer
+    const gcalDate = date.replace(/-/g, '');
+    const gcalTitle = encodeURIComponent('[STD-' + ref + '] ' + name + ' — ' + concept);
+    const gcalLink  = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + gcalTitle + '&dates=' + gcalDate + '/' + gcalDate + '&details=' + encodeURIComponent('Studio Session\nRef: ' + ref + '\nClient: ' + name + '\nPhone: ' + phone + '\nConcept: ' + concept + '\nPax: ' + pax);
+
     const ownerMsg =
-      '📸 *New Studio Session Booking*\n' +
-      '━━━━━━━━━━━━━━\n' +
-      'Ref: *' + ref + '*\n\n' +
-      '👤 Client: *' + name + '*\n' +
-      '📱 Phone: ' + phone + '\n' +
-      '📧 Email: ' + email + '\n\n' +
-      '🗓 Date: *' + dateF + '*\n' +
-      '⏱ Time: *' + time + '*\n' +
-      '🎨 Concept: *' + concept + '*\n' +
-      '👥 Pax: ' + pax + '\n' +
-      '📝 Notes: ' + notes + '\n\n' +
-      '━━━━━━━━━━━━━━\n' +
-      '💳 Send client RM 50 deposit link to confirm slot.';
+      '📸 *New Studio Session*\n━━━━━━━━━━━━━━\nRef: *' + ref + '*\n\n' +
+      '👤 Client: *' + name + '*\n📱 Phone: ' + phone + '\n📧 Email: ' + email + '\n\n' +
+      '🗓 Date: *' + dateF + '*\n⏱ Time: *' + time + '*\n🎨 Concept: *' + concept + '*\n👥 Pax: ' + pax + '\n📝 Notes: ' + notes + '\n\n' +
+      '━━━━━━━━━━━━━━\n💳 Send client RM 50 deposit link\n📅 Add to Calendar: ' + gcalLink;
 
     window.open('https://wa.me/' + PHOTOGRAPHER_WA + '?text=' + encodeURIComponent(ownerMsg), '_blank');
 
-    // Email via Web3Forms
-    const w3fKey = localStorage.getItem('web3forms_key') || W3F_KEY;
+    // 3. Email via Web3Forms
     fetch('https://api.web3forms.com/submit', {
-      method:  'POST',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
-        access_key:      w3fKey,
-        from_name:       'Nizar Naseer Studio',
-        subject:         '📸 New Studio Session — ' + ref + ' — ' + dateF,
+        access_key:    W3F_KEY,
+        from_name:     'Nizar Naseer Studio',
+        subject:       '📸 [STUDIO] ' + ref + ' — ' + concept + ' — ' + dateF,
         name, email, replyto: email,
-        'Ref':           ref,
-        'Client Name':   name,
-        'Client Phone':  phone,
-        'Client Email':  email,
-        'Session Date':  dateF,
-        'Time Slot':     time,
-        'Concept':       concept,
-        'Pax':           pax,
-        'Notes':         notes,
-        'Action':        'Send client RM 50 deposit payment link to confirm slot.',
-        message:         'New studio session booking.\nRef: ' + ref + '\nClient: ' + name + ' | ' + phone + '\nDate: ' + dateF + '\nTime: ' + time + '\nConcept: ' + concept,
+        '📋 Ref':      ref,
+        '👤 Client':   name,
+        '📱 Phone':    phone + ' — wa.me/' + clientWA,
+        '📅 Date':     dateF,
+        '⏱ Time':      time,
+        '🎨 Concept':  concept,
+        '👥 Pax':      pax,
+        '📝 Notes':    notes,
+        '⚠️ Action':    'Send client RM 50 deposit payment link to confirm slot.',
+        '📅 Add to Calendar': gcalLink,
+        message: 'New studio session.\nRef: ' + ref + '\nClient: ' + name + ' | ' + phone + '\nDate: ' + dateF + ' | ' + time + '\nConcept: ' + concept,
       }),
     }).catch(() => {});
 
-    // Show success
+    // 4. Show success
     document.getElementById('bookingForm').style.display = 'none';
     document.getElementById('successMsg').style.display  = 'block';
     document.getElementById('successText').textContent   =

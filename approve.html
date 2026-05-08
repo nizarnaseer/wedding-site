@@ -411,9 +411,9 @@
       : '';
     var msg =
       '📷 *Shooting Assignment — Nizar Naseer Studio*\n━━━━━━━━━━━━━━\nRef: *' + ref + '*\n\n' +
-      '👤 *CLIENT*\nName: ' + clientName + '\nPhone: ' + phone + '\nEmail: ' + email + '\n\n' +
-      '📦 *JOB*\nPackage: *' + pkg + '*\nDate: *' + date + '*\nPrice: ' + price +
-      mapsLink + '\n\n📝 Notes:\n' + notes + '\n\n━━━━━━━━━━━━━━\nPlease confirm availability. Thank you! 🙏';
+      '👤 *CLIENT INFO*\nName: ' + clientName + '\nPhone: ' + phone + '\nEmail: ' + email + '\n\n' +
+      '📅 *JOB DETAILS*\nPackage: *' + pkg + '*\nDate: *' + date + '*' +
+      mapsLink + '\n\n📝 Notes:\n' + notes + '\n\n━━━━━━━━━━━━━━\nPlease confirm your availability. Thank you! 🙏';
     window.open('https://wa.me/' + shooterNum + '?text=' + encodeURIComponent(msg), '_blank');
     document.getElementById('shooterSent').classList.add('show');
     setTimeout(function(){ document.getElementById('shooterSent').classList.remove('show'); }, 4000);
@@ -437,19 +437,19 @@
         body: JSON.stringify({
           access_key: w3fKey,
           from_name:  'Nizar Naseer Studio',
-          subject:    '[Assignment] ' + pkg + ' — ' + date + ' (' + ref + ')',
-          email:      sEmail,
-          replyto:    sEmail,
-          // Client details only — no price
-          '📋 Ref':         ref,
-          '👤 Client':      clientName,
-          '📱 Phone':       phone + (phone ? ' — wa.me/60' + phone.replace(/^0/,'') : ''),
-          '📧 Email':       email,
-          '📅 Date':        date,
-          '📍 Location':    clientLocation,
+          subject:    '[Shooting Assignment] ' + pkg + ' — ' + date + ' (' + ref + ')',
+          email:      sEmail,       // routes to shooter — Web3Forms required field
+          replyto:    (window.STUDIO_CONFIG || {}).photographer_email || sEmail,
+          // Content — no price, no duplicate email row
+          '📋 Ref':      ref,
+          '👤 Client':   clientName,
+          '📱 Phone':    phone + (phone && phone !== '—' ? ' — wa.me/60' + phone.replace(/^0/,'') : ''),
+          '📅 Date':     date,
+          '📦 Package':  pkg,
+          '📍 Location': clientLocation,
           ...(mapsUrl ? { '🗺️ Maps': mapsUrl } : {}),
-          '📝 Notes':       notes,
-          message: 'You have been assigned a shooting job by Nizar Naseer Studio.\n\nClient: ' + clientName + '\nPhone: ' + phone + '\nDate: ' + date + '\nLocation: ' + clientLocation + '\nNotes: ' + notes + '\n\nPlease reply to confirm.',
+          '📝 Notes':    notes,
+          message: 'You have been assigned a shooting job by Nizar Naseer Studio.\n\nRef: ' + ref + '\nClient: ' + clientName + '\nPhone: ' + phone + '\nPackage: ' + pkg + '\nDate: ' + date + '\nLocation: ' + clientLocation + '\nNotes: ' + notes + '\n\nPlease reply to confirm your availability.',
         }),
       });
       var j = await res.json();
