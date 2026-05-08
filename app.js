@@ -354,7 +354,16 @@ document.addEventListener('keydown', e => {
    Reads busy dates from photographer's public Google Calendar.
    Setup: set google_api_key + google_calendar_id in config.js
 ══════════════════════════════════════ */
+function showConnectedBanner(msg) {
+  const banner = document.getElementById('gcalConnectedBanner');
+  if (!banner) return;
+  banner.style.display = 'flex';
+  const span = banner.querySelector('span:nth-child(2)');
+  if (span) span.textContent = msg;
+}
+
 async function loadCalendarBusy() {
+
   if (!GCAL_API_KEY || GCAL_API_KEY.startsWith('YOUR') ||
       !GCAL_ID      || GCAL_ID.startsWith('YOUR')) {
     // Config not set — show all dates as available (no fake busy)
