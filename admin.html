@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Dashboard — Nizar Naseer Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:     #0a0a0a;
+      --card:   #111111;
+      --border: rgba(255,255,255,0.07);
+      --gold:   #c9a96e;
+      --text:   #e8e0d4;
+      --muted:  #7a7068;
+      --green:  #22c55e;
+      --red:    #ef4444;
+      --amber:  #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-weight: 300; min-height: 100vh; }
+
+    /* ── HEADER ── */
+    header { border-bottom: 1px solid var(--border); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); }
+    .logo span { font-weight: 300; color: var(--text); }
+    .header-right { display: flex; align-items: center; gap: 14px; }
+    .btn-sm { padding: 7px 16px; border-radius: 6px; font-size: 0.78rem; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--muted); transition: all 0.2s; }
+    .btn-sm:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-refresh { border-color: rgba(201,169,110,0.3); color: var(--gold); }
+
+    /* ── SETUP PANEL ── */
+    #setupPanel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin: 32px auto; max-width: 560px; }
+    #setupPanel h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; margin-bottom: 6px; }
+    #setupPanel p { color: var(--muted); font-size: 0.82rem; margin-bottom: 20px; line-height: 1.6; }
+    #setupPanel input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 11px 14px; color: var(--text); font-size: 0.85rem; font-family: 'Inter', sans-serif; margin-bottom: 12px; outline: none; }
+    #setupPanel input:focus { border-color: rgba(201,169,110,0.5); }
+    #setupPanel label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 5px; letter-spacing: 1px; text-transform: uppercase; }
+    .btn-save { width: 100%; padding: 12px; background: var(--gold); color: #0a0a0a; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 500; cursor: pointer; margin-top: 4px; }
+    .hint { background: rgba(201,169,110,0.06); border: 1px solid rgba(201,169,110,0.15); border-radius: 8px; padding: 12px 14px; font-size: 0.78rem; color: var(--muted); line-height: 1.7; margin-bottom: 16px; }
+    .hint strong { color: var(--gold); }
+
+    /* ── MAIN ── */
+    main { max-width: 900px; margin: 0 auto; padding: 32px 24px 80px; }
+
+    /* ── STATS ── */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 32px; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; text-align: center; }
+    .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; }
+    .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; }
+    .stat-card.pending .stat-num { color: var(--amber); }
+    .stat-card.approved .stat-num { color: var(--green); }
+    .stat-card.declined .stat-num { color: var(--red); }
+
+    /* ── FILTER BAR ── */
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; }
+    .filter-btn { padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 0.78rem; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+    .filter-btn.active, .filter-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,169,110,0.07); }
+
+    /* ── BOOKING CARDS ── */
+    .booking-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px; margin-bottom: 14px; transition: border-color 0.2s; }
+    .booking-card:hover { border-color: rgba(201,169,110,0.2); }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+    .card-ref { font-size: 0.7rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    .card-name { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 300; margin-top: 2px; }
+    .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; }
+    .badge-pending  { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+    .badge-approved { background: rgba(34,197,94,0.12);  color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+    .badge-declined { background: rgba(239,68,68,0.12);  color: var(--red);   border: 1px solid rgba(239,68,68,0.25); }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 18px; }
+    .card-field { }
+    .card-field-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
+    .card-field-value { font-size: 0.85rem; color: var(--text); }
+    .card-actions { display: flex; gap: 8px; }
+    .btn-approve { flex: 1; padding: 10px; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: var(--green); border-radius: 8px; font-size: 0.8rem; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+    .btn-approve:hover { background: rgba(34,197,94,0.2); }
+    .btn-decline { flex: 1; padding: 10px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: var(--red); border-radius: 8px; font-size: 0.8rem; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+    .btn-decline:hover { background: rgba(239,68,68,0.15); }
+    .btn-wa { padding: 10px 14px; background: rgba(37,211,102,0.1); border: 1px solid rgba(37,211,102,0.25); color: #25d366; border-radius: 8px; font-size: 0.8rem; cursor: pointer; font-family: 'Inter', sans-serif; }
+    .btn-wa:hover { background: rgba(37,211,102,0.18); }
+    .submitted-at { font-size: 0.7rem; color: var(--muted); margin-top: 10px; }
+
+    /* ── EMPTY / LOADING ── */
+    .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty svg { opacity: 0.3; margin-bottom: 16px; }
+    .loading { text-align: center; padding: 40px; color: var(--muted); font-size: 0.85rem; }
+    .error-msg { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 14px; color: var(--red); font-size: 0.82rem; margin-bottom: 20px; }
+
+    @media (max-width: 600px) {
+      .stats { grid-template-columns: repeat(2,1fr); }
+      header { padding: 14px 16px; }
+      main { padding: 20px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Nizar Naseer <span>STUDIO</span></div>
+  <div class="header-right">
+    <button class="btn-sm btn-refresh" onclick="loadBookings()">⟳ Refresh</button>
+    <button class="btn-sm" onclick="showSetup()">⚙ Setup</button>
+    <a href="index.html" class="btn-sm" style="text-decoration:none">← Website</a>
+  </div>
+</header>
+
+<main>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;margin-bottom:6px;">Booking Dashboard</h2>
+  <p style="color:var(--muted);font-size:0.82rem;margin-bottom:28px;">All client enquiries and booking requests.</p>
+
+  <!-- Setup Panel -->
+  <div id="setupPanel" style="display:none;">
+    <h3>⚙️ Dashboard Setup</h3>
+    <p>One-time setup. Your credentials are saved in your browser only.</p>
+
+    <div class="hint">
+      <strong>Where to find these:</strong><br>
+      1. <strong>Site ID:</strong> Netlify dashboard → your site → Site settings → General → Site ID<br>
+      2. <strong>Personal Token:</strong> <a href="https://app.netlify.com/user/applications" target="_blank" style="color:var(--gold)">netlify.com/user/applications</a> → Personal access tokens → New token
+    </div>
+
+    <label>Netlify Site ID</label>
+    <input type="text" id="siteIdInput" placeholder="e.g. abcd1234-ab12-cd34-ef56-abcdef123456" />
+
+    <label>Netlify Personal Access Token</label>
+    <input type="password" id="tokenInput" placeholder="Your Netlify personal access token" />
+
+    <button class="btn-save" onclick="saveSetup()">Save & Load Bookings</button>
+  </div>
+
+  <!-- Error -->
+  <div id="errorMsg" class="error-msg" style="display:none;"></div>
+
+  <!-- Stats -->
+  <div class="stats" id="statsGrid" style="display:none;">
+    <div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total</div></div>
+    <div class="stat-card pending"><div class="stat-num" id="statPending">0</div><div class="stat-label">Pending</div></div>
+    <div class="stat-card approved"><div class="stat-num" id="statApproved">0</div><div class="stat-label">Approved</div></div>
+    <div class="stat-card declined"><div class="stat-num" id="statDeclined">0</div><div class="stat-label">Declined</div></div>
+  </div>
+
+  <!-- Filter -->
+  <div class="filter-bar" id="filterBar" style="display:none;">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" data-filter="pending"  onclick="setFilter('pending',this)">⏳ Pending</button>
+    <button class="filter-btn" data-filter="approved" onclick="setFilter('approved',this)">✅ Approved</button>
+    <button class="filter-btn" data-filter="declined" onclick="setFilter('declined',this)">❌ Declined</button>
+  </div>
+
+  <!-- Loading -->
+  <div id="loadingMsg" class="loading" style="display:none;">Loading bookings…</div>
+
+  <!-- Bookings List -->
+  <div id="bookingList"></div>
+
+  <!-- Empty state -->
+  <div id="emptyMsg" class="empty" style="display:none;">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <p style="font-size:0.9rem;">No bookings found</p>
+    <p style="font-size:0.78rem;margin-top:6px;">Bookings appear here after clients submit via the website.</p>
+  </div>
+</main>
+
+<script>
+  let allBookings = [];
+  let currentFilter = 'all';
+
+  // ── Load credentials from localStorage ──
+  const getSiteId = () => localStorage.getItem('netlify_site_id') || '';
+  const getToken  = () => localStorage.getItem('netlify_token')   || '';
+
+  // ── Status tracking (since Netlify doesn't store status) ──
+  const getStatuses = () => JSON.parse(localStorage.getItem('booking_statuses') || '{}');
+  const setStatus   = (ref, status) => {
+    const s = getStatuses(); s[ref] = status;
+    localStorage.setItem('booking_statuses', JSON.stringify(s));
+  };
+
+  window.addEventListener('DOMContentLoaded', () => {
+    if (!getSiteId() || !getToken()) {
+      document.getElementById('setupPanel').style.display = 'block';
+    } else {
+      loadBookings();
+    }
+  });
+
+  function showSetup() {
+    const p = document.getElementById('setupPanel');
+    p.style.display = p.style.display === 'none' ? 'block' : 'none';
+    if (getSiteId()) document.getElementById('siteIdInput').value = getSiteId();
+  }
+
+  function saveSetup() {
+    const id  = document.getElementById('siteIdInput').value.trim();
+    const tok = document.getElementById('tokenInput').value.trim();
+    if (!id || !tok) { alert('Please fill in both fields.'); return; }
+    localStorage.setItem('netlify_site_id', id);
+    localStorage.setItem('netlify_token',   tok);
+    document.getElementById('setupPanel').style.display = 'none';
+    loadBookings();
+  }
+
+  async function loadBookings() {
+    const siteId = getSiteId();
+    const token  = getToken();
+    if (!siteId || !token) { document.getElementById('setupPanel').style.display = 'block'; return; }
+
+    showLoading(true);
+    showError('');
+
+    try {
+      // 1. Get forms for this site
+      const formsRes = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/forms`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!formsRes.ok) throw new Error(`Auth failed (${formsRes.status}) — check your Site ID and Token`);
+      const forms = await formsRes.json();
+
+      const form = forms.find(f => f.name === 'booking-enquiry');
+      if (!form) {
+        showLoading(false);
+        showError('No bookings yet — the "booking-enquiry" form hasn\'t received any submissions. Deploy the latest site and have a client submit a booking first.');
+        return;
+      }
+
+      // 2. Get submissions
+      const subsRes = await fetch(`https://api.netlify.com/api/v1/forms/${form.id}/submissions?per_page=100`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const subs = await subsRes.json();
+
+      // Map to our booking format
+      const statuses = getStatuses();
+      allBookings = subs.map(s => ({
+        ref:       s.data.ref        || s.id.slice(0,8).toUpperCase(),
+        name:      s.data.client_name || '—',
+        phone:     s.data.phone      || '—',
+        email:     s.data.email      || '—',
+        package:   s.data.package    || '—',
+        price:     s.data.price      || '—',
+        date:      s.data.date       || '—',
+        notes:     s.data.notes      || 'None',
+        created:   s.created_at,
+        status:    statuses[s.data.ref] || 'pending',
+      }));
+
+      renderBookings();
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  function renderBookings() {
+    const list     = document.getElementById('bookingList');
+    const statuses = getStatuses();
+
+    // Re-apply statuses
+    allBookings.forEach(b => { b.status = statuses[b.ref] || 'pending'; });
+
+    const filtered = currentFilter === 'all'
+      ? allBookings
+      : allBookings.filter(b => b.status === currentFilter);
+
+    // Stats
+    const pending  = allBookings.filter(b => b.status === 'pending').length;
+    const approved = allBookings.filter(b => b.status === 'approved').length;
+    const declined = allBookings.filter(b => b.status === 'declined').length;
+    document.getElementById('statTotal').textContent    = allBookings.length;
+    document.getElementById('statPending').textContent  = pending;
+    document.getElementById('statApproved').textContent = approved;
+    document.getElementById('statDeclined').textContent = declined;
+    document.getElementById('statsGrid').style.display  = 'grid';
+    document.getElementById('filterBar').style.display  = 'flex';
+
+    if (filtered.length === 0) {
+      list.innerHTML = '';
+      document.getElementById('emptyMsg').style.display = 'block';
+      return;
+    }
+    document.getElementById('emptyMsg').style.display = 'none';
+
+    list.innerHTML = filtered.map(b => {
+      const badgeClass = `badge badge-${b.status}`;
+      const label      = b.status === 'pending' ? '⏳ Pending' : b.status === 'approved' ? '✅ Approved' : '❌ Declined';
+      const created    = b.created ? new Date(b.created).toLocaleString('en-MY', { dateStyle:'medium', timeStyle:'short' }) : '';
+      const waNum      = b.phone.replace(/[\s\-\+\(\)]/g,'');
+
+      const approveUrl = `approve.html?ref=${encodeURIComponent(b.ref)}&name=${encodeURIComponent(b.name)}&email=${encodeURIComponent(b.email)}&phone=${encodeURIComponent(b.phone)}&package=${encodeURIComponent(b.package)}&price=${encodeURIComponent(b.price)}&date=${encodeURIComponent(b.date)}&notes=${encodeURIComponent(b.notes)}`;
+
+      const actionsBtns = b.status === 'pending' ? `
+        <button class="btn-approve" onclick="markApprove('${b.ref}','${approveUrl}')">✅ Approve & Send Payment</button>
+        <button class="btn-decline" onclick="markDecline('${b.ref}','${encodeURIComponent(b.name)}','${encodeURIComponent(b.date)}','${waNum}','${encodeURIComponent(b.email)}')">❌ Decline</button>
+        <button class="btn-wa" onclick="window.open('https://wa.me/${waNum}','_blank')" title="WhatsApp client">💬</button>
+      ` : `
+        <button class="btn-sm" onclick="resetStatus('${b.ref}')" style="padding:10px 14px;font-size:0.78rem;">Reset to Pending</button>
+        <button class="btn-wa" onclick="window.open('https://wa.me/${waNum}','_blank')" title="WhatsApp client">💬</button>
+        <button class="btn-sm" onclick="window.open('${approveUrl}','_blank')" style="padding:10px 14px;font-size:0.78rem;">Open Approve Page</button>
+      `;
+
+      return `
+        <div class="booking-card" id="card-${b.ref}">
+          <div class="card-top">
+            <div>
+              <div class="card-ref">${b.ref}</div>
+              <div class="card-name">${b.name}</div>
+            </div>
+            <span class="${badgeClass}">${label}</span>
+          </div>
+          <div class="card-grid">
+            <div class="card-field"><div class="card-field-label">📅 Date</div><div class="card-field-value">${b.date}</div></div>
+            <div class="card-field"><div class="card-field-label">📦 Package</div><div class="card-field-value">${b.package}</div></div>
+            <div class="card-field"><div class="card-field-label">💰 Price</div><div class="card-field-value">${b.price}</div></div>
+            <div class="card-field"><div class="card-field-label">📱 WhatsApp</div><div class="card-field-value">${b.phone}</div></div>
+            <div class="card-field"><div class="card-field-label">📧 Email</div><div class="card-field-value">${b.email}</div></div>
+            <div class="card-field"><div class="card-field-label">📝 Notes</div><div class="card-field-value">${b.notes}</div></div>
+          </div>
+          <div class="card-actions">${actionsBtns}</div>
+          ${created ? `<div class="submitted-at">Submitted: ${created}</div>` : ''}
+        </div>`;
+    }).join('');
+  }
+
+  function markApprove(ref, approveUrl) {
+    setStatus(ref, 'approved');
+    window.open(approveUrl, '_blank');
+    renderBookings();
+  }
+
+  function markDecline(ref, namEnc, dateEnc, waNum, emailEnc) {
+    const name = decodeURIComponent(namEnc);
+    const date = decodeURIComponent(dateEnc);
+    const email = decodeURIComponent(emailEnc);
+    const msg = `Hi *${name}*, thank you for your interest in Nizar Naseer Studio.\n\nUnfortunately, we are unable to accommodate your booking request for *${date}* at this time.\n\nWe'd love to work with you on another date — feel free to check our availability at our website.\n\nThank you for understanding! 🙏`;
+    if (waNum && waNum !== 'Notprovided') {
+      window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`, '_blank');
+    } else {
+      const subject = encodeURIComponent('Update on Your Booking Enquiry');
+      window.location.href = `mailto:${email}?subject=${subject}&body=${encodeURIComponent(msg.replace(/\*/g,''))}`;
+    }
+    setStatus(ref, 'declined');
+    renderBookings();
+  }
+
+  function resetStatus(ref) {
+    setStatus(ref, 'pending');
+    renderBookings();
+  }
+
+  function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderBookings();
+  }
+
+  function showLoading(show) {
+    document.getElementById('loadingMsg').style.display = show ? 'block' : 'none';
+    document.getElementById('bookingList').innerHTML = show ? '' : document.getElementById('bookingList').innerHTML;
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.style.display = msg ? 'block' : 'none';
+    el.textContent   = msg;
+  }
+</script>
+</body>
+</html>

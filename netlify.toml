@@ -1,0 +1,8 @@
+# netlify.toml — Netlify configuration for photography portfolio
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# Scheduled function: send review requests daily at 8:00 AM UTC
+[functions."send-review-requests"]
+  schedule = "0 8 * * *"

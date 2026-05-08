@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notification Setup — Nizar Naseer Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --gold: #c9a96e; --gold-light: #e8d5a3; --dark: #0a0a0a; --dark2: #111; --dark3: #1a1a1a; --border: rgba(255,255,255,0.08); --text: #e8e4df; --muted: #888; }
+    body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); min-height: 100vh; padding: 40px 20px; }
+    .wrap { max-width: 620px; margin: 0 auto; }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 40px; }
+    .logo span { color: var(--gold); }
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; margin-bottom: 8px; }
+    .sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 36px; line-height: 1.7; }
+
+    /* Method tabs */
+    .method-tabs { display: flex; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; }
+    .tab { flex: 1; min-width: 140px; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; font-size: 0.82rem; text-align: center; transition: all 0.2s; background: var(--dark2); }
+    .tab.active { border-color: var(--gold); background: rgba(201,169,110,0.08); }
+    .tab .tab-icon { font-size: 1.5rem; display: block; margin-bottom: 6px; }
+    .tab .tab-label { font-weight: 500; color: var(--text); }
+    .tab .tab-sub { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+    .tab.recommended::after { content: 'Recommended'; display: block; font-size: 0.6rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-top: 4px; }
+
+    .method-panel { display: none; }
+    .method-panel.active { display: block; }
+
+    /* Step cards */
+    .step-card { background: var(--dark2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+    .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--gold); color: #000; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+    .step-card h3 { font-size: 0.95rem; font-weight: 500; margin-bottom: 8px; }
+    .step-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
+    .step-card a.link-btn { display: block; margin-top: 12px; background: var(--gold); color: #000; text-align: center; padding: 13px 20px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; text-decoration: none; transition: background 0.2s; }
+    .step-card a.link-btn:hover { background: var(--gold-light); }
+    .step-card a.link-btn.green { background: #25D366; }
+    .step-card a.link-btn.green:hover { background: #1ebe5c; }
+    code { background: var(--dark3); border: 1px solid var(--border); padding: 2px 8px; border-radius: 4px; font-size: 0.82rem; color: var(--gold); font-family: monospace; }
+
+    .config-input { width: 100%; background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.88rem; outline: none; margin-top: 10px; transition: border-color 0.2s; }
+    .config-input:focus { border-color: var(--gold); }
+    .save-btn { margin-top: 12px; background: var(--gold); color: #000; border: none; border-radius: 8px; padding: 12px 24px; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; width: 100%; transition: background 0.2s; }
+    .save-btn:hover { background: var(--gold-light); }
+
+    .status { font-size: 0.8rem; margin-top: 10px; text-align: center; padding: 10px; border-radius: 8px; display: none; }
+    .status.ok  { background: rgba(74,222,128,0.1); color: #4ade80; border: 1px solid rgba(74,222,128,0.2); display: block; }
+    .status.err { background: rgba(255,80,80,0.1); color: #ff8080; border: 1px solid rgba(255,80,80,0.2); display: block; }
+    .status.info{ background: rgba(201,169,110,0.08); color: var(--gold); border: 1px solid rgba(201,169,110,0.2); display: block; }
+
+    .current-config { background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.15); border-radius: 8px; padding: 12px 16px; font-size: 0.8rem; color: #4ade80; margin-top: 10px; display: none; }
+
+    .back-link { display: inline-block; color: var(--muted); font-size: 0.8rem; margin-top: 24px; text-decoration: none; }
+    .back-link:hover { color: var(--gold); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">NIZAR NASEER<span> STUDIO</span></div>
+
+  <h1>Notification Setup</h1>
+  <p class="sub">Choose how you want to be notified when a client submits a booking enquiry. Email is the most reliable — WhatsApp is the quickest.</p>
+
+  <!-- Method tabs -->
+  <div class="method-tabs">
+    <div class="tab recommended active" id="tabEmail" onclick="switchTab('email')">
+      <span class="tab-icon">✉️</span>
+      <span class="tab-label">Email Alert</span>
+      <span class="tab-sub">Automatic · Free · Always works</span>
+    </div>
+    <div class="tab" id="tabWA" onclick="switchTab('wa')">
+      <span class="tab-icon">📲</span>
+      <span class="tab-label">WhatsApp</span>
+      <span class="tab-sub">wa.me link · Client taps Send</span>
+    </div>
+  </div>
+
+  <!-- ══ EMAIL PANEL ══ -->
+  <div class="method-panel active" id="panelEmail">
+
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <h3>Get a free Web3Forms API key (30 seconds)</h3>
+      <p>Web3Forms works from local files — no domain needed. Just enter your email below and they'll send you an API key instantly.</p>
+      <a href="https://web3forms.com/#start" target="_blank" class="link-btn">
+        Get Free API Key → web3forms.com
+      </a>
+      <p style="margin-top:10px;font-size:0.75rem;color:var(--muted);">Enter your email on that page → click <strong style="color:var(--text)">Create Access Key</strong> → copy the key they show you.</p>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <h3>Paste your API key here</h3>
+      <div id="emailSavedConfig" class="current-config"></div>
+      <input type="text" class="config-input" id="web3formsKey" placeholder="Paste your Web3Forms Access Key here" />
+      <button class="save-btn" onclick="saveWeb3forms()">💾 Save & Activate Email Notifications</button>
+      <div class="status" id="emailStatus"></div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <h3>Send a test email now</h3>
+      <p>Verify it works — you should receive an email within seconds.</p>
+      <button class="save-btn" style="margin-top:12px;background:var(--dark3);border:1px solid var(--border);color:var(--text);" onclick="testEmail()">🧪 Send Test Email Now</button>
+      <div class="status" id="testEmailStatus"></div>
+    </div>
+
+  </div>
+
+
+  <!-- ══ WHATSAPP PANEL ══ -->
+  <div class="method-panel" id="panelWA">
+
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <h3>How WhatsApp notifications work</h3>
+      <p>When a client submits an enquiry, your website will open a WhatsApp chat with you (<strong style="color:var(--text)">+601118736810</strong>) with all the booking details pre-filled.<br/><br/>
+        The client just needs to tap <strong style="color:var(--text)">Send</strong> — that's it. You'll receive their message on WhatsApp instantly.
+      </p>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <h3>Test it right now</h3>
+      <p>Click below to see exactly what a client's WhatsApp enquiry will look like when it arrives to you:</p>
+      <a href="https://wa.me/601118736810?text=%F0%9F%94%94%20*New%20Booking%20Enquiry*%0A%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%0A%F0%9F%93%8B%20Ref%3A%20*ENQ-TEST*%0A%F0%9F%91%A4%20Client%3A%20*Ahmad%20Test*%0A%F0%9F%93%B1%20WhatsApp%3A%20%2B60123456789%0A%F0%9F%93%A7%20Email%3A%20test%40example.com%0A%F0%9F%93%A6%20Package%3A%20*Nikah%20%2B%20Sanding%20%2F%20Tandang*%20(RM%202%2C500)%0A%F0%9F%93%85%20Date%3A%20Saturday%2C%2014%20June%202026%0A%F0%9F%93%9D%20Notes%3A%20Garden%20theme%2C%20outdoor%20venue%0A%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%E2%94%80%0A%E2%9C%85%20To%20*APPROVE*%2C%20open%20your%20approve%20link." target="_blank" class="link-btn green">
+        📲 Send Test WhatsApp Enquiry to Myself
+      </a>
+      <p style="margin-top:10px;font-size:0.75rem;color:var(--muted);">This opens WhatsApp with a sample enquiry pre-filled. Tap Send to see how it looks.</p>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <h3>No extra setup needed</h3>
+      <p>WhatsApp notifications are enabled by default — no API key or account required. The wa.me link method works on all devices and is 100% reliable.</p>
+      <div class="status ok" style="display:block;margin-top:14px;">✓ WhatsApp notifications are active on your website</div>
+    </div>
+
+  </div>
+
+  <a class="back-link" href="index.html">← Back to Website</a>
+</div>
+
+<script>
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.method-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab' + (tab === 'email' ? 'Email' : 'WA')).classList.add('active');
+    document.getElementById('panel' + (tab === 'email' ? 'Email' : 'WA')).classList.add('active');
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('web3forms_key');
+    if (saved) {
+      const el = document.getElementById('emailSavedConfig');
+      el.textContent = '✓ API key saved and active';
+      el.style.display = 'block';
+      document.getElementById('web3formsKey').value = saved;
+    }
+  });
+
+  function saveWeb3forms() {
+    const key = document.getElementById('web3formsKey').value.trim();
+    if (!key) { alert('Please paste your Web3Forms Access Key first.'); return; }
+    localStorage.setItem('web3forms_key', key);
+    // Also keep formspree_id blank so app.js uses web3forms
+    localStorage.removeItem('formspree_id');
+    const status = document.getElementById('emailStatus');
+    status.className = 'status ok';
+    status.textContent = '✓ Saved! Email notifications are now active.';
+    document.getElementById('emailSavedConfig').textContent = '✓ API key saved and active';
+    document.getElementById('emailSavedConfig').style.display = 'block';
+  }
+
+  async function testEmail() {
+    const key = localStorage.getItem('web3forms_key') || document.getElementById('web3formsKey').value.trim();
+    const status = document.getElementById('testEmailStatus');
+    if (!key) {
+      status.className = 'status err';
+      status.textContent = '✕ Please save your API key first (Step 2).';
+      return;
+    }
+    status.className = 'status info';
+    status.textContent = '⏳ Sending test email…';
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: key,
+          subject:    '🧪 Test — Nizar Naseer Studio Booking System',
+          name:       'Test Client',
+          email:      'test@example.com',
+          message:    '✅ Email notifications are working correctly! This is a test from your setup page.',
+          ref:        'ENQ-TEST',
+          package:    'Nikah + Sanding / Tandang',
+          date:       'Saturday, 14 June 2026',
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        status.className = 'status ok';
+        status.textContent = '✓ Test email sent! Check your inbox now (also check spam).';
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (err) {
+      status.className = 'status err';
+      status.textContent = `✕ Failed: ${err.message || 'Check your API key and try again.'}`;
+    }
+  }
+</script>
+
+</body>
+</html>

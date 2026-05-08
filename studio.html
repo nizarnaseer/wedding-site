@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Raya Haji Studio Session — Nizar Naseer Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--gold:#c9a96e;--gold-l:#e8d5a3;--dark:#0a0a0a;--dark2:#111;--dark3:#1a1a1a;--border:rgba(255,255,255,0.08);--text:#e8e4df;--muted:#888;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Inter',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;background:rgba(10,10,10,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+    .nav-logo{font-family:'Cormorant Garamond',serif;font-size:1rem;letter-spacing:4px;text-transform:uppercase;}
+    .nav-logo span{color:var(--gold);}
+    .nav-back{font-size:0.78rem;color:var(--muted);text-decoration:none;letter-spacing:1px;transition:color .2s;}
+    .nav-back:hover{color:var(--gold);}
+
+    /* HERO */
+    .hero{padding:140px 40px 80px;text-align:center;background:linear-gradient(180deg,rgba(201,169,110,0.06) 0%,transparent 100%);}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,169,110,0.1);border:1px solid rgba(201,169,110,0.3);color:var(--gold);font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;padding:6px 18px;border-radius:20px;margin-bottom:24px;}
+    .hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,6vw,4.5rem);font-weight:300;line-height:1.1;margin-bottom:16px;}
+    .hero h1 em{color:var(--gold);font-style:italic;}
+    .hero p{font-size:1rem;color:var(--muted);max-width:520px;margin:0 auto 32px;line-height:1.7;}
+    .hero-pills{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;}
+    .pill{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:20px;padding:7px 18px;font-size:0.78rem;color:var(--muted);}
+    .pill span{color:var(--gold);margin-right:6px;}
+
+    /* CONCEPTS */
+    section{max-width:1100px;margin:0 auto;padding:60px 24px;}
+    .section-label{font-size:0.68rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+    .section-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;margin-bottom:40px;}
+
+    .concepts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+    .concept-card{background:var(--dark2);border:2px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:all .3s;position:relative;}
+    .concept-card:hover,.concept-card.selected{border-color:var(--gold);transform:translateY(-4px);}
+    .concept-card.selected::after{content:'✓ Selected';position:absolute;top:12px;right:12px;background:var(--gold);color:#000;font-size:0.68rem;font-weight:700;letter-spacing:1px;padding:4px 10px;border-radius:20px;}
+    .concept-img{width:100%;height:200px;object-fit:cover;display:block;}
+    .concept-img-placeholder{width:100%;height:200px;display:flex;align-items:center;justify-content:center;font-size:3rem;}
+    .concept-body{padding:16px 18px;}
+    .concept-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:6px;}
+    .concept-desc{font-size:0.78rem;color:var(--muted);line-height:1.5;}
+
+    /* BOOKING FORM */
+    .booking-card{background:var(--dark2);border:1px solid var(--border);border-radius:20px;padding:40px;max-width:680px;margin:0 auto;}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+    .form-group.full{grid-column:1/-1;}
+    label{font-size:0.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+    input,select,textarea{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'Inter',sans-serif;font-size:0.88rem;outline:none;transition:border .2s;width:100%;}
+    input:focus,select:focus,textarea:focus{border-color:rgba(201,169,110,0.5);}
+    select option{background:var(--dark2);color:var(--text);}
+    textarea{resize:vertical;min-height:80px;}
+
+    .deposit-notice{background:rgba(201,169,110,0.07);border:1px solid rgba(201,169,110,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px;}
+    .deposit-notice h4{font-size:0.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+    .deposit-notice p{font-size:0.82rem;color:var(--muted);line-height:1.7;}
+    .deposit-notice strong{color:var(--text);}
+
+    .btn-book{width:100%;padding:16px;background:var(--gold);color:#000;border:none;border-radius:12px;font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;letter-spacing:1px;cursor:pointer;transition:all .2s;}
+    .btn-book:hover{background:var(--gold-l);transform:translateY(-2px);}
+
+    .concept-selected-display{background:rgba(201,169,110,0.08);border:1px solid rgba(201,169,110,0.25);border-radius:10px;padding:10px 14px;font-size:0.85rem;color:var(--gold);margin-bottom:16px;display:none;}
+
+    .success-msg{text-align:center;padding:40px 20px;display:none;}
+    .success-msg .icon{font-size:3.5rem;margin-bottom:16px;}
+    .success-msg h2{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:10px;}
+    .success-msg p{color:var(--muted);font-size:0.88rem;line-height:1.7;}
+
+    .divider{border:none;border-top:1px solid var(--border);margin:48px 0;}
+
+    @media(max-width:600px){.form-grid{grid-template-columns:1fr;}.hero{padding:120px 20px 60px;}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Nizar Naseer <span>STUDIO</span></div>
+  <a href="index.html" class="nav-back">← Back to Website</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">🌙 Raya Haji Special</div>
+  <h1>Studio Portrait<br/><em>Family Sessions</em></h1>
+  <p>Celebrate Hari Raya Aidiladha with timeless family portraits. Professional studio lighting, curated backdrops, and memories that last a lifetime.</p>
+  <div class="hero-pills">
+    <div class="pill"><span>⏱</span>30 Minutes Per Session</div>
+    <div class="pill"><span>💳</span>RM 50 Deposit</div>
+    <div class="pill"><span>📸</span>4 Studio Concepts</div>
+    <div class="pill"><span>🗓</span>Choose Your Slot</div>
+  </div>
+</div>
+
+<!-- CONCEPTS -->
+<section>
+  <p class="section-label">Choose Your Style</p>
+  <h2 class="section-title">Studio Concepts</h2>
+  <div class="concepts-grid" id="conceptsGrid">
+
+    <div class="concept-card" onclick="selectConcept('A','Minimalist White')">
+      <div class="concept-img-placeholder" style="background:linear-gradient(135deg,#f5f0eb,#e8e0d8);">🤍</div>
+      <div class="concept-body">
+        <div class="concept-name">Concept A — Minimalist White</div>
+        <div class="concept-desc">Clean white cyclorama backdrop with soft diffused natural light. Timeless, elegant, and perfect for all family sizes.</div>
+      </div>
+    </div>
+
+    <div class="concept-card" onclick="selectConcept('B','Royal Gold')">
+      <div class="concept-img-placeholder" style="background:linear-gradient(135deg,#2a1f0e,#4a3520);">✨</div>
+      <div class="concept-body">
+        <div class="concept-name">Concept B — Royal Gold</div>
+        <div class="concept-desc">Luxurious dark backdrop with warm golden accents. Draped fabric and ornate props that evoke regal celebration.</div>
+      </div>
+    </div>
+
+    <div class="concept-card" onclick="selectConcept('C','Tropical Botanica')">
+      <div class="concept-img-placeholder" style="background:linear-gradient(135deg,#0d1f0d,#1a3a1a);">🌿</div>
+      <div class="concept-body">
+        <div class="concept-name">Concept C — Tropical Botanica</div>
+        <div class="concept-desc">Lush tropical greenery and botanical arrangements. Vibrant, fresh, and full of life — a stunning contrast to traditional baju raya.</div>
+      </div>
+    </div>
+
+    <div class="concept-card" onclick="selectConcept('D','Classic Dark')">
+      <div class="concept-img-placeholder" style="background:linear-gradient(135deg,#0a0a0a,#1a1a1a);">🖤</div>
+      <div class="concept-body">
+        <div class="concept-name">Concept D — Classic Dark</div>
+        <div class="concept-desc">Dramatic dark studio with cinematic moody lighting. Bold, sophisticated, and unforgettable for those who dare to stand out.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- BOOKING FORM -->
+<section style="padding-top:0;">
+  <p class="section-label">Reserve Your Slot</p>
+  <h2 class="section-title" style="margin-bottom:32px;">Book a Session</h2>
+
+  <div class="booking-card">
+    <div id="bookingForm">
+
+      <div class="deposit-notice">
+        <h4>⚠️ Booking Policy</h4>
+        <p>
+          A <strong>RM 50 deposit</strong> is required to confirm your session slot.<br/>
+          <strong>No-shows or cancellations within 24 hours</strong> — deposit is non-refundable and will not be returned.<br/>
+          <strong style="color:#c9a96e;">💰 Balance payment to be settled upon arrival at the studio</strong> on your session day.
+        </p>
+      </div>
+
+      <div class="concept-selected-display" id="conceptDisplay">📸 Selected: —</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>First Name *</label>
+          <input type="text" id="sFirst" placeholder="Ahmad" required/>
+        </div>
+        <div class="form-group">
+          <label>Last Name *</label>
+          <input type="text" id="sLast" placeholder="Abdullah" required/>
+        </div>
+        <div class="form-group">
+          <label>WhatsApp Number *</label>
+          <input type="tel" id="sPhone" placeholder="011-2345678" required/>
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="sEmail" placeholder="email@example.com" required/>
+        </div>
+        <div class="form-group">
+          <label>Session Date *</label>
+          <select id="sDate" required>
+            <option value="">— Select date —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Time Slot *</label>
+          <select id="sTime" required>
+            <option value="">— Select time —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Studio Concept *</label>
+          <select id="sConcept" required>
+            <option value="">— Select concept —</option>
+            <option value="A - Minimalist White">Concept A — Minimalist White</option>
+            <option value="B - Royal Gold">Concept B — Royal Gold</option>
+            <option value="C - Tropical Botanica">Concept C — Tropical Botanica</option>
+            <option value="D - Classic Dark">Concept D — Classic Dark</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Number of Pax *</label>
+          <select id="sPax" required>
+            <option value="">— Select —</option>
+            <option>1–2 pax</option>
+            <option>3–5 pax</option>
+            <option>6–10 pax</option>
+            <option>10+ pax</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Special Requests / Notes</label>
+          <textarea id="sNotes" placeholder="e.g. We have a baby, need prayer mat, colour theme preference…"></textarea>
+        </div>
+      </div>
+
+      <button class="btn-book" onclick="submitStudio()">Reserve My Session — RM 50 Deposit</button>
+      <p style="font-size:0.72rem;color:var(--muted);text-align:center;margin-top:12px;">You will receive WhatsApp confirmation with payment details.</p>
+    </div>
+
+    <div class="success-msg" id="successMsg">
+      <div class="icon">🎉</div>
+      <h2>Session Reserved!</h2>
+      <p id="successText"></p>
+      <p style="margin-top:16px;font-size:0.8rem;">The photographer will WhatsApp you with the RM 50 deposit payment link shortly.<br/>Please complete payment within 24 hours to secure your slot.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const W3F_KEY = '6be870cf-b9ec-42bd-a26f-8d5f09087bf3';
+  const PHOTOGRAPHER_WA = '601118736810';
+  let selectedConceptKey = '';
+
+  // Build DATE dropdown — next 90 days, skip Fridays (Jumaat)
+  var dateSel = document.getElementById('sDate');
+  var today   = new Date();
+  today.setHours(0,0,0,0);
+  for (var di = 1; di <= 90; di++) {
+    var d = new Date(today);
+    d.setDate(today.getDate() + di);
+    if (d.getDay() === 5) continue; // skip Friday
+    var opt = document.createElement('option');
+    opt.value = d.toISOString().split('T')[0];
+    opt.textContent = d.toLocaleDateString('en-MY', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    dateSel.appendChild(opt);
+  }
+
+  // Build TIME dropdown 9 AM – 6 PM, 30-min slots
+  var slotSel = document.getElementById('sTime');
+  for (var h = 9; h < 18; h++) {
+    for (var m of [0, 30]) {
+      var hEnd = m === 30 ? h + 1 : h;
+      var mEnd = m === 30 ? 0   : 30;
+      var fmt  = function(hh, mm) {
+        var ampm = hh < 12 ? 'AM' : 'PM';
+        var h12  = hh === 0 ? 12 : hh > 12 ? hh - 12 : hh;
+        return h12 + ':' + String(mm).padStart(2,'0') + ' ' + ampm;
+      };
+      var label = fmt(h,m) + ' – ' + fmt(hEnd,mEnd);
+      var slotOpt = document.createElement('option');
+      slotOpt.value = label;
+      slotOpt.textContent = label;
+      slotSel.appendChild(slotOpt);
+    }
+  }
+
+
+  function selectConcept(key, name) {
+    selectedConceptKey = key + ' - ' + name;
+    document.querySelectorAll('.concept-card').forEach(c => c.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    document.getElementById('conceptDisplay').style.display = 'block';
+    document.getElementById('conceptDisplay').textContent = '📸 Selected: Concept ' + key + ' — ' + name;
+    document.getElementById('sConcept').value = selectedConceptKey;
+  }
+
+  function genRef() { return 'STD-' + Date.now().toString().slice(-6); }
+
+  function submitStudio() {
+    const first   = document.getElementById('sFirst').value.trim();
+    const last    = document.getElementById('sLast').value.trim();
+    const phone   = document.getElementById('sPhone').value.trim();
+    const email   = document.getElementById('sEmail').value.trim();
+    const date    = document.getElementById('sDate').value;
+    const time    = document.getElementById('sTime').value;
+    const concept = document.getElementById('sConcept').value;
+    const pax     = document.getElementById('sPax').value;
+    const notes   = document.getElementById('sNotes').value.trim() || 'None';
+
+    if (!first || !last || !phone || !email || !date || !time || !concept || !pax) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
+    const name  = first + ' ' + last;
+    const ref   = genRef();
+    const dateF = new Date(date + 'T00:00:00').toLocaleDateString('en-MY', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    const cleanPhone = phone.replace(/[\s\-\+\(\)]/g,'');
+    const clientWA   = cleanPhone.startsWith('60') ? cleanPhone : '60' + cleanPhone.replace(/^0/,'');
+
+    // WhatsApp to photographer
+    const ownerMsg =
+      '📸 *New Studio Session Booking*\n' +
+      '━━━━━━━━━━━━━━\n' +
+      'Ref: *' + ref + '*\n\n' +
+      '👤 Client: *' + name + '*\n' +
+      '📱 Phone: ' + phone + '\n' +
+      '📧 Email: ' + email + '\n\n' +
+      '🗓 Date: *' + dateF + '*\n' +
+      '⏱ Time: *' + time + '*\n' +
+      '🎨 Concept: *' + concept + '*\n' +
+      '👥 Pax: ' + pax + '\n' +
+      '📝 Notes: ' + notes + '\n\n' +
+      '━━━━━━━━━━━━━━\n' +
+      '💳 Send client RM 50 deposit link to confirm slot.';
+
+    window.open('https://wa.me/' + PHOTOGRAPHER_WA + '?text=' + encodeURIComponent(ownerMsg), '_blank');
+
+    // Email via Web3Forms
+    const w3fKey = localStorage.getItem('web3forms_key') || W3F_KEY;
+    fetch('https://api.web3forms.com/submit', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        access_key:      w3fKey,
+        from_name:       'Nizar Naseer Studio',
+        subject:         '📸 New Studio Session — ' + ref + ' — ' + dateF,
+        name, email, replyto: email,
+        'Ref':           ref,
+        'Client Name':   name,
+        'Client Phone':  phone,
+        'Client Email':  email,
+        'Session Date':  dateF,
+        'Time Slot':     time,
+        'Concept':       concept,
+        'Pax':           pax,
+        'Notes':         notes,
+        'Action':        'Send client RM 50 deposit payment link to confirm slot.',
+        message:         'New studio session booking.\nRef: ' + ref + '\nClient: ' + name + ' | ' + phone + '\nDate: ' + dateF + '\nTime: ' + time + '\nConcept: ' + concept,
+      }),
+    }).catch(() => {});
+
+    // Show success
+    document.getElementById('bookingForm').style.display = 'none';
+    document.getElementById('successMsg').style.display  = 'block';
+    document.getElementById('successText').textContent   =
+      'Hi ' + first + '! Your ' + time + ' slot on ' + dateF + ' (Concept ' + concept.charAt(0) + ') has been reserved. ' +
+      'The photographer will WhatsApp you at ' + phone + ' with the RM 50 deposit link. Selamat Hari Raya Aidiladha! 🌙';
+  }
+</script>
+</body>
+</html>

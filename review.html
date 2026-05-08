@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Leave a Review — Nizar Naseer Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#080806;color:#e8e4df;font-family:'Inter',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
+    .review-wrap{width:100%;max-width:520px;}
+    .review-logo{text-align:center;margin-bottom:32px;}
+    .review-logo span{font-family:'Cormorant Garamond',serif;font-size:1.3rem;letter-spacing:3px;color:#c9a96e;text-transform:uppercase;}
+    .review-card{background:linear-gradient(160deg,rgba(201,169,110,0.07),rgba(201,169,110,0.02));border:1px solid rgba(201,169,110,0.25);border-radius:20px;padding:40px 36px;}
+    h1{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;margin-bottom:6px;text-align:center;}
+    .review-sub{font-size:0.8rem;color:#888;text-align:center;margin-bottom:28px;line-height:1.6;}
+    /* Star Rating */
+    .stars-label{font-size:0.68rem;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:10px;}
+    .star-row{display:flex;gap:8px;margin-bottom:24px;}
+    .star{font-size:2rem;cursor:pointer;color:rgba(201,169,110,0.2);transition:color .15s,transform .15s;}
+    .star:hover,.star.active{color:#c9a96e;transform:scale(1.15);}
+    /* Form fields */
+    .form-group{margin-bottom:18px;}
+    label{display:block;font-size:0.68rem;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:6px;}
+    input,textarea,select{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 14px;color:#e8e4df;font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;transition:border-color .2s;}
+    input:focus,textarea:focus,select:focus{border-color:rgba(201,169,110,0.5);}
+    textarea{resize:vertical;min-height:120px;}
+    .submit-btn{width:100%;background:#c9a96e;color:#000;font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:700;padding:14px;border:none;border-radius:12px;cursor:pointer;transition:all .2s;margin-top:8px;letter-spacing:0.5px;}
+    .submit-btn:hover{background:#e8d5a3;transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,169,110,0.3);}
+    /* Thank you screen */
+    #thankYou{display:none;text-align:center;padding:40px 20px;}
+    #thankYou .ty-icon{font-size:3rem;margin-bottom:16px;}
+    #thankYou h2{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:12px;}
+    #thankYou p{font-size:0.85rem;color:#888;line-height:1.7;margin-bottom:28px;}
+    .home-btn{display:inline-block;margin-top:8px;background:#c9a96e;color:#000;font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:700;padding:12px 32px;border-radius:30px;text-decoration:none;letter-spacing:0.5px;transition:all .2s;}
+    .home-btn:hover{background:#e8d5a3;transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,169,110,0.3);}
+  </style>
+</head>
+<body>
+<div class="review-wrap">
+  <div class="review-logo"><span>Nizar Naseer Studio</span></div>
+
+  <!-- Netlify Form -->
+  <div class="review-card" id="formSection">
+    <h1>Share Your Experience</h1>
+    <p class="review-sub" id="reviewSub">We'd love to hear how your session went.<br/>Your review helps future clients find us.</p>
+
+    <form id="reviewForm">
+      <input type="hidden" name="stars" id="starsInput" value="5"/>
+
+      <div class="form-group">
+        <div class="stars-label">Your Rating *</div>
+        <div class="star-row" id="starRow">
+          <span class="star active" data-v="1">★</span>
+          <span class="star active" data-v="2">★</span>
+          <span class="star active" data-v="3">★</span>
+          <span class="star active" data-v="4">★</span>
+          <span class="star active" data-v="5">★</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="reviewer_name">Your Name *</label>
+        <input type="text" id="reviewer_name" name="reviewer_name" required placeholder="e.g. Farhana & Aidil"/>
+      </div>
+
+      <div class="form-group">
+        <label for="package_name">Package / Session *</label>
+        <select id="package_name" name="package_name" required>
+          <option value="">— Select your session —</option>
+          <option value="Nikah / Sanding Package">Nikah / Sanding Package</option>
+          <option value="Full Day Wedding Package">Full Day Wedding Package</option>
+          <option value="Outdoor Portrait Package">Outdoor Portrait Package</option>
+          <option value="Studio Raya Session">Studio Raya Session</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="review_text">Your Review *</label>
+        <textarea id="review_text" name="review_text" required placeholder="Tell us about your experience — how was the session, the photos, the communication?"></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn">✦ Submit My Review</button>
+    </form>
+  </div>
+
+  <!-- Thank You Screen -->
+  <div class="review-card" id="thankYou">
+    <div class="ty-icon">🌟</div>
+    <h2>Thank You!</h2>
+    <p>Your review has been submitted and will appear on our website shortly.<br/><br/>We truly appreciate you taking the time. It means the world to us. 🙏</p>
+    <a href="index.html" class="home-btn">← Back to Homepage</a>
+  </div>
+</div>
+
+<script>
+  // Pre-fill from URL params (set by automated email link)
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('name')) {
+    document.getElementById('reviewer_name').value = decodeURIComponent(params.get('name'));
+  }
+  if (params.get('pkg')) {
+    const sel = document.getElementById('package_name');
+    const val = decodeURIComponent(params.get('pkg'));
+    for (let opt of sel.options) { if (opt.value === val) opt.selected = true; }
+  }
+  if (params.get('ref')) {
+    document.getElementById('bookingRefInput').value = params.get('ref');
+  }
+  if (params.get('name')) {
+    document.getElementById('reviewSub').textContent =
+      'Hi ' + decodeURIComponent(params.get('name').split('&')[0].trim()) +
+      '! Thank you for choosing Nizar Naseer Studio. We\'d love your feedback.';
+  }
+
+  // Star rating interaction
+  const stars = document.querySelectorAll('.star');
+  let currentRating = 5;
+  function setStars(val) {
+    currentRating = val;
+    document.getElementById('starsInput').value = val;
+    stars.forEach(s => {
+      s.classList.toggle('active', parseInt(s.dataset.v) <= val);
+    });
+  }
+  stars.forEach(s => {
+    s.addEventListener('click', () => setStars(parseInt(s.dataset.v)));
+    s.addEventListener('mouseenter', () => {
+      stars.forEach(x => x.classList.toggle('active', parseInt(x.dataset.v) <= parseInt(s.dataset.v)));
+    });
+    s.addEventListener('mouseleave', () => setStars(currentRating));
+  });
+
+  // Form submit → POST to Netlify Function → auto-approved immediately
+  document.getElementById('reviewForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.querySelector('.submit-btn');
+    btn.textContent = 'Submitting…';
+    btn.disabled = true;
+    const payload = {
+      name:  document.getElementById('reviewer_name').value,
+      stars: document.getElementById('starsInput').value,
+      text:  document.getElementById('review_text').value,
+      pkg:   document.getElementById('package_name').value,
+    };
+    try {
+      await fetch('/api/submit-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch(err) { /* show success anyway */ }
+    document.getElementById('formSection').style.display = 'none';
+    document.getElementById('thankYou').style.display = 'block';
+  });
+</script>
+</body>
+</html>

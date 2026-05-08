@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html><body>
+<div id="bookingModal"></div>
+<div id="modalTitle"></div>
+<div id="modalPackageLabel"></div>
+<div id="btnContinue"></div>
+<div id="enquiryBanner"></div>
+<div id="gcalAuthBanner"></div>
+<div id="gcalConnectedBanner"></div>
+<div id="modalSummaryLabel"></div>
+<div id="sumPkg"></div>
+<div id="sumDate"></div>
+<div id="sumPrice"></div>
+<div id="sumTravelRow"></div>
+<div id="sumTravel"></div>
+<div id="sumDiscountRow"></div>
+<div id="sumDiscount"></div>
+<div id="sumPromoRow"></div>
+<div id="sumPromo"></div>
+<div id="sumAddonsRow"></div>
+<div id="sumAddons"></div>
+<div id="calSelectedDates"></div>
+<div id="calDateHint"></div>
+<div id="selectedDatesBox"></div>
+<div id="selectedDatesList"></div>
+<div id="eventDetailsSection"></div>
+<div id="eventDetailsList"></div>
+<div id="step2Title"></div>
+<div id="enquiryNotice"></div>
+<div id="depositNotice"></div>
+<div id="locationActions"></div>
+<div id="travelFeeBox"></div>
+<div id="btnSubmitBooking"></div>
+<div id="promoCodeInput"></div>
+<div id="promoFeedback"></div>
+<div class="addons-section"></div>
+<div id="confirmMsg"></div>
+<pre id="result" style="font-size:16px;padding:20px;"></pre>
+<script src="app.js"></script>
+<script>
+  const r = document.getElementById('result');
+  try {
+    const t = typeof openBookingModal;
+    r.style.color = t === 'function' ? 'green' : 'red';
+    r.textContent = '✅ openBookingModal is: ' + t + '\n'
+      + '✅ updateTotal is: ' + typeof updateTotal + '\n'
+      + '✅ buildEmailHTML is: ' + typeof buildEmailHTML + '\n'
+      + '✅ genRef is: ' + typeof genRef;
+  } catch(e) {
+    r.style.color = 'red';
+    r.textContent = '❌ Error: ' + e.message;
+  }
+</script>
+</body></html>

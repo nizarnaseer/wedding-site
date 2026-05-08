@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discount Manager — Nizar Naseer Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#0a0a0a; --card:#111; --border:rgba(255,255,255,0.07); --gold:#c9a96e; --text:#e8e0d4; --muted:#7a7068; --green:#22c55e; --red:#ef4444; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; font-weight:300; min-height:100vh; }
+    header { border-bottom:1px solid var(--border); padding:18px 32px; display:flex; align-items:center; justify-content:space-between; }
+    .logo { font-family:'Cormorant Garamond',serif; font-size:1.1rem; letter-spacing:4px; text-transform:uppercase; color:var(--gold); }
+    .logo span { color:var(--text); font-weight:300; }
+    .btn-sm { padding:7px 16px; border-radius:6px; font-size:0.78rem; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); text-decoration:none; display:inline-block; transition:all 0.2s; }
+    .btn-sm:hover { border-color:var(--gold); color:var(--gold); }
+    main { max-width:680px; margin:40px auto; padding:0 24px 80px; }
+    h2 { font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:300; margin-bottom:6px; }
+    .sub { color:var(--muted); font-size:0.82rem; margin-bottom:24px; line-height:1.6; }
+
+    /* Cloud setup box */
+    .cloud-box { background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.2); border-radius:12px; padding:20px 22px; margin-bottom:28px; }
+    .cloud-box h3 { font-size:0.78rem; letter-spacing:2px; text-transform:uppercase; color:var(--green); margin-bottom:10px; }
+    .cloud-box p { font-size:0.8rem; color:var(--muted); margin-bottom:12px; line-height:1.6; }
+    .cloud-box a { color:var(--gold); }
+    .cloud-status { display:inline-flex; align-items:center; gap:6px; font-size:0.75rem; padding:4px 12px; border-radius:20px; margin-bottom:12px; }
+    .cloud-status.connected { background:rgba(34,197,94,0.12); color:var(--green); border:1px solid rgba(34,197,94,0.3); }
+    .cloud-status.disconnected { background:rgba(239,68,68,0.08); color:#f87171; border:1px solid rgba(239,68,68,0.2); }
+    .cloud-input { width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:8px; padding:9px 12px; color:var(--text); font-size:0.84rem; outline:none; font-family:'Inter',sans-serif; margin-bottom:8px; }
+    .cloud-input:focus { border-color:rgba(34,197,94,0.4); }
+    .cloud-row { display:flex; gap:8px; margin-bottom:6px; }
+    .btn-cloud { padding:9px 18px; border:none; border-radius:8px; font-size:0.8rem; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; }
+    .btn-green  { background:var(--green); color:#000; }
+    .btn-grey   { background:rgba(255,255,255,0.07); color:var(--muted); }
+    .cloud-hint { font-size:0.73rem; color:var(--muted); line-height:1.5; }
+
+    .pkg-row { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:12px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+    .pkg-info { flex:1; min-width:180px; }
+    .pkg-name { font-family:'Cormorant Garamond',serif; font-size:1.1rem; margin-bottom:2px; }
+    .pkg-base { font-size:0.78rem; color:var(--muted); }
+    .discount-form { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .discount-type { display:flex; border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+    .discount-type button { padding:6px 12px; font-size:0.75rem; background:transparent; color:var(--muted); border:none; cursor:pointer; transition:all 0.15s; font-family:'Inter',sans-serif; }
+    .discount-type button.active { background:var(--gold); color:#000; }
+    .discount-input { background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:8px; padding:8px 12px; color:var(--text); font-size:0.9rem; width:100px; outline:none; font-family:'Inter',sans-serif; }
+    .discount-input:focus { border-color:rgba(201,169,110,0.5); }
+    .save-btn { padding:8px 18px; background:var(--gold); color:#000; border:none; border-radius:8px; font-size:0.8rem; font-weight:500; cursor:pointer; }
+    .clear-btn { padding:8px 14px; border:1px solid rgba(239,68,68,0.3); background:transparent; color:var(--red); border-radius:8px; font-size:0.8rem; cursor:pointer; }
+    .active-discount { font-size:0.78rem; color:var(--green); margin-top:6px; width:100%; }
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); color:var(--green); padding:10px 20px; border-radius:30px; font-size:0.82rem; display:none; }
+    .section-title { font-size:0.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin:28px 0 14px; }
+    .promo-section { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:22px; margin-top:28px; }
+    .promo-section h3 { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:300; margin-bottom:14px; }
+    .promo-row { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+    .promo-input { flex:1; min-width:120px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:8px; padding:9px 12px; color:var(--text); font-size:0.85rem; outline:none; font-family:'Inter',sans-serif; }
+    .promo-input:focus { border-color:rgba(201,169,110,0.5); }
+    .promo-codes-list { margin-top:14px; }
+    .promo-code-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border); font-size:0.84rem; }
+    .promo-code-row:last-child { border-bottom:none; }
+    .promo-code-badge { background:rgba(201,169,110,0.1); border:1px solid rgba(201,169,110,0.3); color:var(--gold); padding:3px 10px; border-radius:20px; font-size:0.75rem; font-family:monospace; letter-spacing:1px; }
+    .remove-promo { color:var(--red); cursor:pointer; font-size:0.75rem; opacity:0.7; }
+    .remove-promo:hover { opacity:1; }
+    .sync-btn { width:100%; padding:12px; background:linear-gradient(135deg,#22c55e,#16a34a); color:#000; border:none; border-radius:10px; font-size:0.88rem; font-weight:600; cursor:pointer; margin-top:20px; font-family:'Inter',sans-serif; }
+    .sync-btn:disabled { opacity:0.5; cursor:not-allowed; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">Nizar Naseer <span>STUDIO</span></div>
+  <div style="display:flex;gap:10px;">
+    <a href="admin.html" class="btn-sm">📋 Bookings</a>
+    <a href="index.html" class="btn-sm">← Website</a>
+  </div>
+</header>
+
+<main>
+  <h2>Discount Manager</h2>
+  <p class="sub">Set discounts per package or create promo codes. Use Cloud Sync so they appear for ALL clients everywhere.</p>
+
+  <!-- ══ HOW TO APPLY DISCOUNTS ══ -->
+  <div class="cloud-box">
+    <h3>🚀 How to Publish Discounts to Live Site</h3>
+    <div id="cloudStatus" class="cloud-status connected" style="margin-bottom:12px;">✅ Simple 2-step process — no accounts needed</div>
+    <p style="margin-bottom:12px;">
+      1. Set your discounts below and click <strong>"Save"</strong> on each package<br>
+      2. Click <strong>"Download discounts.json"</strong> below<br>
+      3. Replace the <code>discounts.json</code> file in your project folder<br>
+      4. Re-upload the zip to Netlify
+    </p>
+    <button class="btn-cloud btn-green" style="width:100%;padding:11px;" onclick="downloadJson()">⬇️ Download discounts.json</button>
+    <p class="cloud-hint" style="margin-top:10px;">This file is fetched automatically by all clients on the live site — every device, every browser.</p>
+  </div>
+
+  <p class="section-title">Per-Package Discounts</p>
+  <div id="packageList"></div>
+
+  <div class="promo-section">
+    <h3>🎟️ Promo Codes</h3>
+    <p style="font-size:0.8rem;color:var(--muted);margin-bottom:14px;">Create codes clients can enter during checkout for a fixed discount.</p>
+    <div class="promo-row">
+      <input class="promo-input" id="promoCode" placeholder="Code e.g. WEDDING50" style="text-transform:uppercase;" />
+      <input class="promo-input" id="promoAmt"  placeholder="Discount RM" type="number" min="0" style="max-width:120px;" />
+      <button class="save-btn" onclick="addPromo()">Add Code</button>
+    </div>
+    <div class="promo-codes-list" id="promoList"></div>
+  </div>
+
+  <button class="sync-btn" id="syncBtn" onclick="pushToCloud()">☁️ Save & Sync to Cloud</button>
+</main>
+
+<div class="toast" id="toast">✅ Saved!</div>
+
+<script>
+  // ── All packages matching index.html ──
+  const PACKAGES = [
+    // Photography
+    { name: 'Tunang Photography',           base: 600  },
+    { name: 'Nikah Photography',            base: 700  },
+    { name: 'Sanding Photography',          base: 900  },
+    { name: 'Nikah & Sanding Photography',  base: 1450 },
+    { name: 'TRIO E (3 Events)',            base: 2400 },
+    { name: 'Pre Wed Photography',          base: 550  },
+    { name: 'Tunang + Nikah + Sanding',     base: 2000 },
+    // Videography
+    { name: 'Nikah Videography',            base: 950  },
+    { name: 'Sanding Videography',          base: 1250 },
+    { name: 'Nikah + Sanding Videography',  base: 1999 },
+  ];
+
+  function getDiscounts()  { return JSON.parse(localStorage.getItem('pkg_discounts')  || '{}'); }
+  function getPromoCodes() { return JSON.parse(localStorage.getItem('promo_codes')    || '{}'); }
+  function saveDiscounts(d){ localStorage.setItem('pkg_discounts',  JSON.stringify(d)); }
+  function savePromos(p)   { localStorage.setItem('promo_codes',     JSON.stringify(p)); }
+
+  function downloadJson() {
+    const data = { pkg_discounts: getDiscounts(), promo_codes: getPromoCodes() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'discounts.json';
+    a.click();
+    showToast('✅ Downloaded! Replace discounts.json in your project and redeploy.');
+  }
+
+  function renderPackages() {
+    const discounts = getDiscounts();
+    document.getElementById('packageList').innerHTML = PACKAGES.map(pkg => {
+      const disc    = discounts[pkg.name] || 0;
+      const typeKey = 'type_' + pkg.name;
+      const typ     = localStorage.getItem(typeKey) || 'fixed';
+      const discAmt = typ === 'pct' ? Math.round(pkg.base * disc / 100) : disc;
+      const finalPx = Math.max(0, pkg.base - discAmt);
+      const activeTxt = disc > 0
+        ? '<div class="active-discount">✅ Active: <strong>' + (typ==='pct' ? disc + '%' : 'RM ' + disc) + '</strong> off → RM ' + finalPx.toLocaleString() + '</div>'
+        : '';
+      const safeKey = pkg.name.replace(/[^a-zA-Z0-9]/g, '_');
+      return '<div class="pkg-row">'
+        + '<div class="pkg-info">'
+        + '<div class="pkg-name">' + pkg.name + '</div>'
+        + '<div class="pkg-base">Base price: RM ' + pkg.base.toLocaleString() + '</div>'
+        + activeTxt
+        + '</div>'
+        + '<div class="discount-form">'
+        + '<div class="discount-type">'
+        + '<button id="fixBtn_' + safeKey + '" class="' + (typ==='fixed'?'active':'') + '" onclick="setType(\'' + pkg.name + '\',\'fixed\')">RM</button>'
+        + '<button id="pctBtn_' + safeKey + '" class="' + (typ==='pct'?'active':'') + '" onclick="setType(\'' + pkg.name + '\',\'pct\')">%</button>'
+        + '</div>'
+        + '<input class="discount-input" id="disc_' + safeKey + '" type="number" min="0" placeholder="0" value="' + (disc||'') + '" />'
+        + '<button class="save-btn" onclick="saveDisc(\'' + pkg.name + '\',' + pkg.base + ')">Save</button>'
+        + (disc > 0 ? '<button class="clear-btn" onclick="clearDisc(\'' + pkg.name + '\')">Clear</button>' : '')
+        + '</div></div>';
+    }).join('');
+  }
+
+  function setType(name, type) {
+    localStorage.setItem('type_' + name, type);
+    renderPackages();
+  }
+
+  function saveDisc(name, base) {
+    const safeKey = name.replace(/[^a-zA-Z0-9]/g, '_');
+    const input = document.getElementById('disc_' + safeKey);
+    const val   = parseFloat(input.value) || 0;
+    const type  = localStorage.getItem('type_' + name) || 'fixed';
+    const d = getDiscounts();
+    d[name] = val;   // store raw value (pct or fixed)
+    saveDiscounts(d);
+    renderPackages();
+    showToast('💾 Saved! Click "Download discounts.json" then redeploy.');
+  }
+
+  function clearDisc(name) {
+    const d = getDiscounts();
+    delete d[name];
+    localStorage.removeItem('type_' + name);
+    saveDiscounts(d);
+    renderPackages();
+    showToast('🗑️ Cleared');
+  }
+
+  // ── Promo codes ──
+  function renderPromos() {
+    const codes = getPromoCodes();
+    const keys  = Object.keys(codes);
+    const list  = document.getElementById('promoList');
+    if (keys.length === 0) { list.innerHTML = '<p style="font-size:0.78rem;color:var(--muted);margin-top:8px;">No promo codes yet.</p>'; return; }
+    list.innerHTML = keys.map(k =>
+      '<div class="promo-code-row">'
+      + '<span class="promo-code-badge">' + k + '</span>'
+      + '<span style="color:var(--muted);font-size:0.82rem;">RM ' + codes[k] + ' off</span>'
+      + '<span class="remove-promo" onclick="removePromo(\'' + k + '\')">✕ Remove</span>'
+      + '</div>'
+    ).join('');
+  }
+
+  function addPromo() {
+    const code = document.getElementById('promoCode').value.trim().toUpperCase();
+    const amt  = parseFloat(document.getElementById('promoAmt').value) || 0;
+    if (!code || amt <= 0) { alert('Enter a code and discount amount.'); return; }
+    const p = getPromoCodes();
+    p[code] = amt;
+    savePromos(p);
+    document.getElementById('promoCode').value = '';
+    document.getElementById('promoAmt').value  = '';
+    renderPromos();
+    showToast('💾 Added! Download JSON and redeploy to publish.');
+  }
+
+  function removePromo(code) {
+    const p = getPromoCodes();
+    delete p[code];
+    savePromos(p);
+    renderPromos();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent   = msg || '✅ Saved!';
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, 3500);
+  }
+
+  // ── Init ──
+  renderPackages();
+  renderPromos();
+</script>
+</body>
+</html>
