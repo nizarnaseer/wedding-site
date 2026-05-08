@@ -238,7 +238,8 @@
   const W3F_KEY = (window.STUDIO_CONFIG || {}).web3forms_key || '6be870cf-b9ec-42bd-a26f-8d5f09087bf3';
   const PHOTOGRAPHER_WA = '601118736810';
   let selectedConceptKey = '';
-  let bookedSlots = []; // loaded from API
+  // Load from localStorage immediately so slots are blocked on page load
+  let bookedSlots = JSON.parse(localStorage.getItem('studioBookedSlots') || '[]');
 
   const CONCEPTS = [
     { key: 'A', name: 'Minimalist White' },
@@ -257,11 +258,19 @@
     }
   })();
 
-  // Load booked slots from API
+  // Load booked slots — localStorage is instant, API syncs on top
   fetch('/api/get-studio-slots')
     .then(r => r.json())
-    .then(d => { bookedSlots = d.slots || []; refreshAvailabilityBadges(); })
-    .catch(() => {});
+    .then(d => {
+      const apiSlots = d.slots || [];
+      const apiKeys  = new Set(apiSlots.map(s => s.key));
+      // Keep local-only slots (booked in this session before API confirmed)
+      const localOnly = bookedSlots.filter(s => !apiKeys.has(s.key));
+      bookedSlots = [...apiSlots, ...localOnly];
+      localStorage.setItem('studioBookedSlots', JSON.stringify(bookedSlots));
+      refreshAvailabilityBadges();
+    })
+    .catch(() => { refreshAvailabilityBadges(); }); // use localStorage only
 
   // Build DATE dropdown
   var dateSel = document.getElementById('sDate');
@@ -396,10 +405,20 @@
     const dateF = new Date(date + 'T00:00:00').toLocaleDateString('en-MY', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
     const clientWA = '60' + phone.replace(/^0/,'');
 
-    // 1. Check & book slot via API
+    // 1. Check availability locally first (instant, no API needed)
     const btn = document.querySelector('.btn-book');
-    btn.textContent = '⏳ Checking availability…';
+    btn.textContent = '⏳ Checking…';
     btn.disabled = true;
+    const slotKey = date + '|' + time + '|' + concept;
+    if (bookedSlots.some(s => s.key === slotKey)) {
+      btn.textContent = 'Reserve My Session — RM 50 Deposit';
+      btn.disabled = false;
+      alert('⚠️ This slot (' + concept + ' at ' + time + ') is already booked!\nPlease choose a different time slot.');
+      refreshTimeSlots();
+      return;
+    }
+
+    // 2. Confirm with server API (if deployed)
     try {
       const bookRes = await fetch('/api/book-studio-slot', {
         method: 'POST',
@@ -408,21 +427,27 @@
       });
       const bookJ = await bookRes.json();
       if (!bookJ.ok) {
+        // Server says it's taken (race condition — another person booked it)
         btn.textContent = 'Reserve My Session — RM 50 Deposit';
         btn.disabled = false;
         alert('⚠️ Sorry! This concept (' + concept + ') at ' + time + ' on ' + dateF + ' was just booked.\n\nPlease choose a different time slot.');
-        refreshTimeSlots(); // refresh grid to show blocked slot
+        // Mark locally so UI updates
+        bookedSlots.push({ key: slotKey, date, time, concept, ref: 'other', name: 'Another client' });
+        localStorage.setItem('studioBookedSlots', JSON.stringify(bookedSlots));
+        refreshTimeSlots();
         refreshAvailabilityBadges();
         return;
       }
-      // Update local cache immediately so UI reflects booking
-      bookedSlots.push({ key: date+'|'+time+'|'+concept, date, time, concept, ref, name });
-      refreshTimeSlots();
-      refreshAvailabilityBadges();
     } catch(e) {
-      // API unavailable — proceed anyway (graceful fallback)
-      console.warn('Slot check unavailable:', e.message);
+      // API not deployed or network error — proceed with localStorage only
+      console.warn('Slot API unavailable, using localStorage:', e.message);
     }
+
+    // ALWAYS lock this slot locally (works even without API)
+    bookedSlots.push({ key: slotKey, date, time, concept, ref, name });
+    localStorage.setItem('studioBookedSlots', JSON.stringify(bookedSlots));
+    refreshTimeSlots();
+    refreshAvailabilityBadges();
 
     // 2. WhatsApp to photographer
     const gcalDate = date.replace(/-/g, '');
