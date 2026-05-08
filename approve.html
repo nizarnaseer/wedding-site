@@ -227,6 +227,7 @@
   </div>
 </div>
 
+<script src="config.js"></script>
 <script>
   /* ── Read URL params — using clientName/clientLocation to avoid
      window.name / window.location global conflicts ── */
@@ -418,24 +419,50 @@
     setTimeout(function(){ document.getElementById('shooterSent').classList.remove('show'); }, 4000);
   }
 
-  function notifyShooterEmail() {
+  async function notifyShooterEmail() {
     var sEmail = document.getElementById('shooterEmail').value.trim();
     if (!sEmail) { alert("Please enter the shooter's email first."); return; }
     var mapsUrl = clientLocation !== 'Not provided'
       ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(clientLocation)
-      : 'Not provided';
-    var subject = encodeURIComponent('[Assignment] ' + pkg + ' — ' + date + ' (' + ref + ')');
-    var body    = encodeURIComponent(
-      'Hi,\n\nYou have been assigned a shooting job by Nizar Naseer Studio.\n\n' +
-      '--- BOOKING ---\nRef: ' + ref + '\nPackage: ' + pkg + '\nDate: ' + date + '\nPrice: ' + price + '\n\n' +
-      '--- CLIENT ---\nName: ' + clientName + '\nPhone: ' + phone + '\nEmail: ' + email + '\nLocation: ' + clientLocation + '\nMaps: ' + mapsUrl + '\n\n' +
-      '--- NOTES ---\n' + notes + '\n\nPlease reply to confirm.\n\nThank you,\nNizar Naseer Studio'
-    );
-    var a = document.createElement('a');
-    a.href = 'mailto:' + sEmail + '?subject=' + subject + '&body=' + body;
-    a.target = '_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    document.getElementById('shooterSent').classList.add('show');
-    setTimeout(function(){ document.getElementById('shooterSent').classList.remove('show'); }, 4000);
+      : '';
+    var btn = document.querySelector('.btn-shooter-email');
+    btn.textContent = '⏳ Sending…';
+    btn.disabled = true;
+    try {
+      var w3fKey = (window.STUDIO_CONFIG || {}).web3forms_key || '';
+      if (!w3fKey) throw new Error('Web3Forms key not set in config.js');
+      var res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: w3fKey,
+          from_name:  'Nizar Naseer Studio',
+          subject:    '[Assignment] ' + pkg + ' — ' + date + ' (' + ref + ')',
+          email:      sEmail,
+          replyto:    sEmail,
+          // Client details only — no price
+          '📋 Ref':         ref,
+          '👤 Client':      clientName,
+          '📱 Phone':       phone + (phone ? ' — wa.me/60' + phone.replace(/^0/,'') : ''),
+          '📧 Email':       email,
+          '📅 Date':        date,
+          '📍 Location':    clientLocation,
+          ...(mapsUrl ? { '🗺️ Maps': mapsUrl } : {}),
+          '📝 Notes':       notes,
+          message: 'You have been assigned a shooting job by Nizar Naseer Studio.\n\nClient: ' + clientName + '\nPhone: ' + phone + '\nDate: ' + date + '\nLocation: ' + clientLocation + '\nNotes: ' + notes + '\n\nPlease reply to confirm.',
+        }),
+      });
+      var j = await res.json();
+      if (j.success) {
+        btn.textContent = '✅ Email Sent!';
+        document.getElementById('shooterSent').classList.add('show');
+        setTimeout(function(){ btn.textContent = '✉️ Notify Shooter (Email)'; btn.disabled = false; document.getElementById('shooterSent').classList.remove('show'); }, 4000);
+      } else throw new Error(j.message || 'Send failed');
+    } catch(e) {
+      btn.textContent = '❌ Failed';
+      btn.disabled = false;
+      alert('Email failed: ' + e.message);
+    }
   }
 
   function doDecline() {

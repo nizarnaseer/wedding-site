@@ -303,6 +303,10 @@ async function loadCalendarBusy() {
       }
     });
 
+    // Also load locally booked dates (persist across page refresh)
+    const savedBooked = JSON.parse(localStorage.getItem('bookedDates') || '[]');
+    savedBooked.forEach(d => busyDates.add(d));
+
     gcalConnected = true;
     showConnectedBanner('📅 Google Calendar synced — busy dates greyed out');
     renderCalendar();
@@ -913,7 +917,14 @@ function submitBooking(e) {
   const first    = document.getElementById('bFirstName').value.trim();
   const last     = document.getElementById('bLastName').value.trim();
   const email    = document.getElementById('bEmail').value.trim();
-  const phone    = document.getElementById('bPhone').value.trim();
+  const phoneRaw = document.getElementById('bPhone').value.trim();
+  // Normalize Malaysian number — auto-add leading 0 if missing
+  const phoneCleanRaw = phoneRaw.replace(/[\s\-\+\(\)]/g, '');
+  const phone = phoneCleanRaw
+    ? (phoneCleanRaw.startsWith('60') ? '0' + phoneCleanRaw.slice(2)
+      : phoneCleanRaw.startsWith('0') ? phoneCleanRaw
+      : '0' + phoneCleanRaw)
+    : '';
   const notes    = document.getElementById('bNotes').value.trim();
   const location = document.getElementById('bLocation').value.trim();
   const name     = `${first} ${last}`;
@@ -1017,7 +1028,7 @@ function submitBooking(e) {
           // ── CLIENT ──
           '📍 REF':          ref,
           '👤 Client Name':   name,
-          '📱 WhatsApp':      displayPhone,
+          '📱 WhatsApp':      phone ? phone + ' — wa.me/60' + phone.replace(/^0/,'') : 'Not provided',
           '📧 Email':         email,
           // ── BOOKING ──
           '📦 Package':       activePackage.name,
@@ -1055,6 +1066,10 @@ function submitBooking(e) {
   } else {
     /* ── DIRECT BOOKING: notify owner + mark dates busy ── */
     selectedDates.forEach(d => busyDates.add(d));
+    // Persist booked dates to localStorage so calendar blocks them after refresh
+    const savedBooked = JSON.parse(localStorage.getItem('bookedDates') || '[]');
+    selectedDates.forEach(d => { if (!savedBooked.includes(d)) savedBooked.push(d); });
+    localStorage.setItem('bookedDates', JSON.stringify(savedBooked));
 
     const PHOTOGRAPHER = '601118736810';
     const w3fKey = localStorage.getItem('web3forms_key') || W3F_FALLBACK_KEY;
@@ -1092,7 +1107,7 @@ function submitBooking(e) {
           // ── CLIENT ──
           '📍 REF':           ref,
           '👤 Client Name':    name,
-          '📱 WhatsApp':       displayPhone2,
+          '📱 WhatsApp':       phone ? phone + ' — wa.me/60' + phone.replace(/^0/,'') : 'Not provided',
           '📧 Email':          email,
           // ── BOOKING ──
           '📦 Package':        activePackage.name,
