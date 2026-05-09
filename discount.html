@@ -241,9 +241,40 @@
     }
   }
 
+  // ── Load from cloud on startup (so any device sees current discounts) ──
+  async function loadFromCloud() {
+    try {
+      const res  = await fetch('/api/discounts?v=' + Date.now());
+      const data = await res.json();
+      const serverDiscounts = data.pkg_discounts || {};
+      const serverPromos    = data.promo_codes   || {};
+
+      // Merge server discounts into localStorage
+      if (Object.keys(serverDiscounts).length) {
+        const flat = {};
+        Object.entries(serverDiscounts).forEach(([name, val]) => {
+          if (typeof val === 'object' && val.v) {
+            flat[name] = val.v;
+            localStorage.setItem('type_' + name, val.t || 'fixed');
+          } else {
+            flat[name] = val;
+          }
+        });
+        saveDiscounts(flat);
+      }
+      if (Object.keys(serverPromos).length) {
+        savePromos(serverPromos);
+      }
+    } catch(e) {
+      // If API fails, fall back to localStorage (already loaded)
+    }
+    renderPackages();
+    renderPromos();
+  }
+
   // ── Init ──
-  renderPackages();
-  renderPromos();
+  loadFromCloud();
+
 </script>
 </body>
 </html>
