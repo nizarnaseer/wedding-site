@@ -80,16 +80,22 @@
 
   <!-- ══ HOW TO APPLY DISCOUNTS ══ -->
   <div class="cloud-box">
-    <h3>🚀 How to Publish Discounts to Live Site</h3>
-    <div id="cloudStatus" class="cloud-status connected" style="margin-bottom:12px;">✅ Simple 2-step process — no accounts needed</div>
+    <h3>🚀 How Discounts Go Live</h3>
+    <div id="cloudStatus" class="cloud-status connected" style="margin-bottom:12px;">✅ Set discounts below → click Sync → live in ~30 seconds</div>
     <p style="margin-bottom:12px;">
-      1. Set your discounts below and click <strong>"Save"</strong> on each package<br>
-      2. Click <strong>"Download discounts.json"</strong> below<br>
-      3. Replace the <code>discounts.json</code> file in your project folder<br>
-      4. Re-upload the zip to Netlify
+      1. Set your discounts below and click <strong>"Save"</strong> on each package<br/>
+      2. Click <strong>"Save &amp; Sync to Cloud"</strong> at the bottom<br/>
+      3. Discounts appear on the live website automatically — no manual file upload needed
     </p>
-    <button class="btn-cloud btn-green" style="width:100%;padding:11px;" onclick="downloadJson()">⬇️ Download discounts.json</button>
-    <p class="cloud-hint" style="margin-top:10px;">This file is fetched automatically by all clients on the live site — every device, every browser.</p>
+    <!-- GitHub token setup -->
+    <div id="ghSetupBox">
+      <input class="cloud-input" type="password" id="ghToken" placeholder="GitHub Personal Access Token (repo scope)" />
+      <div class="cloud-row">
+        <button class="btn-cloud btn-green" onclick="saveGhToken()">Save Token</button>
+        <button class="btn-cloud btn-grey" onclick="document.getElementById('ghSetupBox').style.display='none'">Cancel</button>
+      </div>
+      <p class="cloud-hint" style="margin-top:8px;">Token is saved in your browser only. Get it at github.com → Settings → Developer settings → Personal access tokens → Classic → repo scope.</p>
+    </div>
   </div>
 
   <p class="section-title">Per-Package Discounts</p>
@@ -241,7 +247,66 @@
     setTimeout(() => { t.style.display = 'none'; }, 3500);
   }
 
+  // ── GitHub token ──
+  const REPO   = 'nizarnaseer/wedding-site';
+  const BRANCH = 'main';
+  const FILE   = 'discounts.json';
+  function getGhToken(){ return localStorage.getItem('gh_admin_token') || ''; }
+  function saveGhToken(){
+    const t = document.getElementById('ghToken').value.trim();
+    if(!t){ alert('Paste your GitHub token first.'); return; }
+    localStorage.setItem('gh_admin_token', t);
+    document.getElementById('ghSetupBox').style.display = 'none';
+    showToast('✅ Token saved — now click Sync!');
+  }
+
+  // ── Push to GitHub ──
+  async function pushToCloud() {
+    const token = getGhToken();
+    if(!token){
+      document.getElementById('ghSetupBox').style.display = 'block';
+      document.getElementById('ghToken').focus();
+      return;
+    }
+    const btn = document.getElementById('syncBtn');
+    btn.textContent = '⏳ Syncing…'; btn.disabled = true;
+
+    const payload = { pkg_discounts: getDiscounts(), promo_codes: getPromoCodes() };
+    const content  = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+
+    try {
+      // Get current SHA
+      let sha = null;
+      const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      if(check.ok){ const j = await check.json(); sha = j.sha; }
+
+      const body = { message: 'admin: update discounts', content, branch: BRANCH };
+      if(sha) body.sha = sha;
+
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
+        method: 'PUT',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if(res.ok){
+        btn.textContent = '✅ Synced! Live in ~30 seconds';
+        showToast('✅ Discounts synced to live site!');
+        setTimeout(() => { btn.textContent = '☁️ Save & Sync to Cloud'; btn.disabled = false; }, 4000);
+      } else {
+        const err = await res.json();
+        throw new Error(err.message);
+      }
+    } catch(e) {
+      btn.textContent = '☁️ Save & Sync to Cloud'; btn.disabled = false;
+      alert('Sync failed: ' + e.message + '\n\nCheck your GitHub token has repo scope access.');
+    }
+  }
+
   // ── Init ──
+  if(getGhToken()) document.getElementById('ghSetupBox').style.display = 'none';
   renderPackages();
   renderPromos();
 </script>
