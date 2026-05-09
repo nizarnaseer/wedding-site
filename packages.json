@@ -1,0 +1,124 @@
+{
+  "photography": [
+    {
+      "id": "pkg1",
+      "badge": "Tunang / Nikah / Sandingg",
+      "type": "tns",
+      "variants": [
+        {
+          "name": "Tunang",
+          "price": 600
+        },
+        {
+          "name": "Nikah",
+          "price": 700
+        },
+        {
+          "name": "Sanding",
+          "price": 900
+        }
+      ],
+      "features": [
+        "Unlimited pictures, fully edited",
+        "Softcopy via Telegram / Google Drive",
+        "Free outdoor session",
+        "Cover 3–4 hours",
+        "Transport outside kawasan: extra charge"
+      ]
+    },
+    {
+      "id": "pkg2",
+      "badge": "Nikah & Sanding",
+      "name": "Nikah & Sanding Photography",
+      "price": 1450,
+      "featured": true,
+      "features": [
+        "Unlimited pictures, fully edited",
+        "Softcopy via Telegram / Google Drive",
+        "Free 2 outdoor sessions",
+        "Cover for 2 events",
+        "Transport outside kawasan: extra charge"
+      ]
+    },
+    {
+      "id": "pkg3",
+      "badge": "TRIO E",
+      "name": "TRIO E (3 Events)",
+      "price": 2400,
+      "features": [
+        "Unlimited pictures, fully edited",
+        "Softcopy via Telegram / Google Drive",
+        "Free 3 outdoor sessions",
+        "Cover for 3 events",
+        "Transport outside kawasan: extra charge"
+      ]
+    },
+    {
+      "id": "pkg4",
+      "badge": "Pre Wed",
+      "name": "Pre Wed Photography",
+      "price": 550,
+      "features": [
+        "Unlimited pictures, fully edited",
+        "Softcopy via Telegram / Google Drive",
+        "Free posing guide",
+        "Cover for 2 hours",
+        "Transport outside kawasan: extra charge"
+      ]
+    },
+    {
+      "id": "pkg5",
+      "badge": "Tunang + Nikah + Sanding",
+      "name": "Tunang + Nikah + Sanding",
+      "price": 2000,
+      "features": [
+        "Unlimited pictures, fully edited",
+        "Softcopy via Telegram / Google Drive",
+        "Free 3 outdoor sessions",
+        "Cover 3 events (full day)",
+        "Transport outside kawasan: extra charge"
+      ]
+    }
+  ],
+  "videography": [
+    {
+      "id": "vid1",
+      "badge": "Nikah Video",
+      "name": "Nikah Video",
+      "price": 950,
+      "features": [
+        "Video duration 2–5 minit",
+        "Highlights video with nasheed/nasyid",
+        "Softcopy via Google Drive",
+        "Cover for Nikah event"
+      ]
+    },
+    {
+      "id": "vid2",
+      "badge": "Nikah + Sanding Video",
+      "name": "Nikah + Sanding Video",
+      "price": 1500,
+      "featured": true,
+      "features": [
+        "Video duration 5–10 minit",
+        "Highlights + full coverage",
+        "Softcopy via Google Drive",
+        "Cover 2 events",
+        "Transport outside kawasan: extra charge"
+      ]
+    },
+    {
+      "id": "vid3",
+      "badge": "Full Package Video",
+      "name": "Full Package Video",
+      "price": 2200,
+      "features": [
+        "Video duration 10–20 minit",
+        "Drone aerial shots (if permitted)",
+        "Softcopy via Google Drive",
+        "Cover 3 events",
+        "Transport outside kawasan: extra charge"
+      ]
+    }
+  ]
+}
