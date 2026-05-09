@@ -972,5 +972,52 @@
       }
     }
   </script>
+
+  <!-- Dynamic Package Loader — reads packages.json published via package-editor.html -->
+  <script>
+  (function loadPackages(){
+    fetch('/packages.json?v='+Date.now())
+      .then(r=>r.ok?r.json():null)
+      .then(data=>{
+        if(!data) return;
+        const all = [...(data.photography||[]), ...(data.videography||[])];
+        all.forEach(p=>{
+          const card = document.getElementById(p.id);
+          if(!card) return;
+          // Update price
+          if(p.price){
+            const amtEl = card.querySelector('.pkg-amount');
+            if(amtEl && p.id!=='pkg1') amtEl.textContent = Number(p.price).toLocaleString();
+          }
+          // Update features
+          if(p.features){
+            const ul = card.querySelector('.pkg-features');
+            if(ul) ul.innerHTML = p.features.map(f=>`<li>${f}</li>`).join('');
+          }
+          // Update badge
+          if(p.badge){
+            const b = card.querySelector('.pkg-badge');
+            if(b) b.textContent = p.badge;
+          }
+          // Update TNS variants
+          if(p.type==='tns' && p.variants){
+            const sel = card.querySelector('select');
+            if(sel){
+              sel.innerHTML = p.variants.map(v=>`<option value="${v.name}|${v.price}">${v.name} — RM ${v.price}</option>`).join('');
+              // Update onclick
+              const btn = card.querySelector('.pkg-btn');
+              if(btn) btn.setAttribute('onclick','bookTNS()');
+            }
+          }
+          // Update Book Now button for non-tns
+          if(!p.type && p.name && p.price){
+            const btn = card.querySelector('.pkg-btn');
+            if(btn) btn.setAttribute('onclick',`openBookingModal('${p.name}','RM ${Number(p.price).toLocaleString()}')`);
+          }
+        });
+      })
+      .catch(()=>{});
+  })();
+  </script>
 </body>
 </html>

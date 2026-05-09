@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Package Editor — Nizar Naseer Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#0a0a0a;--card:#111;--border:rgba(255,255,255,0.07);--gold:#c9a96e;--text:#e8e0d4;--muted:#7a7068;--green:#22c55e;--red:#ef4444;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;}
+    header{border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;}
+    .logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);}
+    .logo span{color:var(--text);}
+    .btn-sm{padding:7px 16px;border-radius:6px;font-size:0.78rem;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s;text-decoration:none;display:inline-block;}
+    .btn-sm:hover{border-color:var(--gold);color:var(--gold);}
+    main{max-width:960px;margin:0 auto;padding:36px 24px 80px;}
+    h1{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:6px;}
+    .subtitle{color:var(--muted);font-size:0.82rem;margin-bottom:28px;}
+    .section-title{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;margin:32px 0 16px;color:var(--gold);border-bottom:1px solid var(--border);padding-bottom:10px;}
+    .pkg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px;}
+    .pkg-editor{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;}
+    .pkg-editor.featured{border-color:rgba(201,169,110,0.35);}
+    .featured-tag{display:inline-block;background:rgba(201,169,110,0.12);color:var(--gold);border:1px solid rgba(201,169,110,0.3);border-radius:4px;font-size:0.65rem;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;margin-bottom:12px;}
+    .field-group{margin-bottom:12px;}
+    label{display:block;font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;}
+    input,textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;transition:border .2s;}
+    input:focus,textarea:focus{border-color:rgba(201,169,110,0.5);}
+    textarea{resize:vertical;min-height:100px;font-size:0.82rem;line-height:1.6;}
+    .price-row{display:flex;align-items:center;gap:8px;}
+    .price-row span{color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:1.1rem;}
+    .price-row input{width:120px;}
+    .notice{background:rgba(201,169,110,0.07);border:1px solid rgba(201,169,110,0.2);border-radius:10px;padding:14px 18px;font-size:0.8rem;color:var(--muted);line-height:1.7;margin-bottom:24px;}
+    .notice strong{color:var(--gold);}
+    .btn-publish{padding:12px 32px;background:var(--gold);color:#000;border:none;border-radius:8px;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;}
+    .btn-publish:hover{background:#d4b47a;}
+    .setup-block{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;}
+    .setup-block h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:12px;}
+    .setup-row{display:flex;gap:10px;}
+    .setup-row input{flex:1;}
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--green);color:#000;padding:12px 20px;border-radius:8px;font-size:0.82rem;font-weight:500;opacity:0;transition:opacity .3s;z-index:999;}
+    .toast.show{opacity:1;}
+    .tns-variant{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;}
+    .tns-variant label{color:var(--gold);font-size:0.65rem;}
+    .variant-row{display:flex;gap:8px;align-items:center;}
+    .variant-row input{flex:1;}
+    @media(max-width:640px){.pkg-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">Nizar Naseer <span>STUDIO</span></div>
+  <div style="display:flex;gap:10px;">
+    <a href="index.html" target="_blank" class="btn-sm">👁 Preview Site</a>
+    <a href="admin.html" class="btn-sm">← Admin</a>
+  </div>
+</header>
+
+<main>
+  <h1>📝 Package Editor</h1>
+  <p class="subtitle">Edit your photography and videography packages. Changes go live after publishing.</p>
+
+  <div class="notice">
+    <strong>How it works:</strong> Edit any package below then click <strong>Publish All Changes</strong>. Updates go live on the website via GitHub + Vercel automatically.<br/>
+    <strong>Features tip:</strong> Enter one feature per line in the features box.
+  </div>
+
+  <!-- GitHub Token Setup -->
+  <div class="setup-block" id="setupBlock">
+    <h3>🔑 GitHub Setup</h3>
+    <div class="setup-row">
+      <input type="password" id="ghToken" placeholder="GitHub Personal Access Token (repo scope)" />
+      <button class="btn-sm" onclick="saveToken()" style="white-space:nowrap;">Save Token</button>
+    </div>
+    <p style="font-size:0.72rem;color:var(--muted);margin-top:8px;">Stored in browser only. Repo: <strong style="color:var(--gold);">nizarnaseer/wedding-site</strong></p>
+  </div>
+
+  <!-- PHOTOGRAPHY PACKAGES -->
+  <div class="section-title">📸 Photography Packages</div>
+  <div class="pkg-grid" id="photoGrid"></div>
+
+  <!-- VIDEOGRAPHY PACKAGES -->
+  <div class="section-title">🎬 Videography Packages</div>
+  <div class="pkg-grid" id="videoGrid"></div>
+
+  <div style="text-align:center;margin-top:36px;">
+    <button class="btn-publish" onclick="publishAll()">🚀 Publish All Changes</button>
+    <p style="font-size:0.72rem;color:var(--muted);margin-top:8px;">Updates packages.json on GitHub and triggers auto-deployment.</p>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const REPO = 'nizarnaseer/wedding-site';
+const FILE = 'packages.json';
+const BRANCH = 'main';
+
+const DEFAULT_PACKAGES = {
+  photography: [
+    { id:'pkg1', badge:'Tunang / Nikah / Sanding', type:'tns',
+      variants:[{name:'Tunang',price:600},{name:'Nikah',price:700},{name:'Sanding',price:900}],
+      features:['Unlimited pictures, fully edited','Softcopy via Telegram / Google Drive','Free outdoor session','Cover 3–4 hours','Transport outside kawasan: extra charge'] },
+    { id:'pkg2', badge:'Nikah & Sanding', name:'Nikah & Sanding Photography', price:1450, featured:true,
+      features:['Unlimited pictures, fully edited','Softcopy via Telegram / Google Drive','Free 2 outdoor sessions','Cover for 2 events','Transport outside kawasan: extra charge'] },
+    { id:'pkg3', badge:'TRIO E', name:'TRIO E (3 Events)', price:2400,
+      features:['Unlimited pictures, fully edited','Softcopy via Telegram / Google Drive','Free 3 outdoor sessions','Cover for 3 events','Transport outside kawasan: extra charge'] },
+    { id:'pkg4', badge:'Pre Wed', name:'Pre Wed Photography', price:550,
+      features:['Unlimited pictures, fully edited','Softcopy via Telegram / Google Drive','Free posing guide','Cover for 2 hours','Transport outside kawasan: extra charge'] },
+    { id:'pkg5', badge:'Tunang + Nikah + Sanding', name:'Tunang + Nikah + Sanding', price:2000,
+      features:['Unlimited pictures, fully edited','Softcopy via Telegram / Google Drive','Free 3 outdoor sessions','Cover 3 events (full day)','Transport outside kawasan: extra charge'] },
+  ],
+  videography: [
+    { id:'vid1', badge:'Nikah Video', name:'Nikah Video', price:950,
+      features:['Video duration 2–5 minit','Highlights video with nasheed/nasyid','Softcopy via Google Drive','Cover for Nikah event'] },
+    { id:'vid2', badge:'Nikah + Sanding Video', name:'Nikah + Sanding Video', price:1500, featured:true,
+      features:['Video duration 5–10 minit','Highlights + full coverage','Softcopy via Google Drive','Cover 2 events','Transport outside kawasan: extra charge'] },
+    { id:'vid3', badge:'Full Package Video', name:'Full Package Video', price:2200,
+      features:['Video duration 10–20 minit','Drone aerial shots (if permitted)','Softcopy via Google Drive','Cover 3 events','Transport outside kawasan: extra charge'] },
+  ]
+};
+
+let pkgs = JSON.parse(localStorage.getItem('packagesEdit') || 'null') || JSON.parse(JSON.stringify(DEFAULT_PACKAGES));
+
+function getToken(){ return localStorage.getItem('gh_admin_token') || ''; }
+function saveToken(){
+  const t = document.getElementById('ghToken').value.trim();
+  if(!t){ alert('Paste your GitHub token.'); return; }
+  localStorage.setItem('gh_admin_token', t);
+  document.getElementById('setupBlock').style.display = 'none';
+  showToast('✅ Token saved!');
+  loadFromGitHub();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if(getToken()) document.getElementById('setupBlock').style.display = 'none';
+  renderAll();
+  if(getToken()) loadFromGitHub();
+});
+
+async function loadFromGitHub(){
+  try{
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
+      headers:{ Authorization:'Bearer '+getToken() }
+    });
+    if(r.ok){ const j=await r.json(); pkgs=JSON.parse(atob(j.content)); localStorage.setItem('packagesEdit',JSON.stringify(pkgs)); renderAll(); }
+  }catch(e){}
+}
+
+function renderAll(){
+  renderGrid('photoGrid', pkgs.photography);
+  renderGrid('videoGrid', pkgs.videography);
+}
+
+function renderGrid(gridId, list){
+  const grid = document.getElementById(gridId);
+  grid.innerHTML = list.map((p,i) => {
+    const cat = gridId === 'photoGrid' ? 'photography' : 'videography';
+    if(p.type === 'tns'){
+      // Special TNS card with variants
+      const variantFields = p.variants.map((v,vi) => `
+        <div class="tns-variant">
+          <div class="variant-row">
+            <input type="text" value="${v.name}" oninput="pkgs.${cat}[${i}].variants[${vi}].name=this.value;save()" placeholder="Variant name"/>
+            <span style="color:var(--gold);">RM</span>
+            <input type="number" value="${v.price}" style="width:90px;" oninput="pkgs.${cat}[${i}].variants[${vi}].price=+this.value;save()"/>
+          </div>
+        </div>`).join('');
+      return `<div class="pkg-editor">
+        <div class="field-group"><label>Badge / Title</label><input type="text" value="${p.badge}" oninput="pkgs.${cat}[${i}].badge=this.value;save()"/></div>
+        <div class="field-group"><label>Pricing Variants</label>${variantFields}</div>
+        <div class="field-group"><label>Features (one per line)</label><textarea oninput="pkgs.${cat}[${i}].features=this.value.split('\\n').filter(l=>l.trim());save()">${p.features.join('\n')}</textarea></div>
+      </div>`;
+    }
+    return `<div class="pkg-editor${p.featured?' featured':''}">
+      ${p.featured?'<div class="featured-tag">⭐ Most Popular</div>':''}
+      <div class="field-group"><label>Package Name</label><input type="text" value="${p.badge}" oninput="pkgs.${cat}[${i}].badge=this.value;pkgs.${cat}[${i}].name=this.value;save()"/></div>
+      <div class="field-group"><label>Price (RM)</label>
+        <div class="price-row"><span>RM</span><input type="number" value="${p.price}" oninput="pkgs.${cat}[${i}].price=+this.value;save()"/></div>
+      </div>
+      <div class="field-group"><label>Features (one per line)</label><textarea oninput="pkgs.${cat}[${i}].features=this.value.split('\\n').filter(l=>l.trim());save()">${p.features.join('\n')}</textarea></div>
+    </div>`;
+  }).join('');
+}
+
+function save(){ localStorage.setItem('packagesEdit', JSON.stringify(pkgs)); }
+
+async function publishAll(){
+  const token = getToken();
+  if(!token){ document.getElementById('setupBlock').style.display='block'; alert('Set your GitHub token first.'); return; }
+  const btn = document.querySelector('.btn-publish');
+  btn.textContent='⏳ Publishing…'; btn.disabled=true;
+  try{
+    let sha=null;
+    const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`,{headers:{Authorization:'Bearer '+token}});
+    if(check.ok){ const j=await check.json(); sha=j.sha; }
+    const body={message:'admin: update packages',content:btoa(unescape(encodeURIComponent(JSON.stringify(pkgs,null,2)))),branch:BRANCH};
+    if(sha) body.sha=sha;
+    const res=await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`,{
+      method:'PUT',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(body)
+    });
+    if(res.ok){
+      showToast('✅ Published! Website updates in ~30 seconds.');
+      btn.textContent='✅ Published!';
+      setTimeout(()=>{btn.textContent='🚀 Publish All Changes';btn.disabled=false;},3000);
+    } else { const e=await res.json(); throw new Error(e.message); }
+  }catch(e){ btn.textContent='🚀 Publish All Changes';btn.disabled=false; alert('Failed: '+e.message); }
+}
+
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500); }
+</script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Studio Editor — Nizar Naseer Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#0a0a0a;--card:#111;--border:rgba(255,255,255,0.07);--gold:#c9a96e;--text:#e8e0d4;--muted:#7a7068;--green:#22c55e;--red:#ef4444;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;}
+    header{border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;}
+    .logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);}
+    .logo span{color:var(--text);}
+    .btn-sm{padding:7px 16px;border-radius:6px;font-size:0.78rem;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s;text-decoration:none;display:inline-block;}
+    .btn-sm:hover{border-color:var(--gold);color:var(--gold);}
+    main{max-width:900px;margin:0 auto;padding:36px 24px 80px;}
+    h1{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:6px;}
+    .subtitle{color:var(--muted);font-size:0.82rem;margin-bottom:32px;}
+    .concepts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:20px;}
+    .concept-editor{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+    .concept-preview{width:100%;height:180px;object-fit:cover;display:block;background:linear-gradient(135deg,#1a1a1a,#2a2a2a);}
+    .concept-preview-placeholder{width:100%;height:180px;display:flex;align-items:center;justify-content:center;font-size:3rem;background:linear-gradient(135deg,#111,#1a1a1a);}
+    .concept-body{padding:20px;}
+    .field-group{margin-bottom:14px;}
+    label{display:block;font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px;}
+    input,textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;transition:border .2s;}
+    input:focus,textarea:focus{border-color:rgba(201,169,110,0.5);}
+    textarea{resize:vertical;min-height:70px;}
+    .color-row{display:flex;gap:8px;align-items:center;}
+    .color-row input[type=color]{width:40px;height:36px;padding:2px;border-radius:6px;cursor:pointer;}
+    .btn-save-concept{width:100%;padding:11px;background:rgba(201,169,110,0.12);border:1px solid rgba(201,169,110,0.3);color:var(--gold);border-radius:8px;cursor:pointer;font-size:0.82rem;font-weight:500;font-family:'Inter',sans-serif;transition:all .2s;margin-top:4px;}
+    .btn-save-concept:hover{background:rgba(201,169,110,0.2);}
+    .btn-save-concept.saving{opacity:0.6;}
+    .btn-publish{padding:12px 28px;background:var(--gold);color:#000;border:none;border-radius:8px;font-size:0.88rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;}
+    .btn-publish:hover{background:#d4b47a;}
+    .notice{background:rgba(201,169,110,0.07);border:1px solid rgba(201,169,110,0.2);border-radius:10px;padding:14px 18px;font-size:0.8rem;color:var(--muted);line-height:1.6;margin-bottom:28px;}
+    .notice strong{color:var(--gold);}
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--green);color:#000;padding:12px 20px;border-radius:8px;font-size:0.82rem;font-weight:500;opacity:0;transition:opacity .3s;z-index:999;}
+    .toast.show{opacity:1;}
+    .setup-block{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:28px;}
+    .setup-block h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:12px;}
+    .setup-row{display:flex;gap:10px;}
+    .setup-row input{flex:1;}
+    @media(max-width:600px){.concepts-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo">Nizar Naseer <span>STUDIO</span></div>
+  <div style="display:flex;gap:10px;">
+    <a href="studio.html" target="_blank" class="btn-sm">👁 Preview Studio</a>
+    <a href="admin.html" class="btn-sm">← Admin</a>
+  </div>
+</header>
+
+<main>
+  <h1>🎨 Studio Concept Editor</h1>
+  <p class="subtitle">Edit the studio concept cards shown to clients on the booking page. Changes go live after publishing.</p>
+
+  <div class="notice">
+    <strong>How it works:</strong> Edit any concept below and click <strong>Publish All Changes</strong>. Changes save to your GitHub repo and go live on the website automatically via Vercel.<br/>
+    <strong>Setup required:</strong> Enter your GitHub token below once — it's saved in your browser.
+  </div>
+
+  <!-- GitHub Token Setup -->
+  <div class="setup-block" id="setupBlock">
+    <h3>🔑 GitHub Setup</h3>
+    <div class="setup-row">
+      <input type="password" id="ghToken" placeholder="GitHub Personal Access Token (repo scope)" />
+      <button class="btn-sm" onclick="saveToken()" style="white-space:nowrap;">Save Token</button>
+    </div>
+    <p style="font-size:0.72rem;color:var(--muted);margin-top:8px;">Token is stored in your browser only. Repo: <strong style="color:var(--gold);">nizarnaseer/wedding-site</strong></p>
+  </div>
+
+  <div class="concepts-grid" id="conceptsGrid"></div>
+
+  <div style="text-align:center;margin-top:32px;">
+    <button class="btn-publish" onclick="publishAll()">🚀 Publish All Changes</button>
+    <p style="font-size:0.72rem;color:var(--muted);margin-top:8px;">This updates studio.html on GitHub and triggers a live deployment.</p>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const REPO = 'nizarnaseer/wedding-site';
+const FILE = 'studio-concepts.json';
+const BRANCH = 'main';
+
+// Default concepts (used if file doesn't exist yet on GitHub)
+const DEFAULT_CONCEPTS = [
+  { key:'A', name:'Minimalist White', desc:'Clean white cyclorama backdrop with soft diffused natural light. Timeless, elegant, and perfect for all family sizes.', emoji:'🤍', bg1:'#f5f0eb', bg2:'#e8e0d8', imgUrl:'' },
+  { key:'B', name:'Royal Gold', desc:'Luxurious dark backdrop with warm golden accents. Draped fabric and ornate props that evoke regal celebration.', emoji:'✨', bg1:'#2a1f0e', bg2:'#4a3520', imgUrl:'' },
+  { key:'C', name:'Tropical Botanica', desc:'Lush tropical greenery and botanical arrangements. Vibrant, fresh, and full of life.', emoji:'🌿', bg1:'#0d1f0d', bg2:'#1a3a1a', imgUrl:'' },
+  { key:'D', name:'Classic Dark', desc:'Dramatic dark studio with cinematic moody lighting. Bold, sophisticated, and unforgettable.', emoji:'🖤', bg1:'#0a0a0a', bg2:'#1a1a1a', imgUrl:'' },
+];
+
+let concepts = JSON.parse(localStorage.getItem('studioConceptsEdit') || 'null') || DEFAULT_CONCEPTS;
+
+function getToken(){ return localStorage.getItem('gh_admin_token') || ''; }
+function saveToken(){
+  const t = document.getElementById('ghToken').value.trim();
+  if(!t){ alert('Paste your GitHub token first.'); return; }
+  localStorage.setItem('gh_admin_token', t);
+  document.getElementById('setupBlock').style.display = 'none';
+  showToast('✅ Token saved!');
+  loadFromGitHub();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if(getToken()) document.getElementById('setupBlock').style.display = 'none';
+  renderConcepts();
+  if(getToken()) loadFromGitHub();
+});
+
+async function loadFromGitHub() {
+  try {
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
+      headers: { Authorization: 'Bearer ' + getToken() }
+    });
+    if(r.ok) {
+      const j = await r.json();
+      concepts = JSON.parse(atob(j.content));
+      localStorage.setItem('studioConceptsEdit', JSON.stringify(concepts));
+      renderConcepts();
+    }
+  } catch(e) { /* file may not exist yet */ }
+}
+
+function renderConcepts() {
+  const grid = document.getElementById('conceptsGrid');
+  grid.innerHTML = concepts.map((c, i) => `
+    <div class="concept-editor" id="card-${c.key}">
+      ${c.imgUrl
+        ? `<img class="concept-preview" src="${c.imgUrl}" alt="${c.name}" onerror="this.style.display='none'">`
+        : `<div class="concept-preview-placeholder" style="background:linear-gradient(135deg,${c.bg1},${c.bg2});">${c.emoji}</div>`}
+      <div class="concept-body">
+        <div class="field-group">
+          <label>Concept Label</label>
+          <input type="text" id="name-${c.key}" value="Concept ${c.key} — ${c.name}" oninput="syncName('${c.key}',this.value)"/>
+        </div>
+        <div class="field-group">
+          <label>Description</label>
+          <textarea id="desc-${c.key}" oninput="syncDesc('${c.key}',this.value)">${c.desc}</textarea>
+        </div>
+        <div class="field-group">
+          <label>Concept Image URL (optional — leave blank to use colour gradient)</label>
+          <input type="url" id="img-${c.key}" value="${c.imgUrl||''}" placeholder="https://..." oninput="syncImg('${c.key}',this.value)"/>
+        </div>
+        <div class="field-group">
+          <label>Gradient Colours (used when no image set)</label>
+          <div class="color-row">
+            <input type="color" id="bg1-${c.key}" value="${c.bg1}" oninput="syncBg('${c.key}')"/>
+            <input type="color" id="bg2-${c.key}" value="${c.bg2}" oninput="syncBg('${c.key}')"/>
+            <span style="font-size:0.75rem;color:var(--muted);">from → to</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Emoji (shown on gradient)</label>
+          <input type="text" id="emoji-${c.key}" value="${c.emoji}" maxlength="4" style="width:80px;" oninput="syncEmoji('${c.key}',this.value)"/>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function syncName(key, val) { const c = concepts.find(c=>c.key===key); if(c){ const parts = val.replace(/^Concept [A-Z]\s*—\s*/,''); c.name = parts; } save(); }
+function syncDesc(key, val) { const c = concepts.find(c=>c.key===key); if(c) c.desc = val; save(); }
+function syncImg(key, val)  { const c = concepts.find(c=>c.key===key); if(c) c.imgUrl = val; save(); }
+function syncBg(key)  {
+  const c = concepts.find(c=>c.key===key);
+  if(c){ c.bg1 = document.getElementById('bg1-'+key).value; c.bg2 = document.getElementById('bg2-'+key).value; save(); }
+}
+function syncEmoji(key, val){ const c = concepts.find(c=>c.key===key); if(c) c.emoji = val; save(); }
+function save(){ localStorage.setItem('studioConceptsEdit', JSON.stringify(concepts)); }
+
+async function publishAll() {
+  const token = getToken();
+  if(!token){ document.getElementById('setupBlock').style.display='block'; alert('Set your GitHub token first.'); return; }
+  const btn = document.querySelector('.btn-publish');
+  btn.textContent = '⏳ Publishing…'; btn.disabled = true;
+
+  try {
+    // Get current file SHA (needed to update)
+    let sha = null;
+    const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    if(check.ok){ const j = await check.json(); sha = j.sha; }
+
+    const body = { message: 'admin: update studio concepts', content: btoa(JSON.stringify(concepts, null, 2)), branch: BRANCH };
+    if(sha) body.sha = sha;
+
+    const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
+      method: 'PUT',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if(res.ok){
+      showToast('✅ Published! Studio page will update in ~30 seconds.');
+      btn.textContent = '✅ Published!';
+      setTimeout(() => { btn.textContent = '🚀 Publish All Changes'; btn.disabled = false; }, 3000);
+    } else {
+      const err = await res.json();
+      throw new Error(err.message);
+    }
+  } catch(e) {
+    btn.textContent = '🚀 Publish All Changes'; btn.disabled = false;
+    alert('Publish failed: ' + e.message);
+  }
+}
+
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+</script>
+</body>
+</html>
