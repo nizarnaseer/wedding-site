@@ -214,7 +214,14 @@
     const btn = document.getElementById('syncBtn');
     btn.textContent = '⏳ Syncing…'; btn.disabled = true;
 
-    const payload = { pkg_discounts: getDiscounts(), promo_codes: getPromoCodes() };
+    // Build payload including type (pct/fixed) for each package
+    const rawDiscounts = getDiscounts();
+    const richDiscounts = {};
+    Object.entries(rawDiscounts).forEach(([name, val]) => {
+      const t = localStorage.getItem('type_' + name) || 'fixed';
+      richDiscounts[name] = { v: val, t };
+    });
+    const payload = { pkg_discounts: richDiscounts, promo_codes: getPromoCodes() };
 
     try {
       const res = await fetch('/api/discounts', {
