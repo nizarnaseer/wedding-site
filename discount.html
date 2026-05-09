@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Discount Manager — Nizar Naseer Studio</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     :root { --bg:#0a0a0a; --card:#111; --border:rgba(255,255,255,0.07); --gold:#c9a96e; --text:#e8e0d4; --muted:#7a7068; --green:#22c55e; --red:#ef4444; }
@@ -18,23 +17,11 @@
     main { max-width:680px; margin:40px auto; padding:0 24px 80px; }
     h2 { font-family:'Cormorant Garamond',serif; font-size:1.8rem; font-weight:300; margin-bottom:6px; }
     .sub { color:var(--muted); font-size:0.82rem; margin-bottom:24px; line-height:1.6; }
-
-    /* Cloud setup box */
     .cloud-box { background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.2); border-radius:12px; padding:20px 22px; margin-bottom:28px; }
     .cloud-box h3 { font-size:0.78rem; letter-spacing:2px; text-transform:uppercase; color:var(--green); margin-bottom:10px; }
-    .cloud-box p { font-size:0.8rem; color:var(--muted); margin-bottom:12px; line-height:1.6; }
-    .cloud-box a { color:var(--gold); }
+    .cloud-box p { font-size:0.8rem; color:var(--muted); line-height:1.6; }
     .cloud-status { display:inline-flex; align-items:center; gap:6px; font-size:0.75rem; padding:4px 12px; border-radius:20px; margin-bottom:12px; }
     .cloud-status.connected { background:rgba(34,197,94,0.12); color:var(--green); border:1px solid rgba(34,197,94,0.3); }
-    .cloud-status.disconnected { background:rgba(239,68,68,0.08); color:#f87171; border:1px solid rgba(239,68,68,0.2); }
-    .cloud-input { width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:8px; padding:9px 12px; color:var(--text); font-size:0.84rem; outline:none; font-family:'Inter',sans-serif; margin-bottom:8px; }
-    .cloud-input:focus { border-color:rgba(34,197,94,0.4); }
-    .cloud-row { display:flex; gap:8px; margin-bottom:6px; }
-    .btn-cloud { padding:9px 18px; border:none; border-radius:8px; font-size:0.8rem; font-weight:500; cursor:pointer; font-family:'Inter',sans-serif; }
-    .btn-green  { background:var(--green); color:#000; }
-    .btn-grey   { background:rgba(255,255,255,0.07); color:var(--muted); }
-    .cloud-hint { font-size:0.73rem; color:var(--muted); line-height:1.5; }
-
     .pkg-row { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px 22px; margin-bottom:12px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
     .pkg-info { flex:1; min-width:180px; }
     .pkg-name { font-family:'Cormorant Garamond',serif; font-size:1.1rem; margin-bottom:2px; }
@@ -48,7 +35,7 @@
     .save-btn { padding:8px 18px; background:var(--gold); color:#000; border:none; border-radius:8px; font-size:0.8rem; font-weight:500; cursor:pointer; }
     .clear-btn { padding:8px 14px; border:1px solid rgba(239,68,68,0.3); background:transparent; color:var(--red); border-radius:8px; font-size:0.8rem; cursor:pointer; }
     .active-discount { font-size:0.78rem; color:var(--green); margin-top:6px; width:100%; }
-    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); color:var(--green); padding:10px 20px; border-radius:30px; font-size:0.82rem; display:none; }
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); color:var(--green); padding:10px 20px; border-radius:30px; font-size:0.82rem; display:none; z-index:999; }
     .section-title { font-size:0.72rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin:28px 0 14px; }
     .promo-section { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:22px; margin-top:28px; }
     .promo-section h3 { font-family:'Cormorant Garamond',serif; font-size:1.2rem; font-weight:300; margin-bottom:14px; }
@@ -76,26 +63,16 @@
 
 <main>
   <h2>Discount Manager</h2>
-  <p class="sub">Set discounts per package or create promo codes. Use Cloud Sync so they appear for ALL clients everywhere.</p>
+  <p class="sub">Set discounts per package or create promo codes. Click Sync and they go live instantly on the website.</p>
 
-  <!-- ══ HOW TO APPLY DISCOUNTS ══ -->
   <div class="cloud-box">
-    <h3>🚀 How Discounts Go Live</h3>
-    <div id="cloudStatus" class="cloud-status connected" style="margin-bottom:12px;">✅ Set discounts below → click Sync → live in ~30 seconds</div>
-    <p style="margin-bottom:12px;">
+    <h3>⚡ How Discounts Go Live</h3>
+    <div class="cloud-status connected">✅ Set discounts → click Sync → live instantly</div>
+    <p>
       1. Set your discounts below and click <strong>"Save"</strong> on each package<br/>
-      2. Click <strong>"Save &amp; Sync to Cloud"</strong> at the bottom<br/>
-      3. Discounts appear on the live website automatically — no manual file upload needed
+      2. Click <strong>"☁️ Save & Sync to Cloud"</strong> at the bottom<br/>
+      3. Discounts appear on the live website <strong>instantly</strong> — no token, no file upload needed
     </p>
-    <!-- GitHub token setup -->
-    <div id="ghSetupBox">
-      <input class="cloud-input" type="password" id="ghToken" placeholder="GitHub Personal Access Token (repo scope)" />
-      <div class="cloud-row">
-        <button class="btn-cloud btn-green" onclick="saveGhToken()">Save Token</button>
-        <button class="btn-cloud btn-grey" onclick="document.getElementById('ghSetupBox').style.display='none'">Cancel</button>
-      </div>
-      <p class="cloud-hint" style="margin-top:8px;">Token is saved in your browser only. Get it at github.com → Settings → Developer settings → Personal access tokens → Classic → repo scope.</p>
-    </div>
   </div>
 
   <p class="section-title">Per-Package Discounts</p>
@@ -118,9 +95,7 @@
 <div class="toast" id="toast">✅ Saved!</div>
 
 <script>
-  // ── All packages matching index.html ──
   const PACKAGES = [
-    // Photography
     { name: 'Tunang Photography',           base: 600  },
     { name: 'Nikah Photography',            base: 700  },
     { name: 'Sanding Photography',          base: 900  },
@@ -128,7 +103,6 @@
     { name: 'TRIO E (3 Events)',            base: 2400 },
     { name: 'Pre Wed Photography',          base: 550  },
     { name: 'Tunang + Nikah + Sanding',     base: 2000 },
-    // Videography
     { name: 'Nikah Videography',            base: 950  },
     { name: 'Sanding Videography',          base: 1250 },
     { name: 'Nikah + Sanding Videography',  base: 1999 },
@@ -137,17 +111,7 @@
   function getDiscounts()  { return JSON.parse(localStorage.getItem('pkg_discounts')  || '{}'); }
   function getPromoCodes() { return JSON.parse(localStorage.getItem('promo_codes')    || '{}'); }
   function saveDiscounts(d){ localStorage.setItem('pkg_discounts',  JSON.stringify(d)); }
-  function savePromos(p)   { localStorage.setItem('promo_codes',     JSON.stringify(p)); }
-
-  function downloadJson() {
-    const data = { pkg_discounts: getDiscounts(), promo_codes: getPromoCodes() };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'discounts.json';
-    a.click();
-    showToast('✅ Downloaded! Replace discounts.json in your project and redeploy.');
-  }
+  function savePromos(p)   { localStorage.setItem('promo_codes',    JSON.stringify(p)); }
 
   function renderPackages() {
     const discounts = getDiscounts();
@@ -188,12 +152,11 @@
     const safeKey = name.replace(/[^a-zA-Z0-9]/g, '_');
     const input = document.getElementById('disc_' + safeKey);
     const val   = parseFloat(input.value) || 0;
-    const type  = localStorage.getItem('type_' + name) || 'fixed';
     const d = getDiscounts();
-    d[name] = val;   // store raw value (pct or fixed)
+    d[name] = val;
     saveDiscounts(d);
     renderPackages();
-    showToast('💾 Saved! Click "Download discounts.json" then redeploy.');
+    showToast('💾 Saved! Click Sync to push live.');
   }
 
   function clearDisc(name) {
@@ -205,7 +168,6 @@
     showToast('🗑️ Cleared');
   }
 
-  // ── Promo codes ──
   function renderPromos() {
     const codes = getPromoCodes();
     const keys  = Object.keys(codes);
@@ -230,7 +192,7 @@
     document.getElementById('promoCode').value = '';
     document.getElementById('promoAmt').value  = '';
     renderPromos();
-    showToast('💾 Added! Download JSON and redeploy to publish.');
+    showToast('💾 Added! Click Sync to push live.');
   }
 
   function removePromo(code) {
@@ -247,66 +209,32 @@
     setTimeout(() => { t.style.display = 'none'; }, 3500);
   }
 
-  // ── GitHub token ──
-  const REPO   = 'nizarnaseer/wedding-site';
-  const BRANCH = 'main';
-  const FILE   = 'discounts.json';
-  function getGhToken(){ return localStorage.getItem('gh_admin_token') || ''; }
-  function saveGhToken(){
-    const t = document.getElementById('ghToken').value.trim();
-    if(!t){ alert('Paste your GitHub token first.'); return; }
-    localStorage.setItem('gh_admin_token', t);
-    document.getElementById('ghSetupBox').style.display = 'none';
-    showToast('✅ Token saved — now click Sync!');
-  }
-
-  // ── Push to GitHub ──
+  // ── Push to Redis API — instant, no GitHub token needed ──
   async function pushToCloud() {
-    const token = getGhToken();
-    if(!token){
-      document.getElementById('ghSetupBox').style.display = 'block';
-      document.getElementById('ghToken').focus();
-      return;
-    }
     const btn = document.getElementById('syncBtn');
     btn.textContent = '⏳ Syncing…'; btn.disabled = true;
 
     const payload = { pkg_discounts: getDiscounts(), promo_codes: getPromoCodes() };
-    const content  = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
 
     try {
-      // Get current SHA
-      let sha = null;
-      const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
-        headers: { Authorization: 'Bearer ' + token }
+      const res = await fetch('/api/save-discounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
-      if(check.ok){ const j = await check.json(); sha = j.sha; }
+      const j = await res.json();
+      if (!res.ok) throw new Error(j.error || 'Unknown error');
 
-      const body = { message: 'admin: update discounts', content, branch: BRANCH };
-      if(sha) body.sha = sha;
-
-      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
-        method: 'PUT',
-        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      if(res.ok){
-        btn.textContent = '✅ Synced! Live in ~30 seconds';
-        showToast('✅ Discounts synced to live site!');
-        setTimeout(() => { btn.textContent = '☁️ Save & Sync to Cloud'; btn.disabled = false; }, 4000);
-      } else {
-        const err = await res.json();
-        throw new Error(err.message);
-      }
+      btn.textContent = '✅ Synced! Discounts are live now';
+      showToast('✅ Discounts live on website!');
+      setTimeout(() => { btn.textContent = '☁️ Save & Sync to Cloud'; btn.disabled = false; }, 3500);
     } catch(e) {
       btn.textContent = '☁️ Save & Sync to Cloud'; btn.disabled = false;
-      alert('Sync failed: ' + e.message + '\n\nCheck your GitHub token has repo scope access.');
+      alert('Sync failed: ' + e.message);
     }
   }
 
   // ── Init ──
-  if(getGhToken()) document.getElementById('ghSetupBox').style.display = 'none';
   renderPackages();
   renderPromos();
 </script>

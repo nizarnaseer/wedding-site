@@ -1238,8 +1238,8 @@ document.addEventListener('DOMContentLoaded', () => {
    visitors see the same discounts everywhere.
 ══════════════════════════════════════ */
 function applyDiscountsToPkgCards() {
-  // Primary: fetch discounts.json from the same server (works on all devices)
-  fetch('discounts.json?v=' + Date.now())
+  // Try Redis API first (real-time, set from admin discount page)
+  fetch('/api/get-discounts?v=' + Date.now())
     .then(r => r.json())
     .then(data => {
       const discounts = data.pkg_discounts || {};
@@ -1249,7 +1249,7 @@ function applyDiscountsToPkgCards() {
       _renderDiscountCards(discounts);
     })
     .catch(() => {
-      // Fallback: use localStorage (works on localhost)
+      // Fallback: use localStorage
       _renderDiscountCards(JSON.parse(localStorage.getItem('pkg_discounts') || '{}'));
     });
 }
