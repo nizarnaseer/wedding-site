@@ -1239,7 +1239,7 @@ document.addEventListener('DOMContentLoaded', () => {
 ══════════════════════════════════════ */
 function applyDiscountsToPkgCards() {
   // Try Redis API first (real-time, set from admin discount page)
-  fetch('/api/get-discounts?v=' + Date.now())
+  fetch('/api/discounts?v=' + Date.now())
     .then(r => r.json())
     .then(data => {
       const discounts = data.pkg_discounts || {};

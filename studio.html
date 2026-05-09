@@ -259,7 +259,7 @@
   })();
 
   // Load booked slots — localStorage is instant, API syncs on top
-  fetch('/api/get-studio-slots')
+  fetch('/api/studio-slots')
     .then(r => r.json())
     .then(d => {
       const apiSlots = d.slots || [];
@@ -420,7 +420,7 @@
 
     // 2. Confirm with server API (if deployed)
     try {
-      const bookRes = await fetch('/api/book-studio-slot', {
+      const bookRes = await fetch('/api/studio-slots', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date, time, concept, ref, name }),
