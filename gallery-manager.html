@@ -282,6 +282,11 @@ function movePhoto(i, dir) {
   [editPhotos[i], editPhotos[j]] = [editPhotos[j], editPhotos[i]];
   renderPhotosList();
 }
+function removePhoto(i) {
+  if (!confirm('Remove this photo from the album?')) return;
+  editPhotos.splice(i, 1);
+  renderPhotosList();
+}
 function addUrlPhoto() {
   const url = document.getElementById('urlInput').value.trim();
   if (!url) return;
