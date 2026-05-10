@@ -43,6 +43,10 @@
       "coverGradient": "linear-gradient(135deg,#1a1208,#2a1e0a)",
       "teasers": [
         {
+          "src": "https://res.cloudinary.com/dh5vjsskl/image/upload/v1778436274/mk3y0w6brglke7gnozql.jpg",
+          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
+        },
+        {
           "src": "https://res.cloudinary.com/dh5vjsskl/image/upload/v1778411940/zumk7qsarqtiutlvdflv.jpg",
           "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
         },
