@@ -1089,42 +1089,23 @@
     <source src="https://cdn.pixabay.com/audio/2022/01/18/audio_d0c6ff1bab.mp3" type="audio/mpeg"/>
   </audio>
 
-  <!-- Music toggle button — bottom right — shows pause by default since music autoplays -->
+  <!-- Music toggle button — bottom right — defaults to play icon -->
   <button id="musicBtn" title="Toggle music" onclick="toggleMusic()" style="
     position:fixed; bottom:24px; right:24px; z-index:990;
     width:44px; height:44px; border-radius:50%;
-    background:rgba(201,169,110,0.22);
+    background:rgba(201,169,110,0.1);
     border:1px solid rgba(201,169,110,0.4);
     color:#c9a96e; font-size:1.1rem;
     cursor:pointer; backdrop-filter:blur(10px);
     display:flex; align-items:center; justify-content:center;
-    transition:all .3s; box-shadow:0 0 16px rgba(201,169,110,0.2);
-  ">⏸</button>
+    transition:all .3s; box-shadow:0 2px 10px rgba(0,0,0,0.25);
+  ">🎵</button>
 
   <script>
     var bgMusic  = document.getElementById('bgMusic');
     var musicBtn = document.getElementById('musicBtn');
     var playing  = false;
-    var started  = false;
     bgMusic.volume = 0.22;
-
-    // Start music on first user interaction (browser autoplay policy)
-    function startOnce() {
-      if (started) return;
-      started = true;
-      playing = true;
-      bgMusic.play().then(function() {
-        musicBtn.textContent = '⏸';
-        musicBtn.style.background = 'rgba(201,169,110,0.22)';
-        musicBtn.style.boxShadow  = '0 0 16px rgba(201,169,110,0.2)';
-      }).catch(function(){});
-      document.removeEventListener('scroll',    startOnce);
-      document.removeEventListener('touchstart', startOnce);
-      document.removeEventListener('click',     startOnce);
-    }
-    document.addEventListener('scroll',    startOnce, { passive: true });
-    document.addEventListener('touchstart', startOnce, { passive: true });
-    document.addEventListener('click',     startOnce);
 
     function toggleMusic() {
       if (playing) {
@@ -1134,12 +1115,17 @@
         musicBtn.style.background = 'rgba(201,169,110,0.1)';
         musicBtn.style.boxShadow  = '0 2px 10px rgba(0,0,0,0.25)';
       } else {
-        started = true;
-        bgMusic.play().catch(function(){});
-        playing = true;
-        musicBtn.textContent = '⏸';
-        musicBtn.style.background = 'rgba(201,169,110,0.22)';
-        musicBtn.style.boxShadow  = '0 0 16px rgba(201,169,110,0.2)';
+        var playPromise = bgMusic.play();
+        if (playPromise !== undefined) {
+          playPromise.then(function() {
+            playing = true;
+            musicBtn.textContent = '⏸';
+            musicBtn.style.background = 'rgba(201,169,110,0.22)';
+            musicBtn.style.boxShadow  = '0 0 16px rgba(201,169,110,0.2)';
+          }).catch(function(error) {
+            console.log("Audio playback failed:", error);
+          });
+        }
       }
     }
   </script>
