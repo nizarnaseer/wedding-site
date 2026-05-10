@@ -152,9 +152,14 @@
   function renderPackages() {
     const discounts = getDiscounts();
     document.getElementById('packageList').innerHTML = PACKAGES.map(pkg => {
-      const disc    = discounts[pkg.name] || 0;
+      const rawDisc = discounts[pkg.name];
+      const disc    = rawDisc && typeof rawDisc === 'object' ? rawDisc.v : (rawDisc || 0);
       const typeKey = 'type_' + pkg.name;
-      const typ     = localStorage.getItem(typeKey) || 'fixed';
+      let typ       = localStorage.getItem(typeKey);
+      if (!typ && rawDisc && typeof rawDisc === 'object') typ = rawDisc.t;
+      if (!typ) typ = 'fixed';
+      localStorage.setItem(typeKey, typ); // Ensure it's synced
+
       const discAmt = typ === 'pct' ? Math.round(pkg.base * disc / 100) : disc;
       const finalPx = Math.max(0, pkg.base - discAmt);
       const activeTxt = disc > 0
@@ -190,7 +195,7 @@
     const val   = parseFloat(input.value) || 0;
     const type  = localStorage.getItem('type_' + name) || 'fixed';
     const d = getDiscounts();
-    d[name] = val;   // store raw value (pct or fixed)
+    d[name] = { v: val, t: type };   // store object
     saveDiscounts(d);
     renderPackages();
     showToast('💾 Saved! Click "Download discounts.json" then redeploy.');
@@ -271,12 +276,16 @@
     const btn = document.getElementById('syncBtn');
     btn.textContent = '⏳ Syncing…'; btn.disabled = true;
 
-    // Build rich discounts including type (pct/fixed) so website renders % correctly
+    // Convert old flat format to rich format if needed
     const rawDisc = getDiscounts();
     const richDisc = {};
     Object.entries(rawDisc).forEach(([name, val]) => {
-      const t = localStorage.getItem('type_' + name) || 'fixed';
-      richDisc[name] = { v: val, t };
+      if (typeof val === 'object') {
+        richDisc[name] = val;
+      } else {
+        const t = localStorage.getItem('type_' + name) || 'fixed';
+        richDisc[name] = { v: val, t };
+      }
     });
     const payload = { pkg_discounts: richDisc, promo_codes: getPromoCodes() };
     const content  = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
@@ -314,8 +323,20 @@
 
   // ── Init ──
   if(getGhToken()) document.getElementById('ghSetupBox').style.display = 'none';
-  renderPackages();
-  renderPromos();
+
+  // Load latest from server so admin is always in sync with live
+  fetch('discounts.json?v=' + Date.now())
+    .then(r => r.json())
+    .then(data => {
+      saveDiscounts(data.pkg_discounts || {});
+      savePromos(data.promo_codes || {});
+      renderPackages();
+      renderPromos();
+    })
+    .catch(() => {
+      renderPackages();
+      renderPromos();
+    });
 </script>
 </body>
 </html>

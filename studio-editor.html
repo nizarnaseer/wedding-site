@@ -134,7 +134,7 @@ async function loadFromGitHub() {
     });
     if(r.ok) {
       const j = await r.json();
-      concepts = JSON.parse(atob(j.content));
+      concepts = JSON.parse(decodeURIComponent(escape(atob(j.content))));
       localStorage.setItem('studioConceptsEdit', JSON.stringify(concepts));
       renderConcepts();
     }
@@ -202,7 +202,8 @@ async function publishAll() {
     });
     if(check.ok){ const j = await check.json(); sha = j.sha; }
 
-    const body = { message: 'admin: update studio concepts', content: btoa(JSON.stringify(concepts, null, 2)), branch: BRANCH };
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(concepts, null, 2))));
+    const body = { message: 'admin: update studio concepts', content: content, branch: BRANCH };
     if(sha) body.sha = sha;
 
     const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
