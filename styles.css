@@ -562,9 +562,16 @@ ul { list-style: none; }
 }
 .lightbox-img-wrap { flex: 1; position: relative; border-radius: 8px; overflow: hidden; }
 .lightbox-img {
-  width: 100%; aspect-ratio: 3/2;
-  background-size: cover; background-position: center;
-  border-radius: 8px; transition: background-image 0.4s ease;
+  width: 100%;
+  max-height: 65vh;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #0a0a0a;
+  border-radius: 8px;
+  transition: background-image 0.3s ease;
+  aspect-ratio: unset;
+  min-height: 220px;
 }
 .lightbox-img-counter {
   position: absolute; bottom: 12px; right: 14px;
@@ -605,7 +612,7 @@ ul { list-style: none; }
 @media(max-width:600px) {
   .lightbox-title { font-size: 1.3rem; }
   .lb-arrow { width: 36px; height: 36px; font-size: 1.2rem; }
-  .lightbox-img { aspect-ratio: 4/3; }
+  .lightbox-img { max-height: 55vw; min-height: 180px; }
 }
 
 /* ─── RESPONSIVE ─── */

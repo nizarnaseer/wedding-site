@@ -53,26 +53,70 @@
     </ul>
   </div>
 
-  <!-- ══════════ TERMS & CONDITIONS POPUP ══════════ -->
-  <div id="tcModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;">
-    <div style="background:#111;border:1px solid rgba(201,169,110,0.3);border-radius:16px;max-width:520px;width:100%;padding:32px;font-family:'Inter',sans-serif;max-height:90vh;overflow-y:auto;">
-      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#fff;margin:0 0 6px;">📋 Terms & Conditions</h2>
-      <p style="font-size:0.75rem;color:#c9a96e;margin:0 0 20px;letter-spacing:1px;text-transform:uppercase;">Please read before booking</p>
-      <div style="font-size:0.82rem;color:#bbb;line-height:1.8;margin-bottom:20px;background:rgba(255,255,255,0.03);border-radius:8px;padding:16px;border:1px solid rgba(255,255,255,0.06);">
-        <p style="margin:0 0 10px;"><strong style="color:#fff;">1. Deposit & Payment</strong><br>A minimum deposit is required to confirm your booking date. The deposit is non-refundable if cancelled within 7 days of the event date.</p>
-        <p style="margin:0 0 10px;"><strong style="color:#fff;">2. Rescheduling</strong><br>Rescheduling is allowed with minimum 14 days notice, subject to availability. One reschedule allowed per booking.</p>
-        <p style="margin:0 0 10px;"><strong style="color:#fff;">3. Delivery</strong><br>Edited photos will be delivered within 2–4 weeks after the event via Google Drive or Telegram. RAW files are not provided.</p>
-        <p style="margin:0 0 10px;"><strong style="color:#fff;">4. Usage Rights</strong><br>Nizar Naseer Studio retains the right to use photos for portfolio and marketing purposes unless otherwise agreed in writing.</p>
-        <p style="margin:0 0 10px;"><strong style="color:#fff;">5. Cancellation</strong><br>Cancellation more than 7 days before the event: deposit transferable to a future booking. Less than 7 days: deposit forfeited.</p>
-        <p style="margin:0;"><strong style="color:#fff;">6. Conduct</strong><br>The photographer reserves the right to refuse service if the client behaves in a disrespectful manner toward the team.</p>
+  <!-- ══════════ TERMS & CONDITIONS POPUP (BOOKING GATE) ══════════ -->
+  <div id="tcModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.82);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;">
+    <div style="background:linear-gradient(160deg,#111009,#0d0c08);border:1px solid rgba(201,169,110,0.25);border-radius:24px 24px 0 0;width:100%;max-width:680px;max-height:88vh;overflow-y:auto;padding:36px 28px 40px;position:relative;transform:translateY(0);font-family:'Inter',sans-serif;">
+      <!-- Header -->
+      <div style="text-align:center;margin-bottom:28px;">
+        <p style="font-size:0.65rem;letter-spacing:4px;text-transform:uppercase;color:#c9a96e;margin-bottom:6px;">Nizar Naseer Studio</p>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:300;color:#e8e4df;line-height:1.2;">Terma <em style="color:#c9a96e;">&amp;</em> Syarat</h2>
+        <div style="width:40px;height:1px;background:rgba(201,169,110,0.35);margin:12px auto 0;"></div>
       </div>
+
+      <p style="font-size:0.82rem;color:#aaa;line-height:1.8;margin-bottom:24px;text-align:center;">
+        Kepada pelanggan yang dihormati, anda dinasihatkan supaya membaca terma dan syarat yang telah ditetapkan oleh pihak <strong style="color:#c9a96e;">Nizar Naseer Studio</strong>.<br/><br/>
+        Setelah tempahan dibuat, bermakna anda telah membaca, memahami dan bersetuju dengan terma dan syarat yang telah dinyatakan.
+      </p>
+
+      <!-- Album & Pakej -->
+      <div style="margin-bottom:24px;">
+        <p style="font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:#c9a96e;margin-bottom:12px;border-bottom:1px solid rgba(201,169,110,0.15);padding-bottom:8px;">📷 Album &amp; Pakej</p>
+        <ul style="list-style:none;font-size:0.83rem;color:#bbb;line-height:2;padding:0;">
+          <li>i. Harga pakej adalah tetap, kecuali semasa promosi khas dari pihak Nizar Naseer Studio.</li>
+          <li>ii. Sebarang pertanyaan berkaitan pakej boleh dibuat melalui WhatsApp atau media sosial rasmi kami.</li>
+          <li>iii. Caj luar kawasan mengambil kira kos petrol, tol &amp; penginapan (jika berkenaan).</li>
+          <li>iv. Caj boleh dirunding &amp; mengikut persetujuan berdasarkan kadar semasa.</li>
+        </ul>
+      </div>
+
+      <!-- Tempahan -->
+      <div style="margin-bottom:24px;">
+        <p style="font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:#c9a96e;margin-bottom:12px;border-bottom:1px solid rgba(201,169,110,0.15);padding-bottom:8px;">📅 Tempahan</p>
+        <ul style="list-style:none;font-size:0.83rem;color:#bbb;line-height:2;padding:0;">
+          <li>i. Tempahan boleh dibuat 1 bulan hingga 1 tahun sebelum sesi dan tertakluk kepada kekosongan slot.</li>
+          <li>ii. Tempahan rasmi dikira selepas bayaran deposit diterima.</li>
+          <li>iii. Deposit akan dikembalikan 100% sekiranya ada pembatalan tempahan yang munasabah &amp; dimaklumkan lebih awal.</li>
+          <li>iv. Tarikh yang ditempah boleh ditukar selepas tempahan rasmi dibuat bergantung kepada slot yang hendak ditukar.</li>
+          <li>v. Sekiranya principal photographer telah ditempah oleh pihak lain, pihak kami akan mewakilkan photographer lain yang berkelayakan.</li>
+        </ul>
+      </div>
+
+      <!-- Deposit & Bayaran -->
+      <div style="margin-bottom:24px;">
+        <p style="font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:#c9a96e;margin-bottom:12px;border-bottom:1px solid rgba(201,169,110,0.15);padding-bottom:8px;">💳 Deposit &amp; Bayaran</p>
+        <ul style="list-style:none;font-size:0.83rem;color:#bbb;line-height:2;padding:0;">
+          <li>i. Bayaran boleh dibuat melalui perbankan dalam talian (online banking) atau mesin ATM.</li>
+          <li>ii. Pembayaran hendaklah dibuat dalam 2 peringkat:</li>
+          <li style="padding-left:16px;">— <strong style="color:#c9a96e;">Deposit (RM 50)</strong> : Untuk mengesahkan tempahan</li>
+          <li style="padding-left:16px;">— <strong style="color:#c9a96e;">Baki Bayaran</strong> : Dijelaskan sepenuhnya semasa tiba di studio</li>
+        </ul>
+      </div>
+
+      <!-- Warning -->
+      <div style="background:rgba(201,169,110,0.06);border:1px solid rgba(201,169,110,0.2);border-radius:12px;padding:14px 18px;text-align:center;font-size:0.75rem;color:#c9a96e;letter-spacing:0.5px;line-height:1.7;margin-bottom:24px;">
+        ⚠️ PIHAK NIZAR NASEER STUDIO BERHAK MENOLAK TEMPAHAN ATAS KELEWATAN PEMBAYARAN DEPOSIT
+      </div>
+
+      <!-- Agree checkbox -->
       <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:20px;">
         <input type="checkbox" id="tcAgreeCheck" style="margin-top:3px;accent-color:#c9a96e;width:16px;height:16px;flex-shrink:0;">
-        <span style="font-size:0.82rem;color:#ccc;">I have read and agree to the Terms & Conditions above.</span>
+        <span style="font-size:0.82rem;color:#ccc;">Saya telah membaca, memahami dan bersetuju dengan Terma &amp; Syarat di atas.</span>
       </label>
+
+      <!-- Buttons -->
       <div style="display:flex;gap:10px;">
-        <button onclick="closeTcModal()" style="flex:1;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#888;font-size:0.85rem;cursor:pointer;">Cancel</button>
-        <button id="tcProceedBtn" onclick="proceedAfterTc()" style="flex:2;padding:12px;background:linear-gradient(135deg,#c9a96e,#a07840);border:none;border-radius:8px;color:#000;font-weight:700;font-size:0.85rem;cursor:pointer;opacity:0.5;pointer-events:none;">Continue to Booking →</button>
+        <button onclick="closeTcModal()" style="flex:1;padding:13px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#777;font-size:0.85rem;cursor:pointer;font-family:'Inter',sans-serif;">Batal</button>
+        <button id="tcProceedBtn" onclick="proceedAfterTc()" style="flex:2;padding:13px;background:linear-gradient(135deg,#c9a96e,#a07840);border:none;border-radius:10px;color:#000;font-weight:700;font-size:0.85rem;cursor:pointer;opacity:0.45;pointer-events:none;font-family:'Cormorant Garamond',serif;font-size:1rem;letter-spacing:0.5px;">Saya Faham &amp; Bersetuju ✓</button>
       </div>
     </div>
   </div>
