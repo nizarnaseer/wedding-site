@@ -1118,9 +1118,28 @@ function submitBooking(e) {
       }).catch(() => {});
     }
 
-    /* 2️⃣ WhatsApp via wa.me */
-    const waUrl = `https://wa.me/${PHOTOGRAPHER}?text=${encodeURIComponent(waMsg)}`;
-    window.open(waUrl, '_blank');
+
+    /* 2️⃣  Auto-WhatsApp to photographer via CallMeBot (server-side) */
+    fetch('/api/store-booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bookingId:     ref,
+        clientName:    name,
+        couple:        coupleLabel,
+        clientEmail:   email,
+        clientPhone:   phone,
+        packageName:   activePackage.name,
+        eventDate:     selectedDates[0],
+        location:      location || '',
+        notes:         notes || '',
+        totalAmount:   activePackage.totalAmount || activePackage.baseAmount || 0,
+        depositAmount: 100,
+        datesBlock,
+        approveLink,
+        notify: true,   // ← triggers auto-WhatsApp to photographer
+      }),
+    }).catch(() => {});
 
     /* 3️⃣ Auto-add to Google Calendar */
     fetch('/api/add-calendar-event', {
