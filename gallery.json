@@ -1,7 +1,7 @@
 {
   "albums": [
     {
-      "id": "zarif-anis",
+      "id": "zarif-weds-anis",
       "title": "Zarif Weds Anis",
       "date": "14 December 2024 · Dewan Sri Penang",
       "category": "Wedding",
@@ -10,28 +10,23 @@
       "teasers": [
         {
           "src": "images/zarif-anis/01.jpg",
-          "fallback": "https://images.unsplash.com/photo-1519741497674-611481863552?w=900&auto=format&fit=crop",
           "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
         },
         {
           "src": "images/zarif-anis/02.jpg",
-          "fallback": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop",
-          "g": "linear-gradient(135deg,#1a1210,#2a1e12)"
+          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
         },
         {
           "src": "images/zarif-anis/03.jpg",
-          "fallback": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&auto=format&fit=crop",
-          "g": "linear-gradient(135deg,#120a1a,#1e1228)"
+          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
         },
         {
           "src": "images/zarif-anis/04.jpg",
-          "fallback": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&auto=format&fit=crop",
-          "g": "linear-gradient(135deg,#1a0e0a,#2a180e)"
+          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
         },
         {
           "src": "images/zarif-anis/05.jpg",
-          "fallback": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop",
-          "g": "linear-gradient(135deg,#0a1a10,#0e2416)"
+          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
         }
       ]
     },
