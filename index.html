@@ -1001,7 +1001,9 @@
     function collapseRayaBanner() {
       var banner = document.getElementById('rayaPromoBanner');
       var pill   = document.getElementById('rayaMiniPill');
+      var hero   = document.getElementById('hero');
       banner.classList.add('raya-collapsed');
+      if (hero) hero.style.paddingTop = '0';
       setTimeout(function() {
         pill.classList.add('raya-pill-visible');
       }, 320);
@@ -1009,7 +1011,9 @@
     function expandRayaBanner() {
       var banner = document.getElementById('rayaPromoBanner');
       var pill   = document.getElementById('rayaMiniPill');
+      var hero   = document.getElementById('hero');
       pill.classList.remove('raya-pill-visible');
+      if (hero) hero.style.paddingTop = '';
       setTimeout(function() {
         banner.classList.remove('raya-collapsed');
       }, 200);
@@ -1022,8 +1026,10 @@
         if (cfg.studioVisible === false) {
           var b = document.getElementById('rayaPromoBanner');
           var p = document.getElementById('rayaMiniPill');
+          var h = document.getElementById('hero');
           if (b) b.style.display = 'none';
           if (p) p.style.display = 'none';
+          if (h) h.style.paddingTop = '0';
         }
       }).catch(function(){});
 
