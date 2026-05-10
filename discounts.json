@@ -1,9 +1,17 @@
 {
   "pkg_discounts": {
-    "Tunang Photography":  { "v": 90, "t": "fixed" },
-    "Nikah Photography":   { "v": 50, "t": "fixed" },
-    "TRIO E (3 Events)":   { "v": 70, "t": "pct"   },
-    "Pre Wed Photography": { "v": 50, "t": "fixed"  }
+    "Sanding Photography": {
+      "v": 0,
+      "t": "pct"
+    },
+    "Nikah + Sanding Video": {
+      "v": 30,
+      "t": "fixed"
+    },
+    "Full Package Video": {
+      "v": 60,
+      "t": "pct"
+    }
   },
   "promo_codes": {}
 }
