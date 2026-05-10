@@ -73,6 +73,9 @@ select.form-input option{background:#13131a}
 .photo-row img{width:40px;height:40px;object-fit:cover;border-radius:6px}
 .photo-url{flex:1;font-size:0.72rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .photo-del{background:none;border:none;color:#f87171;cursor:pointer;font-size:1rem;padding:4px}
+.photo-move{background:none;border:1px solid rgba(255,255,255,0.15);color:var(--gold);cursor:pointer;font-size:0.8rem;padding:2px 6px;border-radius:4px;line-height:1.4;transition:background .15s}
+.photo-move:hover{background:rgba(201,169,110,0.15)}
+.photo-move:disabled{opacity:0.25;cursor:default}
 .url-input-row{display:flex;gap:8px;margin-top:8px}
 .url-input-row .form-input{flex:1}
 .empty-state{text-align:center;padding:60px 24px;color:var(--muted)}
@@ -261,14 +264,24 @@ function closeModal() { document.getElementById('modalOverlay').classList.remove
 
 /* ── Photos UI ── */
 function renderPhotosList() {
+  const total = editPhotos.length;
   document.getElementById('photosList').innerHTML = editPhotos.map((p, i) => `
     <div class="photo-row">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <button class="photo-move" onclick="movePhoto(${i},-1)" ${i===0?'disabled':''}>▲</button>
+        <button class="photo-move" onclick="movePhoto(${i}, 1)" ${i===total-1?'disabled':''}>▼</button>
+      </div>
       <img src="${p.preview}" onerror="this.style.display='none'" alt=""/>
-      <span class="photo-url">${p.src}</span>
+      <span class="photo-url">${i===0?'<b style="color:var(--gold);font-size:0.7rem">COVER</b> ':''} ${p.src}</span>
       <button class="photo-del" onclick="removePhoto(${i})">✕</button>
     </div>`).join('');
 }
-function removePhoto(i) { editPhotos.splice(i,1); renderPhotosList(); }
+function movePhoto(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= editPhotos.length) return;
+  [editPhotos[i], editPhotos[j]] = [editPhotos[j], editPhotos[i]];
+  renderPhotosList();
+}
 function addUrlPhoto() {
   const url = document.getElementById('urlInput').value.trim();
   if (!url) return;
