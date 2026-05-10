@@ -612,7 +612,7 @@ ul { list-style: none; }
 @media(max-width:600px) {
   .lightbox-title { font-size: 1.3rem; }
   .lb-arrow { width: 36px; height: 36px; font-size: 1.2rem; }
-  .lightbox-img { max-height: 55vw; min-height: 180px; }
+  .lightbox-img { height: 55vh; max-height: 60vh; min-height: 250px; }
 }
 
 /* ─── RESPONSIVE ─── */

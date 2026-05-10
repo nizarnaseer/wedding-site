@@ -1369,16 +1369,14 @@ function _renderDiscountCards(discounts) {
     const card = btn.closest('.package-card');
     if (!card || card.querySelector('.pkg-discounted')) return;
 
-    const isFeatured = card.classList.contains('package-card--featured');
-
-    // ── Corner ribbon — skip on featured cards to preserve Most Popular badge ──
-    if (!isFeatured) {
-      card.style.overflow = 'hidden';
-      const ribbon = document.createElement('div');
-      ribbon.className = 'discount-ribbon';
-      ribbon.innerHTML = `<span>${pct}% OFF</span>`;
-      card.appendChild(ribbon);
-    }
+    // ── Corner ribbon ──
+    const ribbonContainer = document.createElement('div');
+    ribbonContainer.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;border-radius:inherit;pointer-events:none;z-index:1;';
+    const ribbon = document.createElement('div');
+    ribbon.className = 'discount-ribbon';
+    ribbon.innerHTML = `<span>${pct}% OFF</span>`;
+    ribbonContainer.appendChild(ribbon);
+    card.appendChild(ribbonContainer);
 
     // ── Tag icon next to pkg-badge ──
     const badge = card.querySelector('.pkg-badge');

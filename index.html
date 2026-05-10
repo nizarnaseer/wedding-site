@@ -1166,10 +1166,31 @@
               if(btn) btn.setAttribute('onclick','bookTNS()');
             }
           }
-          // Update Book Now button for non-tns
           if(!p.type && p.name && p.price){
-            const btn = card.querySelector('.pkg-btn');
+            const btn = card.querySelector('.pkg-btn, .pkg-btn--featured');
             if(btn) btn.setAttribute('onclick',`openBookingModal('${p.name}','RM ${Number(p.price).toLocaleString()}')`);
+          }
+          // Update featured toggle
+          if(p.featured !== undefined){
+            const btn = card.querySelector('.pkg-btn, .pkg-btn--featured');
+            if(p.featured) {
+              card.classList.add('package-card--featured');
+              if(btn) {
+                btn.classList.remove('pkg-btn');
+                btn.classList.add('pkg-btn--featured');
+              }
+              if(!card.querySelector('.pkg-popular-tag')){
+                card.insertAdjacentHTML('afterbegin', '<div class="pkg-popular-tag">Most Popular</div>');
+              }
+            } else {
+              card.classList.remove('package-card--featured');
+              if(btn) {
+                btn.classList.remove('pkg-btn--featured');
+                btn.classList.add('pkg-btn');
+              }
+              const tag = card.querySelector('.pkg-popular-tag');
+              if(tag) tag.remove();
+            }
           }
         });
       })
