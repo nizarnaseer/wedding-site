@@ -120,7 +120,7 @@
 <script>
   // ── All packages matching index.html ──
   const PACKAGES = [
-    // Photography
+    // Photography — names match openBookingModal() onclick in index.html
     { name: 'Tunang Photography',           base: 600  },
     { name: 'Nikah Photography',            base: 700  },
     { name: 'Sanding Photography',          base: 900  },
@@ -128,10 +128,10 @@
     { name: 'TRIO E (3 Events)',            base: 2400 },
     { name: 'Pre Wed Photography',          base: 550  },
     { name: 'Tunang + Nikah + Sanding',     base: 2000 },
-    // Videography — names must match openBookingModal() in index.html
-    { name: 'Nikah Videography',            base: 950  },
-    { name: 'Sanding Videography',          base: 1250 },
-    { name: 'Nikah + Sanding Videography',  base: 1999 },
+    // Videography — names from packages.json (dynamically loaded)
+    { name: 'Nikah Video',                  base: 950  },
+    { name: 'Nikah + Sanding Video',        base: 1500 },
+    { name: 'Full Package Video',           base: 2200 },
   ];
 
   function getDiscounts()  { return JSON.parse(localStorage.getItem('pkg_discounts')  || '{}'); }
