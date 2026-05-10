@@ -2,14 +2,20 @@
   "pkg_discounts": {
     "Sanding Photography": {
       "v": {
-        "v": 30,
+        "v": {
+          "v": 30,
+          "t": "pct"
+        },
         "t": "pct"
       },
       "t": "pct"
     },
     "Nikah + Sanding Video": {
       "v": {
-        "v": 50,
+        "v": {
+          "v": 50,
+          "t": "fixed"
+        },
         "t": "fixed"
       },
       "t": "fixed"
@@ -20,32 +26,48 @@
     },
     "Tunang Photography": {
       "v": {
-        "v": 10,
-        "t": "fixed"
+        "v": {
+          "v": 10,
+          "t": "fixed"
+        },
+        "t": "pct"
       },
-      "t": "pct"
+      "t": "fixed"
     },
     "Nikah Photography": {
       "v": {
-        "v": 20,
+        "v": {
+          "v": 20,
+          "t": "fixed"
+        },
         "t": "fixed"
       },
       "t": "fixed"
     },
     "Pre Wed Photography": {
-      "v": 70,
-      "t": "fixed"
+      "v": 25,
+      "t": "pct"
     },
     "Nikah Video": {
       "v": {
-        "v": 20,
+        "v": {
+          "v": 20,
+          "t": "pct"
+        },
+        "t": "fixed"
+      },
+      "t": "pct"
+    },
+    "TRIO E (3 Events)": {
+      "v": {
+        "v": 50,
         "t": "pct"
       },
       "t": "fixed"
     },
-    "TRIO E (3 Events)": {
-      "v": 50,
-      "t": "pct"
+    "Nikah & Sanding Photography": {
+      "v": 100,
+      "t": "fixed"
     }
   },
   "promo_codes": {}
