@@ -228,6 +228,15 @@
           <p style="font-size:0.73rem;color:var(--muted);margin-bottom:8px;">Once client pays full balance:</p>
           <button class="btn" style="width:100%;background:#16a34a;color:#fff;padding:12px;font-size:0.85rem;" onclick="markFullPaid()">✅ Mark Full Paid → Generate Receipt</button>
         </div>
+
+        <!-- Google Calendar -->
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+          <p style="font-size:0.73rem;color:var(--muted);margin-bottom:8px;">📅 Save this job to your Google Calendar:</p>
+          <button class="btn" style="width:100%;background:#1a73e8;color:#fff;padding:12px;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="addToGCal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg>
+            Add to Google Calendar
+          </button>
+        </div>
       </div>
 
       <div class="divider">or decline</div>
@@ -559,6 +568,45 @@
       a.target = '_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
     showSuccess('❌ Booking Declined', clientName + ' has been notified.');
+  }
+
+  function addToGCal() {
+    // Format date: YYYY-MM-DD → YYYYMMDD (Google Calendar format)
+    var rawDate = date.replace(/-/g, '').replace(/\//g, '');
+    // If the date string is not 8 digits already, try to parse it
+    if (rawDate.length !== 8) {
+      var parsed = new Date(date);
+      if (!isNaN(parsed)) {
+        rawDate = parsed.toISOString().slice(0,10).replace(/-/g,'');
+      }
+    }
+    var dateStr = rawDate; // YYYYMMDD
+
+    // Build event title
+    var coupleLabel = couple ? couple : clientName;
+    var eventTitle  = '📷 ' + coupleLabel + ' — ' + pkg + ' [' + ref + ']';
+
+    // Build description
+    var desc = [
+      '📋 Ref: ' + ref,
+      '👤 Client: ' + clientName,
+      couple ? '💑 Couple: ' + couple : '',
+      '📦 Package: ' + pkg,
+      '💰 Price: ' + price,
+      '📞 Phone: ' + phone,
+      '✉️ Email: ' + email,
+      clientLocation !== 'Not provided' ? '📍 Location: ' + clientLocation : '',
+      notes !== 'None' && notes ? '📝 Notes: ' + notes : '',
+    ].filter(Boolean).join('\n');
+
+    var gcalUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+      '&text='     + encodeURIComponent(eventTitle) +
+      '&dates='    + dateStr + '/' + dateStr +
+      '&details='  + encodeURIComponent(desc) +
+      '&location=' + encodeURIComponent(clientLocation !== 'Not provided' ? clientLocation : '') +
+      '&sf=true&output=xml';
+
+    window.open(gcalUrl, '_blank');
   }
 </script>
 
