@@ -137,6 +137,9 @@
 
 </head>
 <body>
+<div style="position:fixed;top:16px;left:16px;z-index:999;">
+  <a href="/admin.html" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#888;text-decoration:none;padding:8px 16px;border-radius:8px;font-size:0.78rem;font-family:'Inter',sans-serif;backdrop-filter:blur(8px);transition:all .2s;" onmouseover="this.style.color='#c9a96e';this.style.borderColor='rgba(201,169,110,0.4)'" onmouseout="this.style.color='#888';this.style.borderColor='rgba(255,255,255,0.12)'">← Admin Dashboard</a>
+</div>
 <div class="card">
   <div class="logo">NIZAR NASEER<span> STUDIO</span></div>
 
@@ -150,6 +153,7 @@
 
     <div class="details-box">
       <div class="detail-row"><span>Client</span>    <strong id="dName">—</strong></div>
+      <div class="detail-row" id="coupleRow" style="display:none"><span>Couple 💑</span><strong id="dCouple" style="color:var(--gold)">—</strong></div>
       <div class="detail-row"><span>WhatsApp</span>  <strong id="dPhone">—</strong></div>
       <div class="detail-row"><span>Email</span>     <strong id="dEmail">—</strong></div>
       <div class="detail-row"><span>Package</span>   <strong id="dPackage">—</strong></div>
@@ -207,6 +211,23 @@
             ✉️ Send via Email
           </button>
         </div>
+
+        <!-- Invoice link (shown after sending) -->
+        <div id="invoiceLinkBox" style="display:none;margin-top:12px;background:rgba(201,169,110,0.06);border:1px solid rgba(201,169,110,0.2);border-radius:8px;padding:12px;">
+          <p style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">📄 Invoice ready — share with client:</p>
+          <div style="display:flex;gap:8px;">
+            <a id="invoiceViewBtn" href="#" target="_blank" style="flex:1;" >
+              <button class="btn" style="width:100%;background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);color:var(--gold);padding:10px;font-size:0.78rem;">🧾 View Invoice</button>
+            </a>
+            <button class="btn" style="flex:1;background:#25D366;color:#000;padding:10px;font-size:0.78rem;" onclick="sendInvoiceWA()">📲 Send Invoice via WA</button>
+          </div>
+        </div>
+
+        <!-- Mark full paid -->
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+          <p style="font-size:0.73rem;color:var(--muted);margin-bottom:8px;">Once client pays full balance:</p>
+          <button class="btn" style="width:100%;background:#16a34a;color:#fff;padding:12px;font-size:0.85rem;" onclick="markFullPaid()">✅ Mark Full Paid → Generate Receipt</button>
+        </div>
       </div>
 
       <div class="divider">or decline</div>
@@ -234,6 +255,7 @@
   var _p            = new URLSearchParams(window.location.search);
   var ref           = _p.get('ref')      || 'ENQ-XXXXXX';
   var clientName    = _p.get('name')     || '—';
+  var couple        = _p.get('couple')   || '';
   var email         = _p.get('email')    || '—';
   var phone         = _p.get('phone')    || '—';
   var pkg           = _p.get('package')  || '—';
@@ -241,6 +263,7 @@
   var date          = _p.get('date')     || '—';
   var clientLocation= _p.get('location') || 'Not provided';
   var notes         = _p.get('notes')    || 'None';
+  var DEPOSIT       = 100; // RM deposit required
 
   document.getElementById('refCode').textContent   = ref;
   document.getElementById('dName').textContent     = clientName;
@@ -250,6 +273,10 @@
   document.getElementById('dDate').textContent     = date;
   document.getElementById('dLocation').textContent = clientLocation;
   document.getElementById('dNotes').textContent    = notes;
+  if (couple) {
+    document.getElementById('dCouple').textContent = couple;
+    document.getElementById('coupleRow').style.display = 'flex';
+  }
 
   // Make phone a clickable WhatsApp link
   (function() {
@@ -351,11 +378,12 @@
   function sendLinkWA() {
     var msg =
       '✅ *Booking Approved — Nizar Naseer Studio*\n━━━━━━━━━━━━━━\n' +
-      'Hi *' + clientName + '*! 🎉 Your booking has been *APPROVED*.\n\n' +
+      'Hi *' + (couple || clientName) + '*! 🎉 Your booking has been *APPROVED*.\n\n' +
       '📋 Ref: *' + ref + '*\n📦 Package: *' + pkg + '*\n📅 Date: *' + date + '*\n💰 Amount: *' + price + '*\n\n' +
-      '💳 *Secure payment link:*\n' + generatedPaymentUrl + '\n\n' +
-      '⏰ Link expires in 3 days. Thank you for choosing Nizar Naseer Studio! 🌟';
+      '💳 *Deposit Payment Link:*\n' + generatedPaymentUrl + '\n\n' +
+      '⏰ Link expires in 3 days. Full balance due 7 days before event.\n\nThank you for choosing Nizar Naseer Studio! 🌟';
     window.open('https://wa.me/' + clientWANum() + '?text=' + encodeURIComponent(msg), '_blank');
+    showInvoiceLink();
     showSuccess('✅ Payment Link Sent via WhatsApp', 'ToyyibPay link sent to ' + clientName + '.');
     storeBookingForReview();
   }
@@ -363,32 +391,89 @@
   function sendLinkEmail() {
     var subject = encodeURIComponent('Booking Confirmed — Payment Link for ' + pkg + ' (' + ref + ')');
     var body    = encodeURIComponent(
-      'Dear ' + clientName + ',\n\nYour booking (' + ref + ') for ' + pkg + ' on ' + date + ' has been APPROVED!\n\n' +
-      'Please pay ' + price + ' via:\n' + generatedPaymentUrl + '\n\n' +
-      'Link expires in 3 days.\n\nThank you,\nNizar Naseer Studio'
+      'Dear ' + (couple || clientName) + ',\n\nYour booking (' + ref + ') for ' + pkg + ' on ' + date + ' has been APPROVED!\n\n' +
+      'Please pay RM 100 deposit via:\n' + generatedPaymentUrl + '\n\n' +
+      'Balance due 7 days before event.\n\nThank you,\nNizar Naseer Studio'
     );
     var a = document.createElement('a');
     a.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
     a.target = '_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    showInvoiceLink();
     showSuccess('✅ Payment Link Sent via Email', 'ToyyibPay link emailed to ' + email + '.');
     storeBookingForReview();
   }
 
-  // Silently stores booking in Netlify Blobs so the daily cron auto-sends
-  // a review request email 2 days after the event date.
+  function buildInvoiceUrl(type) {
+    var totalNum = parseFloat(price.replace(/[^0-9.]/g, '')) || 0;
+    return window.location.origin + '/invoice.html'
+      + '?type=' + (type || 'invoice')
+      + '&ref=' + encodeURIComponent(ref)
+      + '&couple=' + encodeURIComponent(couple)
+      + '&name=' + encodeURIComponent(clientName)
+      + '&email=' + encodeURIComponent(email)
+      + '&phone=' + encodeURIComponent(phone)
+      + '&pkg=' + encodeURIComponent(pkg)
+      + '&total=' + totalNum
+      + '&deposit=' + DEPOSIT
+      + '&date=' + encodeURIComponent(date)
+      + '&location=' + encodeURIComponent(clientLocation)
+      + '&notes=' + encodeURIComponent(notes);
+  }
+
+  function showInvoiceLink() {
+    var invUrl = buildInvoiceUrl('invoice');
+    document.getElementById('invoiceViewBtn').href = invUrl;
+    document.getElementById('invoiceLinkBox').style.display = 'block';
+  }
+
+  function sendInvoiceWA() {
+    var invUrl   = buildInvoiceUrl('invoice');
+    var totalNum = parseFloat(price.replace(/[^0-9.]/g, '')) || 0;
+    var balance  = Math.max(0, totalNum - DEPOSIT);
+    var invoiceMsg =
+      '📋 *Invoice — Nizar Naseer Studio*\n━━━━━━━━━━━━━━\n' +
+      'Dear *' + (couple || clientName) + '*,\n\n' +
+      '📋 Ref: ' + ref + '\n📦 Package: ' + pkg + '\n📅 Date: ' + date + '\n' +
+      '💰 Total: ' + price + '\n💳 Deposit: RM ' + DEPOSIT + '\n📊 Balance: RM ' + balance.toLocaleString() + '\n\n' +
+      '🧾 View & print invoice:\n' + invUrl + '\n\nThank you! 🙏';
+    window.open('https://wa.me/' + clientWANum() + '?text=' + encodeURIComponent(invoiceMsg), '_blank');
+  }
+
+  function markFullPaid() {
+    if (!confirm('Mark this booking as FULLY PAID and generate receipt?')) return;
+    fetch('/api/store-booking?ref=' + ref + '&action=full_paid')
+      .then(function(r){ return r.json(); })
+      .then(function(){
+        var receiptUrl = buildInvoiceUrl('receipt');
+        var msg = '✅ *Payment Received — Nizar Naseer Studio*\n━━━━━━━━━━━━━━\n' +
+          'Dear *' + (couple || clientName) + '*, your full payment has been received! 🎉\n\n' +
+          '📋 Ref: ' + ref + '\n📦 Package: ' + pkg + '\n📅 Date: ' + date + '\n\n' +
+          '🧾 Your receipt:\n' + receiptUrl + '\n\nSee you on your special day! 📷';
+        window.open('https://wa.me/' + clientWANum() + '?text=' + encodeURIComponent(msg), '_blank');
+        window.open(receiptUrl, '_blank');
+      })
+      .catch(function(){ alert('Could not update payment status. Open receipt manually.'); window.open(buildInvoiceUrl('receipt'), '_blank'); });
+  }
+
   function storeBookingForReview() {
     var rawPhone = phone.replace(/[\s\-\+\(\)]/g,'');
     var waNum    = rawPhone.startsWith('60') ? rawPhone : '60' + rawPhone.replace(/^0/,'');
+    var totalNum = parseFloat(price.replace(/[^0-9.]/g, '')) || 0;
     fetch('/api/store-booking', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        bookingId:   ref,
-        clientName:  clientName,
-        clientEmail: email,
-        clientPhone: waNum,
-        eventDate:   date,
-        packageName: pkg,
+        bookingId:     ref,
+        clientName:    clientName,
+        couple:        couple,
+        clientEmail:   email,
+        clientPhone:   waNum,
+        eventDate:     date,
+        packageName:   pkg,
+        location:      clientLocation,
+        notes:         notes,
+        totalAmount:   totalNum,
+        depositAmount: DEPOSIT,
       }),
     }).catch(function(){/* silent — non-critical */});
   }

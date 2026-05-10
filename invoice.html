@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice — Nizar Naseer Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f5f3ef; color: #1a1a1a; min-height: 100vh; padding: 32px 16px; }
+    .page { max-width: 720px; margin: 0 auto; background: #fff; border-radius: 4px; box-shadow: 0 4px 32px rgba(0,0,0,0.12); overflow: hidden; }
+
+    /* ── Header ── */
+    .inv-header { background: #0a0a0a; color: #fff; padding: 40px 48px 32px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .studio-name { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; letter-spacing: 4px; text-transform: uppercase; }
+    .studio-name span { color: #c9a96e; }
+    .studio-tagline { font-size: 0.7rem; color: #888; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+    .inv-type-badge { text-align: right; }
+    .inv-type { font-family: 'Cormorant Garamond', serif; font-size: 2.8rem; font-weight: 300; color: #c9a96e; letter-spacing: 4px; text-transform: uppercase; line-height: 1; }
+    .inv-ref { font-size: 0.72rem; color: #888; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+    .inv-ref strong { color: #e8d5a3; font-family: monospace; font-weight: 400; }
+
+    /* ── Meta bar ── */
+    .inv-meta { background: #1a1a1a; padding: 16px 48px; display: flex; gap: 48px; }
+    .meta-item label { font-size: 0.65rem; color: #888; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 3px; }
+    .meta-item span { font-size: 0.82rem; color: #e8e4df; }
+
+    /* ── Body ── */
+    .inv-body { padding: 40px 48px; }
+
+    /* ── Parties ── */
+    .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 36px; }
+    .party-label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: #c9a96e; font-weight: 600; margin-bottom: 10px; }
+    .party-name { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; margin-bottom: 4px; }
+    .party-detail { font-size: 0.8rem; color: #666; line-height: 1.7; }
+
+    /* ── Event box ── */
+    .event-box { background: #f8f6f2; border-left: 3px solid #c9a96e; padding: 16px 20px; border-radius: 0 6px 6px 0; margin-bottom: 32px; }
+    .event-box-label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: #c9a96e; margin-bottom: 8px; font-weight: 600; }
+    .event-detail { font-size: 0.82rem; color: #333; line-height: 1.8; }
+
+    /* ── Items table ── */
+    .items-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    .items-table th { background: #0a0a0a; color: #c9a96e; font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; padding: 10px 14px; text-align: left; font-weight: 500; }
+    .items-table th:last-child { text-align: right; }
+    .items-table td { padding: 13px 14px; border-bottom: 1px solid #eee; font-size: 0.82rem; }
+    .items-table td:last-child { text-align: right; font-weight: 500; }
+    .items-table tr:last-child td { border-bottom: none; }
+    .items-table .subtotal-row td { color: #888; font-size: 0.78rem; padding-top: 6px; padding-bottom: 6px; }
+
+    /* ── Totals ── */
+    .totals-box { margin-left: auto; width: 280px; }
+    .total-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.83rem; border-bottom: 1px solid #eee; }
+    .total-row:last-child { border-bottom: none; }
+    .total-row.deposit { color: #16a34a; font-weight: 500; }
+    .total-row.balance { font-size: 1rem; font-weight: 600; color: #0a0a0a; padding: 14px 0 0; border-bottom: none; }
+    .totals-box .grand { background: #0a0a0a; color: #c9a96e; padding: 14px 16px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+    .totals-box .grand .label { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; }
+    .totals-box .grand .amount { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; }
+
+    /* ── Payment info ── */
+    .payment-info { margin-top: 36px; padding-top: 28px; border-top: 1px solid #eee; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .payment-section h4 { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: #c9a96e; margin-bottom: 10px; font-weight: 600; }
+    .payment-section p { font-size: 0.8rem; color: #555; line-height: 1.8; }
+    .payment-section strong { color: #0a0a0a; }
+    .deadline-box { background: #fff8ed; border: 1px solid #f0d080; border-radius: 6px; padding: 12px 16px; margin-top: 10px; font-size: 0.78rem; color: #7a5c00; }
+
+    /* ── Footer ── */
+    .inv-footer { background: #f8f6f2; border-top: 1px solid #e5e5e5; padding: 20px 48px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-note { font-size: 0.72rem; color: #999; font-style: italic; }
+    .footer-studio { font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; color: #c9a96e; letter-spacing: 2px; }
+
+    /* ── Print button ── */
+    .print-bar { max-width: 720px; margin: 0 auto 24px; display: flex; gap: 12px; }
+    .btn-print { background: #c9a96e; color: #000; border: none; padding: 12px 28px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; letter-spacing: 0.5px; transition: background .15s; }
+    .btn-print:hover { background: #e8d5a3; }
+    .btn-wa { background: #25d366; color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .btn-wa:hover { background: #1ebe5c; }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .print-bar { display: none; }
+      .page { box-shadow: none; border-radius: 0; }
+    }
+    @media (max-width: 600px) {
+      .inv-header, .inv-meta, .inv-body, .inv-footer { padding-left: 24px; padding-right: 24px; }
+      .parties { grid-template-columns: 1fr; }
+      .payment-info { grid-template-columns: 1fr; }
+      .totals-box { width: 100%; }
+      .inv-type { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="print-bar">
+  <button class="btn-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+  <button class="btn-wa" id="btnWA">📲 Send via WhatsApp</button>
+</div>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="inv-header">
+    <div>
+      <div class="studio-name">NIZAR NASEER<span> STUDIO</span></div>
+      <div class="studio-tagline">Wedding & Event Photography</div>
+    </div>
+    <div class="inv-type-badge">
+      <div class="inv-type" id="docType">INVOICE</div>
+      <div class="inv-ref">Ref: <strong id="refNum">—</strong></div>
+    </div>
+  </div>
+
+  <!-- Meta bar -->
+  <div class="inv-meta">
+    <div class="meta-item"><label>Date Issued</label><span id="issueDate">—</span></div>
+    <div class="meta-item"><label>Invoice No.</label><span id="invNo">—</span></div>
+    <div class="meta-item"><label>Status</label><span id="statusLabel" style="color:#ffb300">⏳ Awaiting Deposit</span></div>
+  </div>
+
+  <!-- Body -->
+  <div class="inv-body">
+
+    <!-- Parties -->
+    <div class="parties">
+      <div>
+        <div class="party-label">Billed To</div>
+        <div class="party-name" id="clientName">—</div>
+        <div class="party-detail" id="clientDetail">—</div>
+      </div>
+      <div>
+        <div class="party-label">From</div>
+        <div class="party-name">Nizar Naseer Studio</div>
+        <div class="party-detail">
+          photography@weddingclicks.us<br/>
+          weddingclicks.us<br/>
+          Malaysia
+        </div>
+      </div>
+    </div>
+
+    <!-- Event box -->
+    <div class="event-box">
+      <div class="event-box-label">📅 Event Details</div>
+      <div class="event-detail" id="eventDetail">—</div>
+    </div>
+
+    <!-- Items table -->
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th style="width:50%">Description</th>
+          <th>Details</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody id="itemsBody">
+      </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div style="display:flex;justify-content:flex-end;">
+      <div class="totals-box">
+        <div class="total-row"><span>Subtotal</span><span id="subtotal">—</span></div>
+        <div class="total-row deposit" id="depositRow"><span>✅ Deposit Received</span><span id="depositAmt">—</span></div>
+        <div class="grand" id="balanceGrand">
+          <div class="label">Balance Due</div>
+          <div class="amount" id="balanceAmt">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment info -->
+    <div class="payment-info">
+      <div class="payment-section">
+        <h4>💳 Payment Method</h4>
+        <p>
+          <strong>Online Banking (FPX)</strong><br/>
+          via secure payment link<br/><br/>
+          <strong>Bank Transfer</strong><br/>
+          Bank: <strong id="bankName">—</strong><br/>
+          Account: <strong id="bankAcc">—</strong><br/>
+          Name: <strong>Nizar Naseer</strong>
+        </p>
+      </div>
+      <div class="payment-section">
+        <h4>📋 Payment Terms</h4>
+        <p>
+          <strong>Deposit:</strong> Required to confirm booking.<br/>
+          <strong>Balance:</strong> Full payment required 7 days before event date.<br/><br/>
+          Late payment may result in booking cancellation.
+        </p>
+        <div class="deadline-box">
+          ⚠️ Balance payment deadline:<br/>
+          <strong id="deadlineDate">—</strong>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="inv-footer">
+    <div class="footer-note">Thank you for choosing Nizar Naseer Studio 🙏</div>
+    <div class="footer-studio">NIZAR NASEER STUDIO</div>
+  </div>
+
+</div>
+
+<script src="config.js"></script>
+<script>
+  const p = new URLSearchParams(window.location.search);
+  const isReceipt = p.get('type') === 'receipt';
+
+  const ref      = p.get('ref')      || '—';
+  const couple   = p.get('couple')   || '';
+  const client   = p.get('name')     || '—';
+  const email    = p.get('email')    || '';
+  const phone    = p.get('phone')    || '';
+  const pkg      = p.get('pkg')      || '—';
+  const totalAmt = parseFloat(p.get('total') || '0');
+  const deposit  = parseFloat(p.get('deposit') || '100');
+  const balance  = Math.max(0, totalAmt - deposit);
+  const eventDate = p.get('date')    || '—';
+  const location = p.get('location') || '—';
+  const notes    = p.get('notes')    || '';
+  const today    = new Date().toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  // Deadline = 7 days before event
+  let deadlineStr = '—';
+  try {
+    const evtParts = eventDate.split(/[^0-9]/);
+    // Try to parse from formatted string like "Wednesday, 13 May 2026"
+    const evtDate  = new Date(eventDate);
+    if (!isNaN(evtDate)) {
+      const dl = new Date(evtDate);
+      dl.setDate(dl.getDate() - 7);
+      deadlineStr = dl.toLocaleDateString('en-MY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+  } catch(e) {}
+
+  // Set doc type
+  document.getElementById('docType').textContent    = isReceipt ? 'RECEIPT' : 'INVOICE';
+  document.title = (isReceipt ? 'Receipt' : 'Invoice') + ' — Nizar Naseer Studio';
+  document.getElementById('refNum').textContent     = ref;
+  document.getElementById('issueDate').textContent  = today;
+  document.getElementById('invNo').textContent      = (isReceipt ? 'RCT' : 'INV') + '-' + ref;
+
+  // Status
+  const statusEl = document.getElementById('statusLabel');
+  if (isReceipt) {
+    statusEl.style.color = '#16a34a';
+    statusEl.textContent = '✅ PAID IN FULL';
+  } else {
+    statusEl.style.color = '#ffb300';
+    statusEl.textContent = '⏳ Awaiting Deposit';
+  }
+
+  // Client
+  const displayName = couple ? `${couple}\n(Contact: ${client})` : client;
+  document.getElementById('clientName').textContent = couple || client;
+  document.getElementById('clientDetail').innerHTML =
+    (couple ? `Contact: ${client}<br/>` : '') +
+    (email  ? `${email}<br/>` : '') +
+    (phone  ? `📱 ${phone}` : '');
+
+  // Event
+  document.getElementById('eventDetail').innerHTML =
+    `📅 Date: <strong>${eventDate}</strong><br/>` +
+    `📍 Location: <strong>${location}</strong>` +
+    (notes ? `<br/>📝 Notes: ${notes}` : '');
+
+  // Items
+  const tbody = document.getElementById('itemsBody');
+  tbody.innerHTML = `
+    <tr>
+      <td><strong>${pkg}</strong><br/><span style="font-size:0.75rem;color:#888">Wedding Photography / Videography Package</span></td>
+      <td style="color:#666;font-size:0.78rem">${eventDate}</td>
+      <td>RM ${totalAmt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+    </tr>
+  `;
+
+  // Totals
+  document.getElementById('subtotal').textContent  = `RM ${totalAmt.toLocaleString(undefined,{minimumFractionDigits:2})}`;
+
+  if (isReceipt) {
+    document.getElementById('depositRow').innerHTML = `<span>✅ Total Paid</span><span style="color:#16a34a">RM ${totalAmt.toLocaleString(undefined,{minimumFractionDigits:2})}</span>`;
+    document.getElementById('balanceGrand').style.background = '#16a34a';
+    document.getElementById('balanceGrand').querySelector('.label').textContent = 'PAID IN FULL';
+    document.getElementById('balanceAmt').textContent = 'RM 0.00';
+    document.getElementById('deadlineDate').textContent = 'Payment complete — Thank you!';
+    document.querySelector('.deadline-box').style.background = '#f0fdf4';
+    document.querySelector('.deadline-box').style.borderColor = '#86efac';
+    document.querySelector('.deadline-box').style.color = '#166534';
+  } else {
+    document.getElementById('depositAmt').textContent = `– RM ${deposit.toLocaleString(undefined,{minimumFractionDigits:2})}`;
+    document.getElementById('balanceAmt').textContent = `RM ${balance.toLocaleString(undefined,{minimumFractionDigits:2})}`;
+    document.getElementById('deadlineDate').textContent = deadlineStr;
+  }
+
+  // Bank details from config
+  const CFG = window.SITE_CONFIG || {};
+  document.getElementById('bankName').textContent = CFG.bank_name || 'Maybank';
+  document.getElementById('bankAcc').textContent  = CFG.bank_account || '1234567890';
+
+  // WhatsApp
+  document.getElementById('btnWA').onclick = () => {
+    const raw = phone.replace(/[\s\-\+\(\)]/g, '');
+    const waNum = raw.startsWith('60') ? raw : '60' + raw.replace(/^0/, '');
+    const invoiceUrl = window.location.href;
+    const msg = isReceipt
+      ? `✅ *Receipt — Nizar Naseer Studio*\n━━━━━━━━━━━━━━\nDear *${couple || client}*,\n\nThank you! Full payment received for *${pkg}*.\n\n📋 Receipt: INV-${ref}\n📅 Event: ${eventDate}\n💰 Paid: RM ${totalAmt.toLocaleString()}\n\nView Receipt:\n${invoiceUrl}\n\nJazakallah khair! 🙏`
+      : `📋 *Invoice — Nizar Naseer Studio*\n━━━━━━━━━━━━━━\nDear *${couple || client}*,\n\nThank you for your booking! Please find your invoice details:\n\n📋 Ref: *${ref}*\n📦 Package: *${pkg}*\n📅 Date: ${eventDate}\n💰 Total: RM ${totalAmt.toLocaleString()}\n💳 Deposit Required: RM ${deposit.toLocaleString()}\n📊 Balance Due: RM ${balance.toLocaleString()}\n\nBalance payment deadline: ${deadlineStr}\n\nView Invoice:\n${invoiceUrl}\n\nThank you for choosing Nizar Naseer Studio! 🌟`;
+    window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+</script>
+
+</body>
+</html>
