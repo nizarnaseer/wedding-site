@@ -7,6 +7,20 @@
       "permanent": true
     }
   ],
+  "headers": [
+    {
+      "source": "/(.*\\.html)",
+      "headers": [{"key": "Cache-Control", "value": "no-store, no-cache, must-revalidate"}]
+    },
+    {
+      "source": "/app.js",
+      "headers": [{"key": "Cache-Control", "value": "no-store, no-cache, must-revalidate"}]
+    },
+    {
+      "source": "/discounts.json",
+      "headers": [{"key": "Cache-Control", "value": "no-store, no-cache, must-revalidate"}]
+    }
+  ],
   "crons": [
     {
       "path": "/api/send-review-requests",
