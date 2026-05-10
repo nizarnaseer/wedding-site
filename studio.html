@@ -99,6 +99,38 @@
   <a href="index.html" class="nav-back">← Back to Website</a>
 </nav>
 
+<!-- ADMIN BANNER TOGGLE -->
+<div id="adminBannerPanel" style="background:rgba(201,169,110,0.08);border-bottom:1px solid rgba(201,169,110,0.2);padding:10px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;font-family:'Inter',sans-serif;">
+  <span style="font-size:0.78rem;color:#c9a96e;letter-spacing:1px;text-transform:uppercase;">⚙️ Admin — Studio Popup Banner</span>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span id="bannerStatusLabel" style="font-size:0.78rem;color:#888;"></span>
+    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+      <input type="checkbox" id="bannerToggle" onchange="saveBannerToggle()" style="width:36px;height:20px;accent-color:#c9a96e;cursor:pointer;">
+      <span style="font-size:0.78rem;color:#c9a96e;" id="bannerToggleLabel">Show on Homepage</span>
+    </label>
+  </div>
+</div>
+<script>
+  // Load current banner state
+  fetch('/api/gallery?action=banner-config')
+    .then(r => r.json())
+    .then(cfg => {
+      const on = cfg.studioVisible !== false;
+      document.getElementById('bannerToggle').checked = on;
+      document.getElementById('bannerStatusLabel').textContent = on ? '✅ Banner is VISIBLE' : '🚫 Banner is HIDDEN';
+    }).catch(() => {});
+
+  function saveBannerToggle() {
+    const on = document.getElementById('bannerToggle').checked;
+    document.getElementById('bannerStatusLabel').textContent = on ? '✅ Banner is VISIBLE' : '🚫 Banner is HIDDEN';
+    fetch('/api/gallery', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'banner-config', studioVisible: on }),
+    }).catch(() => {});
+  }
+</script>
+
 <!-- HERO -->
 <div class="hero">
   <div class="hero-badge">🌙 Raya Haji Special</div>

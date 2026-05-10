@@ -283,9 +283,23 @@ function movePhoto(i, dir) {
   renderPhotosList();
 }
 function removePhoto(i) {
-  if (!confirm('Remove this photo from the album?')) return;
+  if (!confirm('Remove this photo?\n\nIt will also be deleted from Cloudinary to save storage space.')) return;
+  const photo = editPhotos[i];
   editPhotos.splice(i, 1);
   renderPhotosList();
+
+  // Also delete from Cloudinary if it's a Cloudinary URL
+  if (photo && photo.src && photo.src.includes('cloudinary.com')) {
+    // Extract public_id from URL: .../upload/v123456/folder/filename.ext
+    const match = photo.src.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.\w+)?$/);
+    if (match && match[1]) {
+      fetch('/api/gallery', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ publicId: match[1] }),
+      }).catch(() => {});  // silent — non-critical
+    }
+  }
 }
 function addUrlPhoto() {
   const url = document.getElementById('urlInput').value.trim();

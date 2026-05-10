@@ -53,6 +53,30 @@
     </ul>
   </div>
 
+  <!-- ══════════ TERMS & CONDITIONS POPUP ══════════ -->
+  <div id="tcModal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#111;border:1px solid rgba(201,169,110,0.3);border-radius:16px;max-width:520px;width:100%;padding:32px;font-family:'Inter',sans-serif;max-height:90vh;overflow-y:auto;">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#fff;margin:0 0 6px;">📋 Terms & Conditions</h2>
+      <p style="font-size:0.75rem;color:#c9a96e;margin:0 0 20px;letter-spacing:1px;text-transform:uppercase;">Please read before booking</p>
+      <div style="font-size:0.82rem;color:#bbb;line-height:1.8;margin-bottom:20px;background:rgba(255,255,255,0.03);border-radius:8px;padding:16px;border:1px solid rgba(255,255,255,0.06);">
+        <p style="margin:0 0 10px;"><strong style="color:#fff;">1. Deposit & Payment</strong><br>A minimum deposit is required to confirm your booking date. The deposit is non-refundable if cancelled within 7 days of the event date.</p>
+        <p style="margin:0 0 10px;"><strong style="color:#fff;">2. Rescheduling</strong><br>Rescheduling is allowed with minimum 14 days notice, subject to availability. One reschedule allowed per booking.</p>
+        <p style="margin:0 0 10px;"><strong style="color:#fff;">3. Delivery</strong><br>Edited photos will be delivered within 2–4 weeks after the event via Google Drive or Telegram. RAW files are not provided.</p>
+        <p style="margin:0 0 10px;"><strong style="color:#fff;">4. Usage Rights</strong><br>Nizar Naseer Studio retains the right to use photos for portfolio and marketing purposes unless otherwise agreed in writing.</p>
+        <p style="margin:0 0 10px;"><strong style="color:#fff;">5. Cancellation</strong><br>Cancellation more than 7 days before the event: deposit transferable to a future booking. Less than 7 days: deposit forfeited.</p>
+        <p style="margin:0;"><strong style="color:#fff;">6. Conduct</strong><br>The photographer reserves the right to refuse service if the client behaves in a disrespectful manner toward the team.</p>
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:20px;">
+        <input type="checkbox" id="tcAgreeCheck" style="margin-top:3px;accent-color:#c9a96e;width:16px;height:16px;flex-shrink:0;">
+        <span style="font-size:0.82rem;color:#ccc;">I have read and agree to the Terms & Conditions above.</span>
+      </label>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeTcModal()" style="flex:1;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#888;font-size:0.85rem;cursor:pointer;">Cancel</button>
+        <button id="tcProceedBtn" onclick="proceedAfterTc()" style="flex:2;padding:12px;background:linear-gradient(135deg,#c9a96e,#a07840);border:none;border-radius:8px;color:#000;font-weight:700;font-size:0.85rem;cursor:pointer;opacity:0.5;pointer-events:none;">Continue to Booking →</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ══════════ RAYA HAJI STICKY BANNER ══════════ -->
   <div id="rayaPromoBanner">
     <!-- Close button -->
@@ -928,7 +952,6 @@
     }
 
     function collapseRayaBanner() {
-
       var banner = document.getElementById('rayaPromoBanner');
       var pill   = document.getElementById('rayaMiniPill');
       banner.classList.add('raya-collapsed');
@@ -943,6 +966,72 @@
       setTimeout(function() {
         banner.classList.remove('raya-collapsed');
       }, 200);
+    }
+
+    // ── Check admin banner toggle from Redis ──
+    fetch('/api/gallery?action=banner-config')
+      .then(function(r){ return r.json(); })
+      .then(function(cfg){
+        if (cfg.studioVisible === false) {
+          var b = document.getElementById('rayaPromoBanner');
+          var p = document.getElementById('rayaMiniPill');
+          if (b) b.style.display = 'none';
+          if (p) p.style.display = 'none';
+        }
+      }).catch(function(){});
+
+    // ── Terms & Conditions Modal ──
+    var _tcPendingPkg  = null;
+    var _tcPendingPrice = null;
+
+    var _origOpenBookingModal = window.openBookingModal;
+    window.openBookingModal = function(name, price) {
+      // If already agreed this session, go straight to booking
+      if (sessionStorage.getItem('tc_agreed') === '1') {
+        _origOpenBookingModal(name, price);
+        return;
+      }
+      // Store pending package, show T&C
+      _tcPendingPkg   = name;
+      _tcPendingPrice = price;
+      var modal = document.getElementById('tcModal');
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      var cb  = document.getElementById('tcAgreeCheck');
+      var btn = document.getElementById('tcProceedBtn');
+      cb.checked = false;
+      btn.style.opacity = '0.5';
+      btn.style.pointerEvents = 'none';
+    };
+
+    document.getElementById('tcAgreeCheck').addEventListener('change', function() {
+      var btn = document.getElementById('tcProceedBtn');
+      if (this.checked) {
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+      } else {
+        btn.style.opacity = '0.5';
+        btn.style.pointerEvents = 'none';
+      }
+    });
+
+    function closeTcModal() {
+      document.getElementById('tcModal').style.display = 'none';
+      document.body.style.overflow = '';
+      _tcPendingPkg   = null;
+      _tcPendingPrice = null;
+    }
+
+    function proceedAfterTc() {
+      if (!document.getElementById('tcAgreeCheck').checked) return;
+      sessionStorage.setItem('tc_agreed', '1');
+      document.getElementById('tcModal').style.display = 'none';
+      document.body.style.overflow = '';
+      if (_tcPendingPkg) {
+        _origOpenBookingModal(_tcPendingPkg, _tcPendingPrice);
+        _tcPendingPkg = null;
+        _tcPendingPrice = null;
+      }
     }
   </script>
 
