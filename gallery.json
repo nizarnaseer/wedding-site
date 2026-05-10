@@ -43,7 +43,7 @@
       "coverGradient": "linear-gradient(135deg,#1a1208,#2a1e0a)",
       "teasers": [
         {
-          "src": "https://res.cloudinary.com/dh5vjsskl/image/upload/v1778411706/oxz0ysh32xdyferacaay.jpg",
+          "src": "https://res.cloudinary.com/dh5vjsskl/image/upload/v1778411940/zumk7qsarqtiutlvdflv.jpg",
           "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
         },
         {
@@ -61,58 +61,57 @@
       ]
     },
     {
-      "id": "haziq-hana-nikah",
+      "id": "haziq-hana",
       "title": "Haziq & Hana · Nikah",
       "date": "5 April 2025 · Masjid Wilayah, KL",
       "category": "Wedding",
       "layout": "",
-      "coverGradient": "linear-gradient(135deg,#1a1208,#2a1e0a)",
+      "coverGradient": "linear-gradient(135deg,#1a1208,#120e06)",
       "teasers": [
         {
-          "src": "https://res.cloudinary.com/dh5vjsskl/image/upload/v1778411793/k7t1grgptzdmsr33rlsp.jpg",
-          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
-        },
-        {
           "src": "images/haziq-hana/01.jpg",
-          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
+          "fallback": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#1a1208,#120e06)"
         },
         {
           "src": "images/haziq-hana/02.jpg",
-          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
+          "fallback": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#1a1210,#201412)"
         },
         {
           "src": "images/haziq-hana/03.jpg",
-          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
+          "fallback": "https://images.unsplash.com/photo-1519741497674-611481863552?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#1a0a0a,#281010)"
         },
         {
           "src": "images/haziq-hana/04.jpg",
-          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
+          "fallback": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#0a1a14,#0e2818)"
         }
       ]
     },
     {
-      "id": "izzatul-azim-sanding",
+      "id": "izzatul-azim",
       "title": "Izzatul & Azim · Sanding",
       "date": "22 November 2024 · Nilai Springs",
       "category": "Wedding",
       "layout": "",
-      "coverGradient": "linear-gradient(135deg,#1a1208,#2a1e0a)",
+      "coverGradient": "linear-gradient(135deg,#121a08,#1a2408)",
       "teasers": [
         {
-          "src": "https://res.cloudinary.com/dh5vjsskl/image/upload/v1778411831/d6em6b8lf5hlz14ym6te.jpg",
-          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
-        },
-        {
           "src": "images/izzatul-azim/01.jpg",
-          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
+          "fallback": "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#121a08,#1a2408)"
         },
         {
           "src": "images/izzatul-azim/02.jpg",
-          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
+          "fallback": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#1a1808,#28200a)"
         },
         {
           "src": "images/izzatul-azim/03.jpg",
-          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
+          "fallback": "https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=900&auto=format&fit=crop",
+          "g": "linear-gradient(135deg,#0a1810,#0e2418)"
         }
       ]
     }
