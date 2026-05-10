@@ -1,15 +1,34 @@
 {
   "pkg_discounts": {
     "Sanding Photography": {
-      "v": 0,
+      "v": 30,
       "t": "pct"
     },
     "Nikah + Sanding Video": {
-      "v": 30,
+      "v": 50,
       "t": "fixed"
     },
     "Full Package Video": {
-      "v": 60,
+      "v": {
+        "v": 60,
+        "t": "pct"
+      },
+      "t": "pct"
+    },
+    "Tunang Photography": {
+      "v": 10,
+      "t": "fixed"
+    },
+    "Nikah Photography": {
+      "v": 20,
+      "t": "fixed"
+    },
+    "Pre Wed Photography": {
+      "v": 40,
+      "t": "pct"
+    },
+    "Nikah Video": {
+      "v": 20,
       "t": "pct"
     }
   },
