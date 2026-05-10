@@ -31,7 +31,7 @@
       "badge": "Nikah & Sanding",
       "name": "Nikah & Sanding Photography",
       "price": 1450,
-      "featured": true,
+      "featured": false,
       "features": [
         "Unlimited pictures, fully edited",
         "Softcopy via Telegram / Google Drive",
@@ -64,7 +64,8 @@
         "Free posing guide",
         "Cover for 2 hours",
         "Transport outside kawasan: extra charge"
-      ]
+      ],
+      "featured": true
     },
     {
       "id": "pkg5",
@@ -98,7 +99,7 @@
       "badge": "Nikah + Sanding Video",
       "name": "Nikah + Sanding Video",
       "price": 1500,
-      "featured": true,
+      "featured": false,
       "features": [
         "Video duration 5ÃÂ¢ÃÂÃÂ10 minit",
         "Highlights + full coverage",
@@ -118,7 +119,8 @@
         "Softcopy via Google Drive",
         "Cover 3 events",
         "Transport outside kawasan: extra charge"
-      ]
+      ],
+      "featured": true
     }
   ]
 }
