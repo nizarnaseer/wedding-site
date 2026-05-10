@@ -1,10 +1,9 @@
 {
   "pkg_discounts": {
-    "Tunang Photography": 90,
-    "Nikah Photography": 50,
-    "Sanding Photography": 0,
-    "TRIO E (3 Events)": 70,
-    "Pre Wed Photography": 50
+    "Tunang Photography":  { "v": 90, "t": "fixed" },
+    "Nikah Photography":   { "v": 50, "t": "fixed" },
+    "TRIO E (3 Events)":   { "v": 70, "t": "pct"   },
+    "Pre Wed Photography": { "v": 50, "t": "fixed"  }
   },
   "promo_codes": {}
 }
