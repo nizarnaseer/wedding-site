@@ -128,7 +128,7 @@
     { name: 'TRIO E (3 Events)',            base: 2400 },
     { name: 'Pre Wed Photography',          base: 550  },
     { name: 'Tunang + Nikah + Sanding',     base: 2000 },
-    // Videography
+    // Videography — names must match openBookingModal() in index.html
     { name: 'Nikah Videography',            base: 950  },
     { name: 'Sanding Videography',          base: 1250 },
     { name: 'Nikah + Sanding Videography',  base: 1999 },
@@ -271,7 +271,14 @@
     const btn = document.getElementById('syncBtn');
     btn.textContent = '⏳ Syncing…'; btn.disabled = true;
 
-    const payload = { pkg_discounts: getDiscounts(), promo_codes: getPromoCodes() };
+    // Build rich discounts including type (pct/fixed) so website renders % correctly
+    const rawDisc = getDiscounts();
+    const richDisc = {};
+    Object.entries(rawDisc).forEach(([name, val]) => {
+      const t = localStorage.getItem('type_' + name) || 'fixed';
+      richDisc[name] = { v: val, t };
+    });
+    const payload = { pkg_discounts: richDisc, promo_codes: getPromoCodes() };
     const content  = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
 
     try {

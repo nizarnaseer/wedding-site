@@ -1263,12 +1263,18 @@ function _renderDiscountCards(discounts) {
     if (!match) return;
     const pkgName  = match[1];
     const pkgPrice = match[2];
-    const discAmt  = discounts[pkgName];
-    if (!discAmt || discAmt <= 0) return;
+    const raw      = discounts[pkgName];
+    if (!raw) return;
+
+    // Support {v, t} format (pct/fixed) and legacy plain number (fixed)
+    const discVal  = (typeof raw === 'object') ? raw.v : raw;
+    const discType = (typeof raw === 'object') ? raw.t : 'fixed';
+    if (!discVal || discVal <= 0) return;
 
     const origNum    = parseInt(pkgPrice.replace(/[^0-9]/g, ''));
-    const discounted = origNum - discAmt;
-    const pct        = Math.round(discAmt / origNum * 100);
+    const discAmt    = discType === 'pct' ? Math.round(origNum * discVal / 100) : discVal;
+    const pct        = discType === 'pct' ? discVal : Math.round(discVal / origNum * 100);
+    const discounted = Math.max(0, origNum - discAmt);
 
     const card = btn.closest('.package-card');
     if (!card || card.querySelector('.pkg-discounted')) return;
@@ -1284,7 +1290,7 @@ function _renderDiscountCards(discounts) {
     const badge = card.querySelector('.pkg-badge');
     if (badge) {
       badge.insertAdjacentHTML('afterend',
-        `<div class="discount-tag-pill">🏷️ Special Offer &mdash; Save RM ${discAmt}</div>`
+        `<div class="discount-tag-pill">Special Offer &mdash; Save RM ${discAmt.toLocaleString()}</div>`
       );
     }
 
