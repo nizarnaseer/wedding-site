@@ -1,4 +1,7 @@
 {
-  "pkg_discounts": {},
+  "pkg_discounts": {
+    "Nikah Videography": 60,
+    "Pre Wed Photography": 70
+  },
   "promo_codes": {}
 }
