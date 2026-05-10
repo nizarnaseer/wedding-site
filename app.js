@@ -606,11 +606,12 @@ function updateTotal() {
    BOOKING MODAL
 ══════════════════════════════════════ */
 function openBookingModal(name, price) {
+  const rawAmt = parseInt((price || '').replace(/[^0-9]/g, '')) || 0;
   activePackage = {
     name,
     price,
-    baseAmount:   parseInt(price.replace(/[^0-9]/g, '')),
-    totalAmount:  parseInt(price.replace(/[^0-9]/g, '')),
+    baseAmount:   rawAmt,
+    totalAmount:  rawAmt,
   };
   selectedDates   = [];
   selectedDate    = null;
