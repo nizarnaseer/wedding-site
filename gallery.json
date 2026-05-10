@@ -35,27 +35,28 @@
       ]
     },
     {
-      "id": "portrait-farah",
+      "id": "farah-studio-portrait",
       "title": "Farah · Studio Portrait",
       "date": "March 2025 · Kuala Lumpur",
       "category": "Portrait",
       "layout": "tall",
-      "coverGradient": "linear-gradient(135deg,#0a0f1a,#0f1a2a)",
+      "coverGradient": "linear-gradient(135deg,#1a1208,#2a1e0a)",
       "teasers": [
         {
+          "src": "https://res.cloudinary.com/dh5vjsskl/image/upload/v1778411706/oxz0ysh32xdyferacaay.jpg",
+          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
+        },
+        {
           "src": "images/portrait-farah/01.jpg",
-          "fallback": "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&auto=format&fit=crop",
-          "g": "linear-gradient(135deg,#0a0f1a,#0f1a2a)"
+          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
         },
         {
           "src": "images/portrait-farah/02.jpg",
-          "fallback": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=900&auto=format&fit=crop",
-          "g": "linear-gradient(135deg,#0a150f,#0f2018)"
+          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
         },
         {
           "src": "images/portrait-farah/03.jpg",
-          "fallback": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&auto=format&fit=crop",
-          "g": "linear-gradient(135deg,#0a0a1a,#10102a)"
+          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
         }
       ]
     },
