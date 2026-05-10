@@ -76,6 +76,17 @@
     #setupPanel label{display:block;font-size:0.75rem;color:var(--muted);margin-bottom:5px;letter-spacing:1px;text-transform:uppercase;}
     .btn-save{width:100%;padding:12px;background:var(--gold);color:#0a0a0a;border:none;border-radius:8px;font-size:0.85rem;font-weight:500;cursor:pointer;margin-top:4px;}
     @media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr);}header{padding:14px 16px;}main{padding:20px 16px 60px;}}
+    /* ── Review Manager ── */
+    .rev-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;}
+    .rev-stars{color:#c9a96e;font-size:1rem;white-space:nowrap;}
+    .rev-body{flex:1;min-width:0;}
+    .rev-name{font-weight:600;font-size:0.85rem;margin-bottom:2px;}
+    .rev-pkg{font-size:0.72rem;color:var(--muted);margin-bottom:6px;}
+    .rev-text{font-size:0.8rem;color:#aaa;line-height:1.5;}
+    .rev-date{font-size:0.68rem;color:var(--muted);margin-top:6px;}
+    .btn-del-rev{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#f87171;border-radius:6px;padding:6px 12px;font-size:0.72rem;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:'Inter',sans-serif;transition:background .15s;}
+    .btn-del-rev:hover{background:rgba(239,68,68,0.2);}
+    .reviews-count{font-size:0.75rem;color:var(--muted);margin-bottom:12px;}
   </style>
 </head>
 <body>
@@ -145,6 +156,13 @@
       <div class="tool-arrow">Open → </div>
     </a>
 
+  </div>
+
+  <!-- REVIEWS MANAGER -->
+  <div class="section-label">⭐ Reviews Manager</div>
+  <div id="reviewsManagerWrap">
+    <div id="reviewsLoadingMsg" style="color:#888;font-size:0.82rem;padding:12px 0;">Loading reviews…</div>
+    <div id="reviewsList"></div>
   </div>
 
   <!-- BOOKING DASHBOARD -->
@@ -287,6 +305,57 @@
   function setFilter(filter,btn){currentFilter=filter;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBookings();}
   function showLoading(show){document.getElementById('loadingMsg').style.display=show?'block':'none';}
   function showError(msg){const el=document.getElementById('errorMsg');el.style.display=msg?'block':'none';el.textContent=msg;}
+
+  /* ── Reviews Manager ── */
+  (async function loadAdminReviews() {
+    const loadEl = document.getElementById('reviewsLoadingMsg');
+    const listEl = document.getElementById('reviewsList');
+    try {
+      const res  = await fetch('/api/get-reviews');
+      const data = await res.json();
+      const reviews = (data.reviews || []).filter(r => !r.id?.startsWith('s')); // exclude starters
+      loadEl.style.display = 'none';
+      if (!reviews.length) {
+        listEl.innerHTML = '<p style="color:#888;font-size:0.8rem;">No client reviews yet. Share the review link to start collecting!</p>';
+        return;
+      }
+      listEl.innerHTML = `<div class="reviews-count">${reviews.length} review${reviews.length!==1?'s':''} — showing newest first</div>` +
+        reviews.map(r => {
+          const stars = '★'.repeat(r.stars||5) + '☆'.repeat(5-(r.stars||5));
+          const dateStr = r.date ? new Date(r.date).toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'}) : '';
+          return `<div class="rev-card" id="rcard-${r.id}">
+            <div class="rev-stars">${stars}</div>
+            <div class="rev-body">
+              <div class="rev-name">${r.name||'Anonymous'}</div>
+              <div class="rev-pkg">${r.pkg||''}</div>
+              <div class="rev-text">${r.text||''}</div>
+              ${dateStr?`<div class="rev-date">${dateStr}</div>`:''}
+            </div>
+            <button class="btn-del-rev" onclick="deleteReview('${r.id}',this)">🗑 Delete</button>
+          </div>`;
+        }).join('');
+    } catch(e) {
+      loadEl.textContent = 'Failed to load reviews.';
+    }
+  })();
+
+  async function deleteReview(id, btn) {
+    if (!confirm('Delete this review? This cannot be undone.')) return;
+    btn.textContent = '…';
+    btn.disabled = true;
+    try {
+      const r = await fetch('/api/delete-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      const d = await r.json();
+      if (d.ok) {
+        const card = document.getElementById('rcard-' + id);
+        if (card) { card.style.opacity='0'; card.style.transition='opacity .3s'; setTimeout(()=>card.remove(),300); }
+      } else { btn.textContent = '❌'; btn.disabled = false; }
+    } catch(e) { btn.textContent = '❌'; btn.disabled = false; }
+  }
 </script>
 </body>
 </html>

@@ -350,6 +350,11 @@
     <div class="reviews-grid" id="reviewsGrid">
       <!-- Loaded dynamically by JS -->
     </div>
+    <div id="reviewsSeeMore" style="text-align:center;margin-top:32px;display:none;">
+      <button onclick="showAllReviews()" style="background:transparent;border:1px solid rgba(201,169,110,0.4);color:#c9a96e;padding:12px 32px;border-radius:8px;font-family:'Inter',sans-serif;font-size:0.85rem;cursor:pointer;letter-spacing:0.5px;transition:all .2s;" onmouseover="this.style.background='rgba(201,169,110,0.1)'" onmouseout="this.style.background='transparent'">
+        ✦ See All Reviews
+      </button>
+    </div>
   </section>
 
   <!-- ═══════════════════════════ INSTAGRAM FEED ═══════════════════════════ -->
@@ -806,12 +811,17 @@
     { stars:5, name:'Azri & Maisarah',    pkg:'Full Day Wedding Package',     text:'"From the booking process to delivery — everything was smooth. Got our full gallery in 3 weeks. Highly recommend to all couples!"' },
   ];
 
+  var _allReviews = [];
+  var REVIEWS_SHOWN = 5;
+
   function starStr(n) { return '★'.repeat(n) + '☆'.repeat(5-n); }
 
   function renderReviews(list) {
+    _allReviews = list;
     const grid = document.getElementById('reviewsGrid');
     if (!grid) return;
-    grid.innerHTML = list.map(r => `
+    const visible = list.slice(0, REVIEWS_SHOWN);
+    grid.innerHTML = visible.map(r => `
       <div class="review-card fade-in-up">
         <div class="review-stars">${starStr(r.stars)}</div>
         <p class="review-text">${r.text}</p>
@@ -823,7 +833,28 @@
           </div>
         </div>
       </div>`).join('');
-    // trigger observer for newly added cards
+    // Show "See More" button if there are more than REVIEWS_SHOWN reviews
+    const seeMoreBtn = document.getElementById('reviewsSeeMore');
+    if (seeMoreBtn) seeMoreBtn.style.display = list.length > REVIEWS_SHOWN ? 'block' : 'none';
+    observeFade();
+  }
+
+  function showAllReviews() {
+    const grid = document.getElementById('reviewsGrid');
+    if (!grid) return;
+    grid.innerHTML = _allReviews.map(r => `
+      <div class="review-card fade-in-up">
+        <div class="review-stars">${starStr(r.stars)}</div>
+        <p class="review-text">${r.text}</p>
+        <div class="review-author">
+          <div class="review-avatar">${(r.name||'?')[0].toUpperCase()}</div>
+          <div>
+            <div class="review-name">${r.name}</div>
+            <div class="review-pkg">${r.pkg}</div>
+          </div>
+        </div>
+      </div>`).join('');
+    document.getElementById('reviewsSeeMore').style.display = 'none';
     observeFade();
   }
 
