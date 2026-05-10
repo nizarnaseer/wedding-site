@@ -3,7 +3,10 @@
     "Sanding Photography": {
       "v": {
         "v": {
-          "v": 30,
+          "v": {
+            "v": 30,
+            "t": "pct"
+          },
           "t": "pct"
         },
         "t": "pct"
@@ -11,33 +14,36 @@
       "t": "pct"
     },
     "Nikah + Sanding Video": {
-      "v": {
-        "v": {
-          "v": 50,
-          "t": "fixed"
-        },
-        "t": "fixed"
-      },
+      "v": 10,
       "t": "fixed"
     },
     "Full Package Video": {
-      "v": 40,
+      "v": {
+        "v": 40,
+        "t": "pct"
+      },
       "t": "pct"
     },
     "Tunang Photography": {
       "v": {
         "v": {
-          "v": 10,
-          "t": "fixed"
+          "v": {
+            "v": 10,
+            "t": "fixed"
+          },
+          "t": "pct"
         },
-        "t": "pct"
+        "t": "fixed"
       },
       "t": "fixed"
     },
     "Nikah Photography": {
       "v": {
         "v": {
-          "v": 20,
+          "v": {
+            "v": 20,
+            "t": "fixed"
+          },
           "t": "fixed"
         },
         "t": "fixed"
@@ -45,28 +51,40 @@
       "t": "fixed"
     },
     "Pre Wed Photography": {
-      "v": 25,
+      "v": {
+        "v": 25,
+        "t": "pct"
+      },
       "t": "pct"
     },
     "Nikah Video": {
       "v": {
         "v": {
-          "v": 20,
-          "t": "pct"
+          "v": {
+            "v": 20,
+            "t": "pct"
+          },
+          "t": "fixed"
         },
-        "t": "fixed"
+        "t": "pct"
       },
       "t": "pct"
     },
     "TRIO E (3 Events)": {
       "v": {
-        "v": 50,
-        "t": "pct"
+        "v": {
+          "v": 50,
+          "t": "pct"
+        },
+        "t": "fixed"
       },
       "t": "fixed"
     },
     "Nikah & Sanding Photography": {
-      "v": 100,
+      "v": {
+        "v": 100,
+        "t": "fixed"
+      },
       "t": "fixed"
     }
   },
