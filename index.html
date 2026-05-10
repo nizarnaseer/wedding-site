@@ -534,7 +534,7 @@
     background:rgba(0,0,0,0.75); backdrop-filter:blur(6px);
     align-items:flex-end; justify-content:center;
   ">
-    <div id="tcModal" style="
+    <div id="tcInfoModal" style="
       background:linear-gradient(160deg,#111009,#0d0c08);
       border:1px solid rgba(201,169,110,0.25);
       border-radius:24px 24px 0 0;
@@ -981,7 +981,7 @@
 
     function openTC() {
       var ov = document.getElementById('tcOverlay');
-      var md = document.getElementById('tcModal');
+      var md = document.getElementById('tcInfoModal');
       ov.style.display = 'flex';
       requestAnimationFrame(function() {
         md.style.transform = 'translateY(0)';
@@ -990,7 +990,7 @@
     }
     function closeTC() {
       var ov = document.getElementById('tcOverlay');
-      var md = document.getElementById('tcModal');
+      var md = document.getElementById('tcInfoModal');
       md.style.transform = 'translateY(100%)';
       setTimeout(function() {
         ov.style.display = 'none';
@@ -1039,11 +1039,7 @@
 
     var _origOpenBookingModal = window.openBookingModal;
     window.openBookingModal = function(name, price) {
-      // If already agreed this session, go straight to booking
-      if (sessionStorage.getItem('tc_agreed') === '1') {
-        _origOpenBookingModal(name, price);
-        return;
-      }
+      // Always show T&C before booking form
       // Store pending package, show T&C
       _tcPendingPkg   = name;
       _tcPendingPrice = price;
