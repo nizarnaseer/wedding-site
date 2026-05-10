@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reviews Manager — Nizar Naseer Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #c9a96e; --gold-light: #e8d5a3;
+      --dark: #0a0a0a; --dark2: #111; --dark3: #1a1a1a;
+      --border: rgba(255,255,255,0.08); --text: #e8e4df; --muted: #888;
+      --green: #22c55e; --red: #ef4444;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); min-height: 100vh; }
+
+    header {
+      background: var(--dark2); border-bottom: 1px solid var(--border);
+      padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; }
+    .logo span { color: var(--gold); }
+    .btn-sm { background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--muted); padding: 7px 16px; border-radius: 7px; font-size: 0.78rem; cursor: pointer; text-decoration: none; font-family: 'Inter', sans-serif; transition: all .2s; }
+    .btn-sm:hover { color: var(--gold); border-color: rgba(201,169,110,0.4); }
+
+    main { max-width: 740px; margin: 0 auto; padding: 32px 20px 80px; }
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 300; margin-bottom: 4px; }
+    .subtitle { font-size: 0.82rem; color: var(--muted); margin-bottom: 28px; }
+
+    /* Stats */
+    .stats-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .stat-pill { background: var(--dark3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 18px; font-size: 0.8rem; }
+    .stat-pill strong { color: var(--gold); font-size: 1.1rem; display: block; margin-bottom: 2px; }
+    .stat-pill span { color: var(--muted); }
+
+    /* Review cards */
+    .rev-list { display: flex; flex-direction: column; gap: 12px; }
+    .rev-card {
+      background: var(--dark2); border: 1px solid var(--border); border-radius: 12px;
+      padding: 18px 20px; display: flex; gap: 16px; align-items: flex-start;
+      transition: border-color .2s;
+    }
+    .rev-card:hover { border-color: rgba(201,169,110,0.2); }
+    .rev-left { flex: 1; min-width: 0; }
+    .rev-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+    .rev-stars { color: var(--gold); font-size: 0.95rem; letter-spacing: 2px; }
+    .rev-name { font-weight: 600; font-size: 0.88rem; }
+    .badge { font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; letter-spacing: 1.5px; font-weight: 600; text-transform: uppercase; }
+    .badge-real { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); color: #4ade80; }
+    .badge-demo { background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.25); color: #ffb300; }
+    .rev-meta { font-size: 0.74rem; color: var(--muted); margin-bottom: 8px; }
+    .rev-text { font-size: 0.82rem; color: #bbb; line-height: 1.6; }
+    .rev-date { font-size: 0.7rem; color: #666; margin-top: 8px; }
+
+    .btn-del {
+      background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+      color: #f87171; border-radius: 8px; padding: 8px 14px;
+      font-size: 0.75rem; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      font-family: 'Inter', sans-serif; transition: all .15s; align-self: flex-start;
+    }
+    .btn-del:hover { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.5); }
+    .btn-del:disabled { opacity: .4; cursor: not-allowed; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 300; margin-bottom: 8px; }
+    .empty-state p { font-size: 0.82rem; line-height: 1.7; }
+
+    .loading-msg { color: var(--muted); font-size: 0.82rem; padding: 40px; text-align: center; }
+
+    .section-divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; margin: 24px 0 16px; }
+    .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* Toast */
+    #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a1a1a; border: 1px solid var(--border); color: var(--text); padding: 10px 22px; border-radius: 8px; font-size: 0.82rem; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 999; }
+    #toast.show { opacity: 1; }
+
+    @media(max-width:600px) { main { padding: 24px 16px 80px; } .rev-card { flex-direction: column; } .btn-del { width: 100%; text-align: center; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">NIZAR NASEER<span> STUDIO</span></div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn-sm" onclick="loadReviews()">⟳ Refresh</button>
+    <a href="admin.html" class="btn-sm">← Admin Hub</a>
+  </div>
+</header>
+
+<main>
+  <h1>⭐ Reviews Manager</h1>
+  <p class="subtitle">Manage all client reviews displayed on your website.</p>
+
+  <div class="stats-bar" id="statsBar" style="display:none;">
+    <div class="stat-pill"><strong id="statTotal">0</strong><span>Total</span></div>
+    <div class="stat-pill"><strong id="statReal">0</strong><span>From Clients</span></div>
+    <div class="stat-pill"><strong id="statDemo">0</strong><span>Built-in Demo</span></div>
+  </div>
+
+  <div id="loadingMsg" class="loading-msg">Loading reviews…</div>
+  <div id="revList" class="rev-list"></div>
+</main>
+
+<div id="toast"></div>
+
+<script>
+  let allReviews = [];
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function starStr(n) {
+    return '★'.repeat(n || 5) + '☆'.repeat(5 - (n || 5));
+  }
+
+  function renderReviews(reviews) {
+    allReviews = reviews;
+    const listEl   = document.getElementById('revList');
+    const statsBar = document.getElementById('statsBar');
+    const loadEl   = document.getElementById('loadingMsg');
+    loadEl.style.display = 'none';
+
+    const real = reviews.filter(r => !r.id?.startsWith('s'));
+    const demo = reviews.filter(r => r.id?.startsWith('s'));
+
+    // Stats
+    document.getElementById('statTotal').textContent = reviews.length;
+    document.getElementById('statReal').textContent  = real.length;
+    document.getElementById('statDemo').textContent  = demo.length;
+    statsBar.style.display = 'flex';
+
+    if (!reviews.length) {
+      listEl.innerHTML = `
+        <div class="empty-state">
+          <h3>No reviews yet</h3>
+          <p>Share your review page link with clients:<br/>
+          <strong style="color:var(--gold);">${window.location.origin}/review.html</strong></p>
+        </div>`;
+      return;
+    }
+
+    let html = '';
+
+    // Real reviews section
+    if (real.length) {
+      html += `<div class="section-divider">Client Reviews (${real.length})</div>`;
+      html += real.map(r => reviewCardHTML(r, false)).join('');
+    }
+
+    // Demo reviews section
+    if (demo.length) {
+      html += `<div class="section-divider">Built-in Demo Reviews</div>`;
+      html += demo.map(r => reviewCardHTML(r, true)).join('');
+    }
+
+    listEl.innerHTML = html;
+  }
+
+  function reviewCardHTML(r, isDemo) {
+    const dateStr = r.date
+      ? new Date(r.date).toLocaleDateString('en-MY', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })
+      : '—';
+    const badge = isDemo
+      ? '<span class="badge badge-demo">Demo</span>'
+      : '<span class="badge badge-real">Client</span>';
+
+    return `<div class="rev-card" id="rcard-${r.id}">
+      <div class="rev-left">
+        <div class="rev-header">
+          <div class="rev-stars">${starStr(r.stars)}</div>
+          <div class="rev-name">${r.name || 'Anonymous'}</div>
+          ${badge}
+        </div>
+        <div class="rev-meta">${r.pkg || ''}</div>
+        <div class="rev-text">${r.text || ''}</div>
+        <div class="rev-date">📅 ${dateStr}</div>
+      </div>
+      ${!isDemo
+        ? `<button class="btn-del" id="delbtn-${r.id}" onclick="deleteReview('${r.id}')">🗑 Delete</button>`
+        : `<span style="font-size:0.7rem;color:#444;flex-shrink:0;padding-top:4px;">Built-in</span>`
+      }
+    </div>`;
+  }
+
+  async function loadReviews() {
+    document.getElementById('loadingMsg').style.display = 'block';
+    document.getElementById('revList').innerHTML = '';
+    document.getElementById('statsBar').style.display = 'none';
+    try {
+      const res  = await fetch('/api/reviews');
+      const data = await res.json();
+      renderReviews(data.reviews || []);
+    } catch(e) {
+      document.getElementById('loadingMsg').textContent = '❌ Failed to load reviews. Please refresh.';
+    }
+  }
+
+  async function deleteReview(id) {
+    if (!confirm('Delete this review permanently? This cannot be undone.')) return;
+    const btn = document.getElementById('delbtn-' + id);
+    if (btn) { btn.textContent = '…'; btn.disabled = true; }
+    try {
+      const r = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', id }),
+      });
+      const d = await r.json();
+      if (d.ok) {
+        const card = document.getElementById('rcard-' + id);
+        if (card) {
+          card.style.transition = 'opacity .3s, transform .3s';
+          card.style.opacity = '0';
+          card.style.transform = 'translateX(20px)';
+          setTimeout(() => { card.remove(); updateStats(); }, 300);
+        }
+        showToast('✅ Review deleted');
+      } else {
+        if (btn) { btn.textContent = '🗑 Delete'; btn.disabled = false; }
+        showToast('❌ Failed to delete');
+      }
+    } catch(e) {
+      if (btn) { btn.textContent = '🗑 Delete'; btn.disabled = false; }
+      showToast('❌ Error: ' + e.message);
+    }
+  }
+
+  function updateStats() {
+    const remaining = document.querySelectorAll('.rev-card').length;
+    const real = document.querySelectorAll('.badge-real').length;
+    const demo = document.querySelectorAll('.badge-demo').length;
+    document.getElementById('statTotal').textContent = remaining;
+    document.getElementById('statReal').textContent  = real;
+    document.getElementById('statDemo').textContent  = demo;
+  }
+
+  loadReviews();
+</script>
+
+</body>
+</html>
