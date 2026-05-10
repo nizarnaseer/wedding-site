@@ -25,23 +25,42 @@ const SITE_DOMAIN      = CFG.site_domain         || 'https://weddingclicks.us';
 const JSONBIN_BIN_ID   = localStorage.getItem('jsonbin_bin_id') || '';
 
 
-/* ─── PER-PACKAGE DATE CONFIG ─── */
-// maxDates: how many separate days the client can pick for this package
+/* ─── PER-PACKAGE DATE + SESSION CONFIG ─── */
+// maxDates: how many separate days the client can pick
+// sessions: how many function+time slots to show PER DAY
 const PKG_DATE_CONFIG = {
-  'Nikah / Sanding / Tandang':   { maxDates: 1 },
-  'Nikah + Sanding / Tandang':   { maxDates: 2 },
-  'Nikah + Sanding + Tandang':   { maxDates: 3 },
-  'Birthday Event':              { maxDates: 1 },
-  'Portrait Session':            { maxDates: 1 },
+  // Photography
+  'Nikah / Sanding / Tandang':       { maxDates: 1, sessions: 1 },
+  'Tunang':                           { maxDates: 1, sessions: 1 },
+  'Nikah':                            { maxDates: 1, sessions: 1 },
+  'Sanding':                          { maxDates: 1, sessions: 1 },
+  'Nikah & Sanding Photography':      { maxDates: 1, sessions: 2 },
+  'TRIO E (3 Events)':                { maxDates: 1, sessions: 3 },
+  'Pre Wed Photography':              { maxDates: 1, sessions: 1 },
+  'Tunang + Nikah + Sanding':         { maxDates: 1, sessions: 3 },
+  // Videography
+  'Nikah Video':                      { maxDates: 1, sessions: 1 },
+  'Nikah + Sanding Video':            { maxDates: 1, sessions: 2 },
+  'Full Package Video':               { maxDates: 1, sessions: 3 },
 };
 
-/* ─── DATE SLOT LABELS (used in multi-date display) ─── */
-const DATE_LABELS = ['1st Day (e.g. Nikah)', '2nd Day (e.g. Sanding)', '3rd Day (e.g. Tandang)'];
+/* ─── DATE SLOT LABELS (multi-date display) ─── */
+const DATE_LABELS = ['1st Day', '2nd Day', '3rd Day'];
+
+/* Session label hints */
+const SESSION_HINTS = [
+  ['e.g. Nikah', 'e.g. Sanding', 'e.g. Tandang'],
+];
 
 /* Helper: max dates allowed for current package */
 function maxDatesForPkg() {
   return (PKG_DATE_CONFIG[activePackage.name] || { maxDates: 1 }).maxDates;
 }
+/* Helper: sessions (function+time rows) per day for current package */
+function sessionsForPkg() {
+  return (PKG_DATE_CONFIG[activePackage.name] || { sessions: 1 }).sessions;
+}
+
 
 
 /* ─── STATE ─── */
@@ -718,25 +737,41 @@ function goToStep2(enquiry = false) {
 
   const selectStyle = 'background:var(--dark3);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:0.88rem;outline:none;width:100%;cursor:pointer;';
 
+  const sessions = sessionsForPkg();
+  const sessionLabels = ['Nikah','Sanding','Tunang','Tandang','Reception','Majlis 1','Majlis 2','Majlis 3'];
+
   evtList.innerHTML = selectedDates.map((d, i) => {
     const fmt   = fmtDate(d);
     const label = DATE_LABELS[i] || `Day ${i+1}`;
+
+    // Build session rows for this date
+    let sessionRows = '';
+    for (let s = 0; s < sessions; s++) {
+      const sessionLabel = sessions > 1 ? `Session ${s+1}` : 'Function / Event';
+      sessionRows += `
+        <div style="padding:10px 0 4px;${s > 0 ? 'border-top:1px solid rgba(255,255,255,0.06);margin-top:6px;' : ''}">
+          ${sessions > 1 ? `<p style="font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">${sessionLabel}</p>` : ''}
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div class="form-group">
+              <label>Function / Event</label>
+              <select id="evtFunc_${i}_${s}" required style="${selectStyle}">${funcOptions}</select>
+            </div>
+            <div class="form-group">
+              <label>Start Time</label>
+              <select id="evtTime_${i}_${s}" required style="${selectStyle}">${timeOptions}</select>
+            </div>
+          </div>
+        </div>`;
+    }
+
     return `
       <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:14px;margin-bottom:10px;">
         <p style="font-size:0.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">${label} — ${fmt}</p>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div class="form-group">
-            <label>Function / Event</label>
-            <select id="evtFunc_${i}" required style="${selectStyle}">${funcOptions}</select>
-          </div>
-          <div class="form-group">
-            <label>Start Time</label>
-            <select id="evtTime_${i}" required style="${selectStyle}">${timeOptions}</select>
-          </div>
-        </div>
+        ${sessionRows}
       </div>`;
   }).join('');
   evtSection.style.display = 'block';
+
 
   document.getElementById('step2Title').textContent = enquiry ? 'Send Availability Enquiry' : 'Your Details';
   document.getElementById('modalSummaryLabel').textContent = enquiry
@@ -933,13 +968,18 @@ function submitBooking(e) {
   const name     = `${first} ${last}`;
   const ref      = genRef();
 
-  // Collect per-date event details
+  // Collect per-date event details (each date may have multiple sessions)
   const fmtDate = d => new Date(d + 'T00:00:00').toLocaleDateString('en-MY', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  const numSessions = sessionsForPkg();
   const eventDetails = selectedDates.map((d, i) => {
-    const fn    = document.getElementById(`evtFunc_${i}`)?.value.trim() || '—';
-    const tm    = document.getElementById(`evtTime_${i}`)?.value || '—';
     const label = selectedDates.length > 1 ? `${DATE_LABELS[i]}: ` : '';
-    return `${label}${fmtDate(d)} | ${fn} @ ${tm}`;
+    const sessionParts = [];
+    for (let s = 0; s < numSessions; s++) {
+      const fn = document.getElementById(`evtFunc_${i}_${s}`)?.value.trim() || '—';
+      const tm = document.getElementById(`evtTime_${i}_${s}`)?.value || '—';
+      sessionParts.push(numSessions > 1 ? `Session ${s+1}: ${fn} @ ${tm}` : `${fn} @ ${tm}`);
+    }
+    return `${label}${fmtDate(d)}\n  ${sessionParts.join('\n  ')}`;
   });
   const dateStr     = fmtDate(selectedDates[0]);
   const datesBlock  = eventDetails.join('\n');
@@ -1089,7 +1129,7 @@ function submitBooking(e) {
       body: JSON.stringify({
         title:       `[${ref}] ${name} — ${activePackage.name}`,
         date:        selectedDates[0],
-        startTime:   document.getElementById('evtTime_0')?.value || '',
+        startTime:   document.getElementById('evtTime_0_0')?.value || '',
         description: `Ref: ${ref}\nClient: ${name}\nPhone: ${phone}\nEmail: ${email}\nPackage: ${activePackage.name}\nLocation: ${location || 'TBD'}\nNotes: ${notes || 'None'}\nApprove: ${approveLink}`,
         location:    location || '',
         ref,
@@ -1180,7 +1220,7 @@ function submitBooking(e) {
       body: JSON.stringify({
         title:       `[${ref}] ${name} — ${activePackage.name}`,
         date:        selectedDates[0],
-        startTime:   document.getElementById('evtTime_0')?.value || '',
+        startTime:   document.getElementById('evtTime_0_0')?.value || '',
         description: `Ref: ${ref}\nClient: ${name}\nPhone: ${phone}\nEmail: ${email}\nPackage: ${activePackage.name}\nLocation: ${location || 'TBD'}\nNotes: ${notes || 'None'}`,
         location:    location || '',
         ref,
