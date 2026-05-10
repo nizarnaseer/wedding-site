@@ -109,7 +109,7 @@ module.exports = async (req, res) => {
       method: 'POST',
       headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-      from: 'Nizar Naseer Studio <onboarding@resend.dev>',
+      from: 'Nizar Naseer Studio <studio@weddingclicks.us>',
         to: [to],
         subject: '[Assignment] ' + (pkg || '') + ' — ' + (date || '').replace(/[\n\r]+/g, ' | ') + ' (' + ref + ')',
         html,
