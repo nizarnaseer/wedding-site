@@ -17,7 +17,7 @@
 </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Booking Approval — Nizar Naseer Studio</title>
+  <title>Booking Approval Dashboard — Nizar Naseer Studio</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,604 +25,341 @@
       --gold: #c9a96e; --gold-light: #e8d5a3;
       --dark: #0a0a0a; --dark2: #111; --dark3: #1a1a1a;
       --border: rgba(255,255,255,0.08); --text: #e8e4df; --muted: #888;
+      --green: #22c55e; --red: #ef4444;
     }
-    body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    body { font-family: 'Inter', sans-serif; background: var(--dark); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    /* Navbar */
+    header { border-bottom: 1px solid var(--border); padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; background: var(--dark); z-index: 10; }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
+    .logo span { color: var(--text); }
+    .btn-sm { padding: 7px 16px; border-radius: 6px; font-size: 0.78rem; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--muted); transition: all .2s; text-decoration: none; display: inline-block; }
+    .btn-sm:hover { border-color: var(--gold); color: var(--gold); }
 
-    .card {
-      background: var(--dark2); border: 1px solid var(--border); border-radius: 16px;
-      max-width: 520px; width: 100%; padding: 40px;
-    }
-    .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 28px; }
-    .logo span { color: var(--gold); }
+    /* Dashboard Layout */
+    .dashboard { display: flex; flex: 1; height: calc(100vh - 65px); overflow: hidden; }
+    
+    /* Sidebar */
+    .sidebar { width: 340px; background: var(--dark2); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+    .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); }
+    .tab { flex: 1; text-align: center; padding: 16px 0; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: color 0.2s; border-bottom: 2px solid transparent; }
+    .tab.active { color: var(--gold); border-bottom-color: var(--gold); font-weight: 500; }
+    .tab:hover:not(.active) { color: var(--text); }
+    
+    .enquiry-list { flex: 1; overflow-y: auto; padding: 12px; display: none; }
+    .enquiry-list.active { display: block; }
+    
+    .enquiry-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+    .enquiry-card:hover { border-color: rgba(201,169,110,0.3); background: rgba(201,169,110,0.02); }
+    .enquiry-card.selected { border-color: var(--gold); background: rgba(201,169,110,0.05); }
+    .enq-ref { font-family: monospace; font-size: 0.75rem; color: var(--gold); margin-bottom: 6px; }
+    .enq-name { font-weight: 500; font-size: 0.95rem; margin-bottom: 4px; }
+    .enq-pkg { font-size: 0.8rem; color: var(--muted); margin-bottom: 10px; }
+    .enq-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); border-top: 1px solid var(--border); padding-top: 10px; }
 
-    .status-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3);
-      color: #ffb300; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase;
-      padding: 6px 14px; border-radius: 20px; margin-bottom: 20px;
-    }
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #ffb300; animation: pulse 1.5s infinite; }
+    /* Main Content */
+    .main-content { flex: 1; overflow-y: auto; padding: 40px; background: var(--dark); display: flex; justify-content: center; }
+    .card { background: var(--dark2); border: 1px solid var(--border); border-radius: 16px; max-width: 600px; width: 100%; padding: 40px; height: fit-content; }
+    
+    .status-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; padding: 6px 14px; border-radius: 20px; margin-bottom: 20px; }
+    .status-badge.pending { background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); color: #ffb300; }
+    .status-badge.approved { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: var(--green); }
+    .status-badge.declined { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--red); }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .status-badge.pending .status-dot { background: #ffb300; animation: pulse 1.5s infinite; }
+    .status-badge.approved .status-dot { background: var(--green); }
+    .status-badge.declined .status-dot { background: var(--red); }
+
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,165,0,0.4); } 70% { box-shadow: 0 0 0 6px rgba(255,165,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,165,0,0); } }
 
     h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; margin-bottom: 6px; }
     .sub { font-size: 0.8rem; color: var(--muted); margin-bottom: 28px; }
 
-    .details-box {
-      background: var(--dark3); border: 1px solid var(--border); border-radius: 10px;
-      padding: 20px; margin-bottom: 28px;
-    }
-    .detail-row {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      padding: 10px 0; border-bottom: 1px solid var(--border); gap: 12px;
-      font-size: 0.85rem;
-    }
+    .details-box { background: var(--dark3); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 28px; }
+    .detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 12px; font-size: 0.85rem; }
     .detail-row:last-child { border-bottom: none; }
     .detail-row span:first-child { color: var(--muted); white-space: nowrap; }
     .detail-row strong { color: var(--text); text-align: right; }
+    .detail-row.price strong { color: var(--gold); font-size: 1.05rem; font-family: 'Cormorant Garamond', serif; }
 
-    .ref-label { font-size: 0.72rem; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 4px; }
-    .ref-code { font-size: 1.3rem; font-family: 'Cormorant Garamond', serif; margin-bottom: 24px; }
+    .shooter-box { background: rgba(201,169,110,0.03); border: 1px solid rgba(201,169,110,0.15); border-radius: 10px; padding: 20px; margin-bottom: 28px; }
+    .shooter-box h3 { font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; display: flex; justify-content: space-between; }
+    .shooter-box h3 span { font-size: 0.65rem; color: var(--muted); background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; }
+    .input-group { margin-bottom: 12px; }
+    .input-group label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 6px; }
+    .input-group input { width: 100%; background: var(--dark); border: 1px solid var(--border); padding: 10px 14px; border-radius: 6px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.85rem; outline: none; }
+    .input-group input:focus { border-color: var(--gold); }
+    .shooter-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .btn-notify { flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.8rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-notify.wa:hover { background: #22c55e; border-color: #22c55e; color: #000; }
+    .btn-notify.em:hover { background: #3b82f6; border-color: #3b82f6; color: #fff; }
 
-    .btn-group { display: flex; flex-direction: column; gap: 12px; }
-    .btn {
-      width: 100%; padding: 14px 20px; border-radius: 10px; font-family: 'Inter', sans-serif;
-      font-size: 0.88rem; font-weight: 500; cursor: pointer; border: none;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      transition: all 0.2s ease; letter-spacing: 0.5px;
-    }
-    .btn-toyyib { background: var(--gold); color: #000; font-size: 0.95rem; }
-    .btn-toyyib:hover { background: var(--gold-light); transform: translateY(-1px); }
-    .btn-approve { background: #25D366; color: #000; }
-    .btn-approve:hover { background: #1ebe5c; transform: translateY(-1px); }
-    .btn-email { background: #4a90d9; color: #fff; }
-    .btn-email:hover { background: #357abd; transform: translateY(-1px); }
-    .btn-decline { background: transparent; border: 1px solid rgba(255,80,80,0.3); color: #ff5050; }
-    .btn-decline:hover { background: rgba(255,80,80,0.08); }
+    .action-row { display: flex; gap: 12px; margin-bottom: 24px; }
+    .btn { flex: 1; padding: 14px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all .2s; border: none; }
+    .btn-approve { background: var(--gold); color: #000; }
+    .btn-approve:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .btn-decline { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); }
+    .btn-decline:hover { background: rgba(239,68,68,0.1); border-color: var(--red); color: var(--red); }
 
-    .divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 0.72rem; margin: 4px 0; }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-    .payment-link-box {
-      background: rgba(201,169,110,0.08); border: 1px solid rgba(201,169,110,0.25);
-      border-radius: 10px; padding: 16px; margin-bottom: 12px; display: none;
-    }
-    .payment-link-box.show { display: block; }
-    .payment-link-box p { font-size: 0.78rem; color: var(--muted); margin-bottom: 8px; }
-    .payment-link-url {
-      font-size: 0.82rem; color: var(--gold); word-break: break-all;
-      background: var(--dark3); padding: 10px 12px; border-radius: 6px;
-      margin-bottom: 12px; font-family: monospace;
-    }
-    .copy-btn {
-      background: transparent; border: 1px solid var(--border); color: var(--muted);
-      border-radius: 6px; padding: 6px 14px; font-size: 0.75rem; cursor: pointer;
-      transition: all 0.2s;
-    }
-    .copy-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-    .status-msg { font-size: 0.8rem; margin-top: 10px; padding: 10px 14px; border-radius: 8px; display: none; }
-    .status-msg.loading { background: rgba(201,169,110,0.08); color: var(--gold); border: 1px solid rgba(201,169,110,0.2); display: block; }
-    .status-msg.err { background: rgba(255,80,80,0.08); color: #ff8080; border: 1px solid rgba(255,80,80,0.2); display: block; }
-
-    .toyyib-setup {
-      background: var(--dark3); border: 1px solid var(--border); border-radius: 10px;
-      padding: 16px; margin-bottom: 16px; display: none;
-    }
-    .toyyib-setup.show { display: block; }
-    .toyyib-setup h4 { font-size: 0.82rem; font-weight: 500; margin-bottom: 10px; color: var(--gold); }
-    .toyyib-setup input {
-      width: 100%; background: var(--dark); border: 1px solid var(--border); border-radius: 6px;
-      padding: 10px 12px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.82rem;
-      outline: none; margin-bottom: 8px;
-    }
-    .toyyib-setup input:focus { border-color: var(--gold); }
-    .toyyib-setup .save-small { background: var(--gold); color: #000; border: none; border-radius: 6px; padding: 8px 18px; font-size: 0.78rem; font-weight: 600; cursor: pointer; width: 100%; }
-
-    .success-box { text-align: center; padding: 20px 0; display: none; }
-    .success-icon { font-size: 3rem; margin-bottom: 12px; }
-    .success-box h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; margin-bottom: 8px; }
-    .success-box p { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
-
-    .shooter-box {
-      background: rgba(201,169,110,0.06); border: 1px solid rgba(201,169,110,0.2);
-      border-radius: 10px; padding: 18px; margin-bottom: 20px;
-    }
-    .shooter-box h4 { font-size: 0.78rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
-    .shooter-box label { font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 4px; }
-    .shooter-box input {
-      width: 100%; background: var(--dark3); border: 1px solid var(--border); border-radius: 6px;
-      padding: 10px 12px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 0.84rem;
-      outline: none; margin-bottom: 10px;
-    }
-    .shooter-box input:focus { border-color: var(--gold); }
-    .shooter-badge { display: inline-block; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25);
-      color: #4ade80; font-size: 0.7rem; letter-spacing: 1.5px; padding: 3px 10px; border-radius: 12px;
-      text-transform: uppercase; margin-left: 8px; }
-    .btn-shooter { background: linear-gradient(135deg,#22c55e,#16a34a); color: #fff; }
-    .btn-shooter:hover { filter: brightness(1.1); transform: translateY(-1px); }
-    .btn-shooter-wa { background: #25D366; color: #000; }
-    .btn-shooter-wa:hover { background: #1ebe5c; transform: translateY(-1px); }
-    .btn-shooter-email { background: #4a90d9; color: #fff; }
-    .btn-shooter-email:hover { background: #357abd; transform: translateY(-1px); }
-    .shooter-sent { font-size: 0.75rem; color: #4ade80; margin-top: 8px; display: none; text-align: center; }
-    .shooter-sent.show { display: block; }
-    .note { font-size: 0.75rem; color: var(--muted); margin-top: 16px; text-align: center; line-height: 1.6; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--green); color: #000; padding: 12px 20px; border-radius: 8px; font-size: 0.82rem; font-weight: 500; opacity: 0; transition: opacity .3s; z-index: 999; }
+    .toast.show { opacity: 1; }
+    .toast.error { background: var(--red); color: #fff; }
+    
+    .empty-state { text-align: center; color: var(--muted); margin-top: 60px; font-size: 0.85rem; }
   </style>
-
 </head>
 <body>
-<div style="position:fixed;top:16px;left:16px;z-index:999;">
-  <a href="/admin.html" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#888;text-decoration:none;padding:8px 16px;border-radius:8px;font-size:0.78rem;font-family:'Inter',sans-serif;backdrop-filter:blur(8px);transition:all .2s;" onmouseover="this.style.color='#c9a96e';this.style.borderColor='rgba(201,169,110,0.4)'" onmouseout="this.style.color='#888';this.style.borderColor='rgba(255,255,255,0.12)'">← Admin Dashboard</a>
-</div>
-<div class="card">
-  <div class="logo">NIZAR NASEER<span> STUDIO</span></div>
 
-  <div id="mainContent">
-    <div class="status-badge"><span class="status-dot"></span> Pending Approval</div>
-    <h1>New Booking Enquiry</h1>
-    <p class="sub">Review the details below and approve or decline this booking request.</p>
+<header>
+  <div class="logo">Nizar Naseer <span>STUDIO</span></div>
+  <a href="admin.html" class="btn-sm">← Back to Admin</a>
+</header>
 
-    <p class="ref-label">Reference</p>
-    <p class="ref-code" id="refCode">—</p>
-
-    <div class="details-box">
-      <div class="detail-row"><span>Client</span>    <strong id="dName">—</strong></div>
-      <div class="detail-row" id="coupleRow" style="display:none"><span>Couple 💑</span><strong id="dCouple" style="color:var(--gold)">—</strong></div>
-      <div class="detail-row"><span>WhatsApp</span>  <strong id="dPhone">—</strong></div>
-      <div class="detail-row"><span>Email</span>     <strong id="dEmail">—</strong></div>
-      <div class="detail-row"><span>Package</span>   <strong id="dPackage">—</strong></div>
-      <div class="detail-row"><span>Price</span>     <strong id="dPrice" style="color:var(--gold)">—</strong></div>
-      <div class="detail-row"><span>Date</span>      <strong id="dDate">—</strong></div>
-      <div class="detail-row"><span>Location</span>  <strong id="dLocation" style="font-weight:400;color:var(--muted)">—</strong></div>
-      <div class="detail-row"><span>Notes</span>     <strong id="dNotes" style="font-weight:400;color:var(--muted)">—</strong></div>
+<div class="dashboard">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-tabs">
+      <div class="tab active" onclick="switchTab('pending')">Pending (2)</div>
+      <div class="tab" onclick="switchTab('approved')">Approved</div>
+      <div class="tab" onclick="switchTab('declined')">Declined</div>
     </div>
-
-    <!-- ── SHOOTER ASSIGNMENT ── -->
-    <div class="shooter-box">
-      <h4>📷 Assign Shooter <span class="shooter-badge">Optional</span></h4>
-      <label>Shooter WhatsApp Number</label>
-      <input type="tel" id="shooterPhone" placeholder="e.g. 0123456789" />
-      <label>Shooter Email</label>
-      <input type="email" id="shooterEmail" placeholder="shooter@email.com" />
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-shooter-wa" style="flex:1;padding:10px;font-size:0.8rem;" onclick="notifyShooterWA()">
-          📲 Notify Shooter (WA)
-        </button>
-        <button class="btn btn-shooter-email" style="flex:1;padding:10px;font-size:0.8rem;" onclick="notifyShooterEmail()">
-          ✉️ Notify Shooter (Email)
-        </button>
+    
+    <!-- Pending List -->
+    <div id="list-pending" class="enquiry-list active">
+      <!-- Dynamic entry will be inserted here via JS -->
+      <div class="enquiry-card" onclick="loadDummyData('ENQ-819233', 'Ahmad Faizal', 'Nikah + Sanding Video', 'RM 1,500', '20 May 2026', 'pending')">
+        <div class="enq-ref">ENQ-819233</div>
+        <div class="enq-name">Ahmad Faizal</div>
+        <div class="enq-pkg">Nikah + Sanding Video</div>
+        <div class="enq-meta"><span>14 May 2026</span><span>RM 1,500</span></div>
       </div>
-      <div class="shooter-sent" id="shooterSent">✅ Shooter notified!</div>
     </div>
-
-    <!-- ToyyibPay Setup (shown if not configured) -->
-    <div class="toyyib-setup" id="toyyibSetup">
-      <h4>⚙️ ToyyibPay Setup (one-time)</h4>
-      <input type="text" id="tpSecretKey" placeholder="User Secret Key (from ToyyibPay dashboard)" />
-      <input type="text" id="tpCategoryCode" placeholder="Category Code (create one in ToyyibPay)" />
-      <button class="save-small" onclick="saveToyyibCreds()">Save Credentials</button>
+    
+    <!-- Approved List -->
+    <div id="list-approved" class="enquiry-list">
+      <div class="enquiry-card" onclick="loadDummyData('ENQ-718221', 'Siti Nurhaliza', 'Full Package Photo', 'RM 2,000', '10 Jun 2026', 'approved')">
+        <div class="enq-ref">ENQ-718221</div>
+        <div class="enq-name">Siti Nurhaliza</div>
+        <div class="enq-pkg">Full Package Photo</div>
+        <div class="enq-meta"><span>10 May 2026</span><span style="color:#22c55e;">Deposit Paid</span></div>
+      </div>
     </div>
+    
+    <!-- Declined List -->
+    <div id="list-declined" class="enquiry-list">
+      <div class="enquiry-card" onclick="loadDummyData('ENQ-661244', 'Khairul Aming', 'Studio Raya Session', 'RM 150', '22 Apr 2026', 'declined')">
+        <div class="enq-ref">ENQ-661244</div>
+        <div class="enq-name">Khairul Aming</div>
+        <div class="enq-pkg">Studio Raya Session</div>
+        <div class="enq-meta"><span>15 Apr 2026</span><span style="color:#ef4444;">Unavailable</span></div>
+      </div>
+    </div>
+  </div>
 
-    <div class="btn-group">
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="card" id="detail-card">
+      <div id="statusBadge" class="status-badge pending"><div class="status-dot"></div><span id="statusText">Pending Approval</span></div>
+      
+      <h1>Booking Enquiry</h1>
+      <p class="sub">Review the details below and approve or decline this booking request.</p>
 
-      <!-- PRIMARY: Generate ToyyibPay payment link -->
-      <button class="btn btn-toyyib" id="btnGenerate" onclick="generatePaymentLink()">
-        💳 &nbsp; Generate ToyyibPay Payment Link
-      </button>
-      <div class="status-msg" id="tpStatus"></div>
+      <div style="font-size:0.7rem;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:6px;">Reference</div>
+      <div id="refId" style="font-family:monospace;font-size:1.4rem;margin-bottom:28px;">ENQ-000000</div>
 
-      <!-- Payment link box (shown after generation) -->
-      <div class="payment-link-box" id="paymentLinkBox">
-        <p>✅ Payment link created — send this to the client:</p>
-        <div class="payment-link-url" id="paymentLinkUrl"></div>
-        <button class="copy-btn" onclick="copyLink()">📋 Copy Link</button>
+      <div class="details-box">
+        <div class="detail-row"><span>Client</span><strong id="vName">-</strong></div>
+        <div class="detail-row"><span>WhatsApp</span><strong><a href="#" id="vPhoneLink" style="color:var(--text);text-decoration:none;">-</a></strong></div>
+        <div class="detail-row"><span>Email</span><strong id="vEmail">-</strong></div>
+        <div class="detail-row"><span>Package</span><strong id="vPkg">-</strong></div>
+        <div class="detail-row price"><span>Price</span><strong id="vPrice">-</strong></div>
+        <div class="detail-row"><span>Date</span><strong id="vDate">-</strong></div>
+        <div class="detail-row"><span>Notes</span><strong id="vNotes">-</strong></div>
+      </div>
 
-        <div style="display:flex;gap:8px;margin-top:12px;">
-          <button class="btn btn-approve" style="flex:1;padding:11px 10px;font-size:0.8rem;" onclick="sendLinkWA()">
-            📲 Send via WhatsApp
-          </button>
-          <button class="btn btn-email" style="flex:1;padding:11px 10px;font-size:0.8rem;" onclick="sendLinkEmail()">
-            ✉️ Send via Email
-          </button>
+      <div class="shooter-box" id="shooterBox">
+        <h3>📷 Assign Shooter <span>OPTIONAL</span></h3>
+        <div class="input-group">
+          <label>Shooter WhatsApp Number</label>
+          <input type="text" id="shooterWa" placeholder="e.g. 0123456789" />
         </div>
-
-        <!-- Invoice link (shown after sending) -->
-        <div id="invoiceLinkBox" style="display:none;margin-top:12px;background:rgba(201,169,110,0.06);border:1px solid rgba(201,169,110,0.2);border-radius:8px;padding:12px;">
-          <p style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">📄 Invoice ready — share with client:</p>
-          <div style="display:flex;gap:8px;">
-            <a id="invoiceViewBtn" href="#" target="_blank" style="flex:1;" >
-              <button class="btn" style="width:100%;background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);color:var(--gold);padding:10px;font-size:0.78rem;">🧾 View Invoice</button>
-            </a>
-            <button class="btn" style="flex:1;background:#25D366;color:#000;padding:10px;font-size:0.78rem;" onclick="sendInvoiceWA()">📲 Send Invoice via WA</button>
-          </div>
+        <div class="input-group">
+          <label>Shooter Email</label>
+          <input type="email" id="shooterEm" placeholder="shooter@email.com" />
         </div>
-
-        <!-- Mark full paid -->
-        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
-          <p style="font-size:0.73rem;color:var(--muted);margin-bottom:8px;">Once client pays full balance:</p>
-          <button class="btn" style="width:100%;background:#16a34a;color:#fff;padding:12px;font-size:0.85rem;" onclick="markFullPaid()">✅ Mark Full Paid → Generate Receipt</button>
-        </div>
-
-        <!-- Google Calendar -->
-        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
-          <p style="font-size:0.73rem;color:var(--muted);margin-bottom:8px;">📅 Save this job to your Google Calendar:</p>
-          <button class="btn" style="width:100%;background:#1a73e8;color:#fff;padding:12px;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="addToGCal()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg>
-            Add to Google Calendar
-          </button>
+        <div class="shooter-actions">
+          <button class="btn-notify wa" onclick="notifyShooter('wa')">📲 Notify Shooter (WA)</button>
+          <button class="btn-notify em" onclick="notifyShooter('email')">✉️ Notify Shooter (Email)</button>
         </div>
       </div>
 
-      <div class="divider">or decline</div>
-
-      <button class="btn btn-decline" onclick="doDecline()">
-        ✕ &nbsp; Decline — Notify Client via WhatsApp
-      </button>
+      <div class="action-row" id="actionButtons">
+        <button class="btn btn-decline" onclick="decline()">Decline Request</button>
+        <button class="btn btn-approve" onclick="approve()">Generate Payment Link & Approve</button>
+      </div>
+      
+      <div style="font-size:0.75rem;color:var(--muted);text-align:center;line-height:1.6;" id="footerNote">
+        Approving this request will generate a secure ToyyibPay invoice link.<br/>
+        You can send this link to the client via WhatsApp or Email.
+      </div>
     </div>
-
-    <p class="note">ToyyibPay will create a secure payment bill for the client. They pay via FPX/credit card — funds go directly to your ToyyibPay account.</p>
-  </div>
-
-  <!-- Success state -->
-  <div class="success-box" id="successBox">
-    <div class="success-icon">✅</div>
-    <h2 id="successTitle">Approved!</h2>
-    <p id="successMsg"></p>
   </div>
 </div>
 
-<script src="config.js"></script>
+<div class="toast" id="toast">Copied to clipboard!</div>
+
 <script>
-  /* ── Read URL params — using clientName/clientLocation to avoid
-     window.name / window.location global conflicts ── */
-  var _p            = new URLSearchParams(window.location.search);
-  var ref           = _p.get('ref')      || 'ENQ-XXXXXX';
-  var clientName    = _p.get('name')     || '—';
-  var couple        = _p.get('couple')   || '';
-  var email         = _p.get('email')    || '—';
-  var phone         = _p.get('phone')    || '—';
-  var pkg           = _p.get('package')  || '—';
-  var price         = _p.get('price')    || '—';
-  var date          = _p.get('date')     || '—';
-  var clientLocation= _p.get('location') || 'Not provided';
-  var notes         = _p.get('notes')    || 'None';
-  var DEPOSIT       = 100; // RM deposit required
-
-  document.getElementById('refCode').textContent   = ref;
-  document.getElementById('dName').textContent     = clientName;
-  document.getElementById('dEmail').textContent    = email;
-  document.getElementById('dPackage').textContent  = pkg;
-  document.getElementById('dPrice').textContent    = price;
-  document.getElementById('dDate').textContent     = date;
-  document.getElementById('dLocation').textContent = clientLocation;
-  document.getElementById('dNotes').textContent    = notes;
-  if (couple) {
-    document.getElementById('dCouple').textContent = couple;
-    document.getElementById('coupleRow').style.display = 'flex';
+  // ── 1. Read URL Params (The real enquiry from email) ──
+  const params = new URLSearchParams(window.location.search);
+  const realName  = params.get('name');
+  const realPhone = params.get('phone');
+  const realEmail = params.get('email');
+  const realPkg   = params.get('pkg');
+  const realPrice = params.get('price');
+  const realDate  = params.get('date');
+  const realNotes = params.get('notes');
+  const realRef   = params.get('ref') || 'ENQ-' + Math.floor(100000 + Math.random() * 900000);
+  
+  // ── 2. Inject real enquiry into pending list if it exists ──
+  if (realName && realPkg) {
+    const list = document.getElementById('list-pending');
+    const newCard = document.createElement('div');
+    newCard.className = 'enquiry-card';
+    newCard.onclick = () => loadRealData();
+    newCard.innerHTML = `
+      <div class="enq-ref">${realRef} <span style="color:#22c55e;font-size:0.6rem;padding:2px 4px;background:rgba(34,197,94,0.1);border-radius:4px;margin-left:4px;">NEW</span></div>
+      <div class="enq-name">${realName}</div>
+      <div class="enq-pkg">${realPkg}</div>
+      <div class="enq-meta"><span>Just Now</span><span>${realPrice}</span></div>
+    `;
+    list.prepend(newCard);
+    
+    // Auto load it
+    setTimeout(loadRealData, 100);
+  } else {
+    // If no params, load the first dummy
+    setTimeout(() => loadDummyData('ENQ-819233', 'Ahmad Faizal', 'Nikah + Sanding Video', 'RM 1,500', '20 May 2026', 'pending'), 100);
   }
 
-  // Make phone a clickable WhatsApp link
-  (function() {
-    var rawPhone  = phone.replace(/[\s\-\+\(\)]/g, '');
-    var waNum     = rawPhone.startsWith('60') ? rawPhone : '60' + rawPhone.replace(/^0/, '');
-    var phoneEl   = document.getElementById('dPhone');
-    if (phone && phone !== '—' && phone !== 'Not provided') {
-      phoneEl.innerHTML = '<a href="https://wa.me/' + waNum + '" target="_blank" style="color:#25d366;text-decoration:none;font-weight:600;">📲 ' + phone + '</a>';
+  // ── 3. UI Logic ──
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.enquiry-list').forEach(l => l.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('list-' + tabId).classList.add('active');
+  }
+
+  let currentRef = '';
+
+  function loadRealData() {
+    highlightCard(event ? event.currentTarget : document.querySelector('#list-pending .enquiry-card'));
+    populateUI(realRef, realName, realPhone, realEmail, realPkg, realPrice, realDate, realNotes, 'pending');
+  }
+
+  function loadDummyData(ref, name, pkg, price, date, status) {
+    highlightCard(event.currentTarget);
+    populateUI(ref, name, '0123456789', 'client@email.com', pkg, price, date, 'No special requirements.', status);
+  }
+
+  function highlightCard(card) {
+    document.querySelectorAll('.enquiry-card').forEach(c => c.classList.remove('selected'));
+    if(card) card.classList.add('selected');
+  }
+
+  function populateUI(ref, name, phone, email, pkg, price, date, notes, status) {
+    currentRef = ref;
+    document.getElementById('refId').textContent = ref;
+    document.getElementById('vName').textContent = name;
+    document.getElementById('vPhoneLink').textContent = phone;
+    document.getElementById('vPhoneLink').href = 'https://wa.me/' + phone.replace(/[^0-9]/g, '');
+    document.getElementById('vEmail').textContent = email;
+    document.getElementById('vPkg').textContent = pkg;
+    document.getElementById('vPrice').textContent = price;
+    document.getElementById('vDate').textContent = date;
+    document.getElementById('vNotes').textContent = notes || '-';
+
+    const badge = document.getElementById('statusBadge');
+    const badgeText = document.getElementById('statusText');
+    const actions = document.getElementById('actionButtons');
+    const footerNote = document.getElementById('footerNote');
+
+    badge.className = 'status-badge ' + status;
+    
+    if (status === 'pending') {
+      badgeText.textContent = 'Pending Approval';
+      actions.style.display = 'flex';
+      footerNote.style.display = 'block';
+    } else if (status === 'approved') {
+      badgeText.textContent = 'Approved & Invoice Sent';
+      actions.style.display = 'none';
+      footerNote.style.display = 'none';
+    } else if (status === 'declined') {
+      badgeText.textContent = 'Declined';
+      actions.style.display = 'none';
+      footerNote.style.display = 'none';
+    }
+  }
+
+  // ── 4. Actions ──
+  function approve() {
+    const pkgName = document.getElementById('vPkg').textContent;
+    const priceStr = document.getElementById('vPrice').textContent.replace(/[^0-9.]/g, '');
+    const price = parseFloat(priceStr) || 100;
+    
+    // Use the dummy payment gateway we built for presentation!
+    const invoiceUrl = `https://weddingclicks.us/payment-demo.html?ref=${currentRef}&desc=Deposit%20for%20${encodeURIComponent(pkgName)}&amount=${price}`;
+    
+    const waPhone = document.getElementById('vPhoneLink').textContent.replace(/[^0-9]/g, '');
+    const waMsg = `Hi ${document.getElementById('vName').textContent},\n\nGreat news! Your booking enquiry (${currentRef}) for *${pkgName}* has been approved by Nizar Naseer Studio.\n\nPlease click the secure link below to pay your deposit and confirm your slot:\n${invoiceUrl}\n\nThank you!`;
+    
+    window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(waMsg)}`, '_blank');
+    
+    showToast('Booking Approved! Status updated.');
+    // Move to approved visually for presentation
+    document.getElementById('statusBadge').className = 'status-badge approved';
+    document.getElementById('statusText').textContent = 'Approved & Invoice Sent';
+    document.getElementById('actionButtons').style.display = 'none';
+    document.getElementById('footerNote').style.display = 'none';
+  }
+
+  function decline() {
+    const waPhone = document.getElementById('vPhoneLink').textContent.replace(/[^0-9]/g, '');
+    const waMsg = `Hi ${document.getElementById('vName').textContent},\n\nThank you for your interest in Nizar Naseer Studio. Unfortunately, we are fully booked on your requested date (${document.getElementById('vDate').textContent}) and are unable to accept this booking (${currentRef}).\n\nWe apologize for any inconvenience.`;
+    
+    window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(waMsg)}`, '_blank');
+    
+    showToast('Booking Declined! Status updated.', true);
+    document.getElementById('statusBadge').className = 'status-badge declined';
+    document.getElementById('statusText').textContent = 'Declined';
+    document.getElementById('actionButtons').style.display = 'none';
+    document.getElementById('footerNote').style.display = 'none';
+  }
+
+  function notifyShooter(type) {
+    const ref = currentRef;
+    const date = document.getElementById('vDate').textContent;
+    const pkg = document.getElementById('vPkg').textContent;
+    
+    if (type === 'wa') {
+      const wa = document.getElementById('shooterWa').value.replace(/[^0-9]/g, '');
+      if(!wa) return alert('Enter WhatsApp number');
+      const msg = `ASSIGNMENT: ${ref}\nYou've been assigned a shoot for ${pkg} on ${date}. Please check the calendar for full details.`;
+      window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`, '_blank');
     } else {
-      phoneEl.textContent = phone;
-    }
-  })();
-
-  // ── ToyyibPay credentials ──
-  var tpKey  = localStorage.getItem('tp_secret_key')    || '';
-  var tpCat  = localStorage.getItem('tp_category_code') || '';
-  var generatedPaymentUrl = '';
-
-  if (!tpKey || !tpCat) {
-    document.getElementById('toyyibSetup').classList.add('show');
-    if (tpKey) document.getElementById('tpSecretKey').value    = tpKey;
-    if (tpCat) document.getElementById('tpCategoryCode').value = tpCat;
-  }
-
-  function saveToyyibCreds() {
-    tpKey = document.getElementById('tpSecretKey').value.trim();
-    tpCat = document.getElementById('tpCategoryCode').value.trim();
-    if (!tpKey || !tpCat) { alert('Please fill in both fields.'); return; }
-    localStorage.setItem('tp_secret_key', tpKey);
-    localStorage.setItem('tp_category_code', tpCat);
-    document.getElementById('toyyibSetup').classList.remove('show');
-    alert('✅ ToyyibPay credentials saved!');
-  }
-
-  function clientWANum() {
-    var raw = phone.replace(/[\s\-\+\(\)]/g, '');
-    return raw.startsWith('60') ? raw : '60' + raw.replace(/^0/, '');
-  }
-
-  async function generatePaymentLink() {
-    if (!tpKey || !tpCat) {
-      document.getElementById('toyyibSetup').classList.add('show');
-      alert('Please enter your ToyyibPay credentials first.');
-      return;
-    }
-    var status = document.getElementById('tpStatus');
-    status.className = 'status-msg loading';
-    status.textContent = '⏳ Creating payment bill on ToyyibPay…';
-    document.getElementById('btnGenerate').disabled = true;
-
-    var amountCents = Math.round(parseFloat(price.replace(/[^0-9.]/g, '')) * 100);
-    var billName    = ('Booking_' + ref).replace(/[^a-zA-Z0-9_ ]/g, '').slice(0, 30);
-    var billDesc    = (pkg + ' on ' + date).replace(/[^a-zA-Z0-9_ ]/g, ' ').slice(0, 100);
-
-    var payload = new URLSearchParams({
-      userSecretKey: tpKey, categoryCode: tpCat,
-      billName, billDescription: billDesc,
-      billPriceSetting: '1', billPayorInfo: '1',
-      billAmount: String(amountCents),
-      billReturnUrl: 'https://wedding-testinggg.netlify.app',
-      billCallbackUrl: 'https://wedding-testinggg.netlify.app',
-      billExternalReferenceNo: ref,
-      billTo: clientName, billEmail: email, billPhone: clientWANum(),
-      billSplitPayment: '0', billSplitPaymentArgs: '',
-      billPaymentChannel: '2',
-      billContentEmail: 'Thank you for booking Nizar Naseer Studio! Session: ' + date,
-      billChargeToCustomer: '1', billExpiryDays: '3',
-    });
-    try {
-      var res  = await fetch('/api/create-bill', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(Object.fromEntries(payload)),
-      });
-      var data = await res.json();
-      if (data && data[0] && data[0].BillCode) {
-        generatedPaymentUrl = 'https://toyyibpay.com/' + data[0].BillCode;
-        showPaymentLink(generatedPaymentUrl);
-        status.className = 'status-msg';
-      } else { throw new Error(JSON.stringify(data)); }
-    } catch(err) {
-      status.className = 'status-msg err';
-      status.textContent = '✕ Failed: ' + err.message;
-      document.getElementById('btnGenerate').disabled = false;
+      const em = document.getElementById('shooterEm').value;
+      if(!em) return alert('Enter Email');
+      const subj = encodeURIComponent(`Shoot Assignment: ${ref}`);
+      const body = encodeURIComponent(`You've been assigned a shoot for ${pkg} on ${date}. Please log in to view details.`);
+      window.open(`mailto:${em}?subject=${subj}&body=${body}`, '_blank');
     }
   }
 
-  function showPaymentLink(url) {
-    document.getElementById('paymentLinkUrl').textContent = url;
-    document.getElementById('paymentLinkBox').classList.add('show');
-  }
-
-  function copyLink() {
-    navigator.clipboard.writeText(generatedPaymentUrl);
-    var btn = document.querySelector('.copy-btn');
-    btn.textContent = '✓ Copied!';
-    setTimeout(function(){ btn.textContent = '📋 Copy Link'; }, 2000);
-  }
-
-  function sendLinkWA() {
-    var msg =
-      '✅ *Booking Approved — Nizar Naseer Studio*\n━━━━━━━━━━━━━━\n' +
-      'Hi *' + (couple || clientName) + '*! 🎉 Your booking has been *APPROVED*.\n\n' +
-      '📋 Ref: *' + ref + '*\n📦 Package: *' + pkg + '*\n📅 Date: *' + date + '*\n💰 Amount: *' + price + '*\n\n' +
-      '💳 *Deposit Payment Link:*\n' + generatedPaymentUrl + '\n\n' +
-      '⏰ Link expires in 3 days. Full balance due 7 days before event.\n\nThank you for choosing Nizar Naseer Studio! 🌟';
-    window.open('https://wa.me/' + clientWANum() + '?text=' + encodeURIComponent(msg), '_blank');
-    showInvoiceLink();
-    showSuccess('✅ Payment Link Sent via WhatsApp', 'ToyyibPay link sent to ' + clientName + '.');
-    storeBookingForReview();
-  }
-
-  function sendLinkEmail() {
-    var subject = encodeURIComponent('Booking Confirmed — Payment Link for ' + pkg + ' (' + ref + ')');
-    var body    = encodeURIComponent(
-      'Dear ' + (couple || clientName) + ',\n\nYour booking (' + ref + ') for ' + pkg + ' on ' + date + ' has been APPROVED!\n\n' +
-      'Please pay RM 100 deposit via:\n' + generatedPaymentUrl + '\n\n' +
-      'Balance due 7 days before event.\n\nThank you,\nNizar Naseer Studio'
-    );
-    var a = document.createElement('a');
-    a.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
-    a.target = '_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    showInvoiceLink();
-    showSuccess('✅ Payment Link Sent via Email', 'ToyyibPay link emailed to ' + email + '.');
-    storeBookingForReview();
-  }
-
-  function buildInvoiceUrl(type) {
-    var totalNum = parseFloat(price.replace(/[^0-9.]/g, '')) || 0;
-    return window.location.origin + '/invoice.html'
-      + '?type=' + (type || 'invoice')
-      + '&ref=' + encodeURIComponent(ref)
-      + '&couple=' + encodeURIComponent(couple)
-      + '&name=' + encodeURIComponent(clientName)
-      + '&email=' + encodeURIComponent(email)
-      + '&phone=' + encodeURIComponent(phone)
-      + '&pkg=' + encodeURIComponent(pkg)
-      + '&total=' + totalNum
-      + '&deposit=' + DEPOSIT
-      + '&date=' + encodeURIComponent(date)
-      + '&location=' + encodeURIComponent(clientLocation)
-      + '&notes=' + encodeURIComponent(notes);
-  }
-
-  function showInvoiceLink() {
-    var invUrl = buildInvoiceUrl('invoice');
-    document.getElementById('invoiceViewBtn').href = invUrl;
-    document.getElementById('invoiceLinkBox').style.display = 'block';
-  }
-
-  function sendInvoiceWA() {
-    var invUrl   = buildInvoiceUrl('invoice');
-    var totalNum = parseFloat(price.replace(/[^0-9.]/g, '')) || 0;
-    var balance  = Math.max(0, totalNum - DEPOSIT);
-    var invoiceMsg =
-      '📋 *Invoice — Nizar Naseer Studio*\n━━━━━━━━━━━━━━\n' +
-      'Dear *' + (couple || clientName) + '*,\n\n' +
-      '📋 Ref: ' + ref + '\n📦 Package: ' + pkg + '\n📅 Date: ' + date + '\n' +
-      '💰 Total: ' + price + '\n💳 Deposit: RM ' + DEPOSIT + '\n📊 Balance: RM ' + balance.toLocaleString() + '\n\n' +
-      '🧾 View & print invoice:\n' + invUrl + '\n\nThank you! 🙏';
-    window.open('https://wa.me/' + clientWANum() + '?text=' + encodeURIComponent(invoiceMsg), '_blank');
-  }
-
-  function markFullPaid() {
-    if (!confirm('Mark this booking as FULLY PAID and generate receipt?')) return;
-    fetch('/api/store-booking?ref=' + ref + '&action=full_paid')
-      .then(function(r){ return r.json(); })
-      .then(function(){
-        var receiptUrl = buildInvoiceUrl('receipt');
-        var msg = '✅ *Payment Received — Nizar Naseer Studio*\n━━━━━━━━━━━━━━\n' +
-          'Dear *' + (couple || clientName) + '*, your full payment has been received! 🎉\n\n' +
-          '📋 Ref: ' + ref + '\n📦 Package: ' + pkg + '\n📅 Date: ' + date + '\n\n' +
-          '🧾 Your receipt:\n' + receiptUrl + '\n\nSee you on your special day! 📷';
-        window.open('https://wa.me/' + clientWANum() + '?text=' + encodeURIComponent(msg), '_blank');
-        window.open(receiptUrl, '_blank');
-      })
-      .catch(function(){ alert('Could not update payment status. Open receipt manually.'); window.open(buildInvoiceUrl('receipt'), '_blank'); });
-  }
-
-  function storeBookingForReview() {
-    var rawPhone = phone.replace(/[\s\-\+\(\)]/g,'');
-    var waNum    = rawPhone.startsWith('60') ? rawPhone : '60' + rawPhone.replace(/^0/,'');
-    var totalNum = parseFloat(price.replace(/[^0-9.]/g, '')) || 0;
-    fetch('/api/store-booking', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        bookingId:     ref,
-        clientName:    clientName,
-        couple:        couple,
-        clientEmail:   email,
-        clientPhone:   waNum,
-        eventDate:     date,
-        packageName:   pkg,
-        location:      clientLocation,
-        notes:         notes,
-        totalAmount:   totalNum,
-        depositAmount: DEPOSIT,
-      }),
-    }).catch(function(){/* silent — non-critical */});
-  }
-
-
-
-  function showSuccess(title, msg) {
-    document.getElementById('mainContent').style.display = 'none';
-    document.getElementById('successBox').style.display  = 'block';
-    document.getElementById('successTitle').textContent  = title;
-    document.getElementById('successMsg').textContent    = msg;
-  }
-
-  function notifyShooterWA() {
-    var sPhone = document.getElementById('shooterPhone').value.trim().replace(/[\s\-\+\(\)]/g,'');
-    if (!sPhone) { alert("Please enter the shooter's WhatsApp number first."); return; }
-    var shooterNum = sPhone.startsWith('60') ? sPhone : '60' + sPhone.replace(/^0/,'');
-    var mapsLink   = clientLocation !== 'Not provided'
-      ? '\n\n📍 Location: ' + clientLocation + '\nhttps://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(clientLocation)
-      : '';
-    var msg =
-      '📷 *Shooting Assignment — Nizar Naseer Studio*\n━━━━━━━━━━━━━━\nRef: *' + ref + '*\n\n' +
-      '👤 *CLIENT INFO*\nName: ' + clientName + '\nPhone: ' + phone + '\nEmail: ' + email + '\n\n' +
-      '📅 *JOB DETAILS*\nPackage: *' + pkg + '*\nDate: *' + date + '*' +
-      mapsLink + '\n\n📝 Notes:\n' + notes + '\n\n━━━━━━━━━━━━━━\nPlease confirm your availability. Thank you! 🙏';
-    window.open('https://wa.me/' + shooterNum + '?text=' + encodeURIComponent(msg), '_blank');
-    document.getElementById('shooterSent').classList.add('show');
-    setTimeout(function(){ document.getElementById('shooterSent').classList.remove('show'); }, 4000);
-  }
-
-  async function notifyShooterEmail() {
-    var sEmail = document.getElementById('shooterEmail').value.trim();
-    if (!sEmail) { alert("Please enter the shooter's email first."); return; }
-    var btn = document.querySelector('.btn-shooter-email');
-    btn.textContent = '⏳ Sending…';
-    btn.disabled = true;
-    var mapsUrl = clientLocation !== 'Not provided'
-      ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(clientLocation)
-      : '';
-    try {
-      var res = await fetch('/api/notify-shooter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          to:          sEmail,
-          ref:         ref,
-          clientName:  clientName,
-          phone:       phone,
-          clientEmail: email,
-          date:        date,
-          pkg:         pkg,
-          location:    clientLocation,
-          notes:       notes,
-          mapsUrl:     mapsUrl,
-        }),
-      });
-      var j = await res.json();
-      if (j.ok) {
-        btn.textContent = '✅ Email Sent!';
-        document.getElementById('shooterSent').classList.add('show');
-        setTimeout(function(){ btn.textContent = '✉️ Notify Shooter (Email)'; btn.disabled = false; document.getElementById('shooterSent').classList.remove('show'); }, 4000);
-      } else throw new Error(j.error || 'Send failed');
-    } catch(e) {
-      btn.textContent = '❌ Failed';
-      btn.disabled = false;
-      alert('Email failed: ' + e.message + '\n\nMake sure RESEND_API_KEY is set in Vercel → Settings → Environment Variables');
-    }
-  }
-
-  function doDecline() {
-    var clientNum  = clientWANum();
-    var declineMsg =
-      'Hi *' + clientName + '*, thank you for your interest in Nizar Naseer Studio.\n\n' +
-      'Unfortunately we are unable to accommodate your booking (' + ref + ') for *' + date + '* at this time.\n\n' +
-      "We'd love to work with you on another date. Thank you for understanding! 🙏";
-    if (clientNum && clientNum !== 'Notprovided') {
-      window.open('https://wa.me/' + clientNum + '?text=' + encodeURIComponent(declineMsg), '_blank');
-    } else {
-      var s = encodeURIComponent('Update on Your Booking Enquiry — ' + ref);
-      var b = encodeURIComponent(declineMsg.replace(/\*/g, ''));
-      var a = document.createElement('a');
-      a.href = 'mailto:' + email + '?subject=' + s + '&body=' + b;
-      a.target = '_blank'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    }
-    showSuccess('❌ Booking Declined', clientName + ' has been notified.');
-  }
-
-  function addToGCal() {
-    // Format date: YYYY-MM-DD → YYYYMMDD (Google Calendar format)
-    var rawDate = date.replace(/-/g, '').replace(/\//g, '');
-    // If the date string is not 8 digits already, try to parse it
-    if (rawDate.length !== 8) {
-      var parsed = new Date(date);
-      if (!isNaN(parsed)) {
-        rawDate = parsed.toISOString().slice(0,10).replace(/-/g,'');
-      }
-    }
-    var dateStr = rawDate; // YYYYMMDD
-
-    // Build event title
-    var coupleLabel = couple ? couple : clientName;
-    var eventTitle  = '📷 ' + coupleLabel + ' — ' + pkg + ' [' + ref + ']';
-
-    // Build description
-    var desc = [
-      '📋 Ref: ' + ref,
-      '👤 Client: ' + clientName,
-      couple ? '💑 Couple: ' + couple : '',
-      '📦 Package: ' + pkg,
-      '💰 Price: ' + price,
-      '📞 Phone: ' + phone,
-      '✉️ Email: ' + email,
-      clientLocation !== 'Not provided' ? '📍 Location: ' + clientLocation : '',
-      notes !== 'None' && notes ? '📝 Notes: ' + notes : '',
-    ].filter(Boolean).join('\n');
-
-    var gcalUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
-      '&text='     + encodeURIComponent(eventTitle) +
-      '&dates='    + dateStr + '/' + dateStr +
-      '&details='  + encodeURIComponent(desc) +
-      '&location=' + encodeURIComponent(clientLocation !== 'Not provided' ? clientLocation : '') +
-      '&sf=true&output=xml';
-
-    window.open(gcalUrl, '_blank');
+  function showToast(msg, isError=false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.className = 'toast', 3000);
   }
 </script>
-
 </body>
 </html>
