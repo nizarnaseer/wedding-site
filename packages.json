@@ -51,7 +51,8 @@
         "Free 3 outdoor sessions",
         "Cover for 3 events",
         "Transport outside kawasan: extra charge"
-      ]
+      ],
+      "featured": true
     },
     {
       "id": "pkg4",
@@ -65,7 +66,7 @@
         "Cover for 2 hours",
         "Transport outside kawasan: extra charge"
       ],
-      "featured": true
+      "featured": false
     },
     {
       "id": "pkg5",
@@ -92,7 +93,8 @@
         "Highlights video with nasheed/nasyid",
         "Softcopy via Google Drive",
         "Cover for Nikah event"
-      ]
+      ],
+      "featured": true
     },
     {
       "id": "vid2",
@@ -120,7 +122,7 @@
         "Cover 3 events",
         "Transport outside kawasan: extra charge"
       ],
-      "featured": true
+      "featured": false
     }
   ]
 }
