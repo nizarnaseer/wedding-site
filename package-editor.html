@@ -78,10 +78,12 @@
   <!-- PHOTOGRAPHY PACKAGES -->
   <div class="section-title">📸 Photography Packages</div>
   <div class="pkg-grid" id="photoGrid"></div>
+  <button class="btn-sm" onclick="addPackage('photography')" style="margin-top:16px;">+ Add Photography Package</button>
 
   <!-- VIDEOGRAPHY PACKAGES -->
   <div class="section-title">🎬 Videography Packages</div>
   <div class="pkg-grid" id="videoGrid"></div>
+  <button class="btn-sm" onclick="addPackage('videography')" style="margin-top:16px;">+ Add Videography Package</button>
 
   <div style="text-align:center;margin-top:36px;">
     <button class="btn-publish" onclick="publishAll()">🚀 Publish All Changes</button>
@@ -143,7 +145,7 @@ async function loadFromGitHub(){
     const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
       headers:{ Authorization:'Bearer '+getToken() }
     });
-    if(r.ok){ const j=await r.json(); pkgs=JSON.parse(atob(j.content)); localStorage.setItem('packagesEdit',JSON.stringify(pkgs)); renderAll(); }
+    if(r.ok){ const j=await r.json(); pkgs=JSON.parse(decodeURIComponent(escape(atob(j.content)))); localStorage.setItem('packagesEdit',JSON.stringify(pkgs)); renderAll(); }
   }catch(e){}
 }
 
@@ -156,6 +158,8 @@ function renderGrid(gridId, list){
   const grid = document.getElementById(gridId);
   grid.innerHTML = list.map((p,i) => {
     const cat = gridId === 'photoGrid' ? 'photography' : 'videography';
+    const delBtn = `<button class="btn-sm" style="color:var(--red);border-color:rgba(239,68,68,0.3);padding:4px 8px;font-size:0.65rem;" onclick="deletePackage('${cat}', ${i})">🗑 Delete</button>`;
+    
     if(p.type === 'tns'){
       // Special TNS card with variants
       const variantFields = p.variants.map((v,vi) => `
@@ -167,13 +171,24 @@ function renderGrid(gridId, list){
           </div>
         </div>`).join('');
       return `<div class="pkg-editor">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Special Dropdown Package</span>
+          ${delBtn}
+        </div>
         <div class="field-group"><label>Badge / Title</label><input type="text" value="${p.badge}" oninput="pkgs.${cat}[${i}].badge=this.value;save()"/></div>
         <div class="field-group"><label>Pricing Variants</label>${variantFields}</div>
         <div class="field-group"><label>Features (one per line)</label><textarea oninput="pkgs.${cat}[${i}].features=this.value.split('\\n').filter(l=>l.trim());save()">${p.features.join('\n')}</textarea></div>
       </div>`;
     }
+
     return `<div class="pkg-editor${p.featured?' featured':''}">
-      ${p.featured?'<div class="featured-tag">⭐ Most Popular</div>':''}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <label style="display:flex;align-items:center;gap:6px;margin:0;cursor:pointer;color:var(--gold);font-size:0.7rem;">
+          <input type="checkbox" ${p.featured?'checked':''} onchange="pkgs.${cat}[${i}].featured=this.checked;save();renderAll()" style="width:14px;height:14px;accent-color:var(--gold);">
+          ⭐ Most Popular
+        </label>
+        ${delBtn}
+      </div>
       <div class="field-group"><label>Package Name</label><input type="text" value="${p.badge}" oninput="pkgs.${cat}[${i}].badge=this.value;pkgs.${cat}[${i}].name=this.value;save()"/></div>
       <div class="field-group"><label>Price (RM)</label>
         <div class="price-row"><span>RM</span><input type="number" value="${p.price}" oninput="pkgs.${cat}[${i}].price=+this.value;save()"/></div>
@@ -181,6 +196,28 @@ function renderGrid(gridId, list){
       <div class="field-group"><label>Features (one per line)</label><textarea oninput="pkgs.${cat}[${i}].features=this.value.split('\\n').filter(l=>l.trim());save()">${p.features.join('\n')}</textarea></div>
     </div>`;
   }).join('');
+}
+
+function addPackage(cat) {
+  const newPkg = {
+    id: 'pkg_' + Date.now(),
+    badge: 'New Package',
+    name: 'New Package',
+    price: 1000,
+    featured: false,
+    features: ['Feature 1', 'Feature 2']
+  };
+  pkgs[cat].push(newPkg);
+  save();
+  renderAll();
+}
+
+function deletePackage(cat, index) {
+  if(confirm('Are you sure you want to delete this package?')) {
+    pkgs[cat].splice(index, 1);
+    save();
+    renderAll();
+  }
 }
 
 function save(){ localStorage.setItem('packagesEdit', JSON.stringify(pkgs)); }
