@@ -916,6 +916,9 @@ function submitBooking(e) {
   e.preventDefault();
   const first    = document.getElementById('bFirstName').value.trim();
   const last     = document.getElementById('bLastName').value.trim();
+  const groomName = document.getElementById('bGroomName')?.value.trim() || '';
+  const brideName = document.getElementById('bBrideName')?.value.trim() || '';
+  const coupleLabel = (groomName && brideName) ? `${groomName} & ${brideName}` : (groomName || brideName || '');
   const email    = document.getElementById('bEmail').value.trim();
   const phoneRaw = document.getElementById('bPhone').value.trim();
   // Normalize Malaysian number — auto-add leading 0 if missing
@@ -995,8 +998,19 @@ function submitBooking(e) {
 
     // Google Calendar quick-add link (photographer clicks to add event)
     const gcalDate = selectedDates[0].replace(/-/g, ''); // YYYYMMDD
-    const gcalTitle = encodeURIComponent(`[${ref}] ${name} — ${activePackage.name}`);
-    const gcalDetail = encodeURIComponent(`Ref: ${ref}\nClient: ${name}\nPhone: ${phone}\nPackage: ${activePackage.name}\nNotes: ${notes || 'None'}\nApprove: ${approveLink}`);
+    const calTitle = coupleLabel
+      ? `${coupleLabel} — ${activePackage.name}`
+      : `[${ref}] ${name} — ${activePackage.name}`;
+    const gcalTitle = encodeURIComponent(calTitle);
+    const gcalDetail = encodeURIComponent(
+      `Ref: ${ref}\n` +
+      (coupleLabel ? `Couple: ${coupleLabel}\n` : '') +
+      `Client: ${name} | ${phone}\n` +
+      `Package: ${activePackage.name}\n` +
+      `Schedule:\n${datesBlock}\n` +
+      `Notes: ${notes || 'None'}\n` +
+      `Approve: ${approveLink}`
+    );
     const gcalLoc = encodeURIComponent(location || '');
     const gcalLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${gcalTitle}&dates=${gcalDate}/${gcalDate}&details=${gcalDetail}&location=${gcalLoc}`;
 
@@ -1008,6 +1022,7 @@ function submitBooking(e) {
       `📱 WhatsApp: ${phone || 'Not provided'}\n` +
       `📧 Email: ${email}\n` +
       `📦 Package: *${activePackage.name}*\n` +
+      (coupleLabel ? `💑 Couple: *${coupleLabel}*\n` : '') +
       `💰 Price: RM ${(activePackage.totalAmount || activePackage.baseAmount).toLocaleString()}\n` +
       `📍 Location: ${location || 'Not provided'}${travelFeeAmount > 0 ? ` (Travel: RM ${travelFeeAmount} + Hotel: RM ${HOTEL_FEE})` : ''}\n` +
       `📅 Dates:\n${eventDetails.map(e => '  ' + e).join('\n')}\n` +
@@ -1030,11 +1045,14 @@ function submitBooking(e) {
         body: JSON.stringify({
           access_key:  w3fKey,
           from_name:   'Nizar Naseer Studio',
-          subject:     `📋 [ENQUIRY] ${ref} — ${name} — ${activePackage.name}`,
+          subject:     coupleLabel
+            ? `📋 [ENQUIRY] ${ref} — ${coupleLabel} — ${activePackage.name}`
+            : `📋 [ENQUIRY] ${ref} — ${name} — ${activePackage.name}`,
           name, email, replyto: email,
           // ── CLIENT ──
           '📍 REF':          ref,
           '👤 Client Name':   name,
+          ...(coupleLabel ? { '💑 Couple (Groom & Bride)': coupleLabel } : {}),
           '📱 WhatsApp':      phone ? phone + ' — wa.me/60' + phone.replace(/^0/,'') : 'Not provided',
           '📧 Email':         email,
           // ── BOOKING ──
