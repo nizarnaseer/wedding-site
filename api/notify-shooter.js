@@ -111,7 +111,7 @@ module.exports = async (req, res) => {
       body: JSON.stringify({
       from: 'Nizar Naseer Studio <onboarding@resend.dev>',
         to: [to],
-        subject: '[Assignment] ' + (pkg || '') + ' — ' + (date || '') + ' (' + ref + ')',
+        subject: '[Assignment] ' + (pkg || '') + ' — ' + (date || '').replace(/[\n\r]+/g, ' | ') + ' (' + ref + ')',
         html,
       }),
     });
