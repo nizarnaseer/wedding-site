@@ -73,6 +73,19 @@
     <p style="font-size:0.72rem;color:var(--muted);margin-top:8px;">Token is stored in your browser only. Repo: <strong style="color:var(--gold);">nizarnaseer/wedding-site</strong></p>
   </div>
 
+  <!-- Banner Visibility Toggle -->
+  <div class="setup-block" style="margin-bottom:28px;">
+    <h3>📢 Homepage Studio Banner</h3>
+    <p style="font-size:0.78rem;color:var(--muted);margin:8px 0 16px;">Toggle whether the studio booking popup banner is visible to visitors on the main website.</p>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <span id="bannerStatusLabel" style="font-size:0.82rem;color:var(--muted);">Loading…</span>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <span style="font-size:0.82rem;color:var(--gold);">Show on Homepage</span>
+        <input type="checkbox" id="bannerToggle" onchange="saveBannerToggle()" style="width:40px;height:22px;accent-color:#c9a96e;cursor:pointer;">
+      </label>
+    </div>
+  </div>
+
   <div class="concepts-grid" id="conceptsGrid"></div>
 
   <div style="text-align:center;margin-top:32px;">
@@ -212,6 +225,29 @@ async function publishAll() {
 }
 
 function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+
+// Banner toggle
+window.addEventListener('DOMContentLoaded', () => {
+  fetch('/api/gallery?action=banner-config')
+    .then(r => r.json())
+    .then(cfg => {
+      const on = cfg.studioVisible !== false;
+      document.getElementById('bannerToggle').checked = on;
+      document.getElementById('bannerStatusLabel').textContent = on ? '✅ Banner is VISIBLE to visitors' : '🚫 Banner is HIDDEN from visitors';
+    }).catch(() => {
+      document.getElementById('bannerStatusLabel').textContent = '⚠️ Could not load status';
+    });
+});
+
+function saveBannerToggle() {
+  const on = document.getElementById('bannerToggle').checked;
+  document.getElementById('bannerStatusLabel').textContent = on ? '✅ Banner is VISIBLE to visitors' : '🚫 Banner is HIDDEN from visitors';
+  fetch('/api/gallery', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'banner-config', studioVisible: on }),
+  }).then(() => showToast(on ? '✅ Banner enabled!' : '🚫 Banner hidden!')).catch(() => {});
+}
 </script>
 </body>
 </html>
