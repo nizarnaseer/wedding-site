@@ -52,7 +52,7 @@
         "Cover for 3 events",
         "Transport outside kawasan: extra charge"
       ],
-      "featured": true
+      "featured": false
     },
     {
       "id": "pkg4",
@@ -79,7 +79,8 @@
         "Free 3 outdoor sessions",
         "Cover 3 events (full day)",
         "Transport outside kawasan: extra charge"
-      ]
+      ],
+      "featured": true
     }
   ],
   "videography": [
@@ -94,7 +95,7 @@
         "Softcopy via Google Drive",
         "Cover for Nikah event"
       ],
-      "featured": true
+      "featured": false
     },
     {
       "id": "vid2",
@@ -122,7 +123,7 @@
         "Cover 3 events",
         "Transport outside kawasan: extra charge"
       ],
-      "featured": false
+      "featured": true
     }
   ]
 }
