@@ -1176,28 +1176,36 @@
             const btn = card.querySelector('.pkg-btn, .pkg-btn--featured');
             if(btn) btn.setAttribute('onclick',`openBookingModal('${p.name}','RM ${Number(p.price).toLocaleString()}')`);
           }
-          // Update featured toggle
+          // Update featured toggle & centering
           if(p.featured !== undefined){
-            const btn = card.querySelector('.pkg-btn, .pkg-btn--featured');
+            const btn = card.querySelector('.pkg-btn');
             if(p.featured) {
               card.classList.add('package-card--featured');
-              if(btn) {
-                btn.classList.remove('pkg-btn');
-                btn.classList.add('pkg-btn--featured');
-              }
+              if(btn) btn.classList.add('pkg-btn--featured');
               if(!card.querySelector('.pkg-popular-tag')){
                 card.insertAdjacentHTML('afterbegin', '<div class="pkg-popular-tag">Most Popular</div>');
               }
+              card.style.order = '2';
             } else {
               card.classList.remove('package-card--featured');
-              if(btn) {
-                btn.classList.remove('pkg-btn--featured');
-                btn.classList.add('pkg-btn');
-              }
+              if(btn) btn.classList.remove('pkg-btn--featured');
               const tag = card.querySelector('.pkg-popular-tag');
               if(tag) tag.remove();
+              card.style.order = '1'; // Default
             }
           }
+        });
+
+        // After assigning orders, ensure the first non-featured is order 1, and others are order 3
+        // so that order 2 (featured) naturally sits in the middle.
+        document.querySelectorAll('.packages-grid').forEach(grid => {
+          let nonFeaturedCount = 0;
+          Array.from(grid.children).forEach(child => {
+            if (!child.classList.contains('package-card--featured')) {
+              nonFeaturedCount++;
+              child.style.order = nonFeaturedCount === 1 ? '1' : '3';
+            }
+          });
         });
       })
       .catch(()=>{});
