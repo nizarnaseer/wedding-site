@@ -967,6 +967,9 @@
       var sel  = document.getElementById('tnsSelect');
       var parts = sel.value.split('|');
       document.getElementById('tnsPrice').textContent = parts[1];
+      if (typeof _applyTNSDiscount === 'function') {
+        _applyTNSDiscount(JSON.parse(localStorage.getItem('pkg_discounts') || '{}'));
+      }
     }
     function bookTNS() {
       var sel   = document.getElementById('tnsSelect');

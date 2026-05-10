@@ -538,9 +538,17 @@ function updateTotal() {
     travelRow.style.display = 'none';
   }
 
-  // Package discount
+  // Package discount — handle both {v,t} object format (from server) and legacy plain number
   const discounts   = JSON.parse(localStorage.getItem('pkg_discounts') || '{}');
-  let discountAmt   = discounts[activePackage.name] || 0;
+  const rawDisc     = discounts[activePackage.name];
+  let discountAmt   = 0;
+  if (rawDisc) {
+    const discVal  = (typeof rawDisc === 'object') ? (rawDisc.v || 0) : rawDisc;
+    const discType = (typeof rawDisc === 'object') ? (rawDisc.t || 'fixed') : 'fixed';
+    discountAmt = discType === 'pct'
+      ? Math.round(activePackage.baseAmount * discVal / 100)
+      : discVal;
+  }
   const discRow     = document.getElementById('sumDiscountRow');
   if (discountAmt > 0) {
     discRow.style.display = 'flex';
@@ -1361,12 +1369,16 @@ function _renderDiscountCards(discounts) {
     const card = btn.closest('.package-card');
     if (!card || card.querySelector('.pkg-discounted')) return;
 
-    // ── Corner ribbon ──
-    card.style.overflow = 'hidden'; // needed for ribbon clipping
-    const ribbon = document.createElement('div');
-    ribbon.className = 'discount-ribbon';
-    ribbon.innerHTML = `<span>${pct}% OFF</span>`;
-    card.appendChild(ribbon);
+    const isFeatured = card.classList.contains('package-card--featured');
+
+    // ── Corner ribbon — skip on featured cards to preserve Most Popular badge ──
+    if (!isFeatured) {
+      card.style.overflow = 'hidden';
+      const ribbon = document.createElement('div');
+      ribbon.className = 'discount-ribbon';
+      ribbon.innerHTML = `<span>${pct}% OFF</span>`;
+      card.appendChild(ribbon);
+    }
 
     // ── Tag icon next to pkg-badge ──
     const badge = card.querySelector('.pkg-badge');
@@ -1391,4 +1403,58 @@ function _renderDiscountCards(discounts) {
       `<span style="display:block;font-size:0.72rem;letter-spacing:1.5px;color:#4ade80;margin-top:4px;">SAVE RM ${discAmt}</span>`;
     amountEl.parentElement.insertAdjacentElement('afterend', discEl);
   });
+
+  // ── TNS dropdown card discount ──
+  _applyTNSDiscount(discounts);
+}
+
+function _applyTNSDiscount(discounts) {
+  const sel = document.getElementById('tnsSelect');
+  if (!sel) return;
+  const parts   = sel.value.split('|');
+  const name    = parts[0] + ' Photography';   // e.g. "Tunang Photography"
+  const baseNum = parseInt(parts[1]) || 0;
+  const priceEl = document.getElementById('tnsPrice');
+  if (!priceEl) return;
+
+  // Remove any previous discount display on the TNS card
+  const tnsCard = document.getElementById('pkg1');
+  if (tnsCard) {
+    const old = tnsCard.querySelector('.tns-disc-badge');
+    if (old) old.remove();
+    const oldStrike = tnsCard.querySelector('.tns-orig-strike');
+    if (oldStrike) { oldStrike.remove(); }
+  }
+
+  const raw = discounts ? discounts[name] : null;
+  if (!raw) {
+    priceEl.textContent = parts[1];
+    priceEl.style.textDecoration = '';
+    priceEl.style.color = '';
+    priceEl.style.fontSize = '';
+    return;
+  }
+  const discVal  = (typeof raw === 'object') ? (raw.v || 0) : raw;
+  const discType = (typeof raw === 'object') ? (raw.t || 'fixed') : 'fixed';
+  if (!discVal || discVal <= 0) { priceEl.textContent = parts[1]; return; }
+
+  const discAmt    = discType === 'pct' ? Math.round(baseNum * discVal / 100) : discVal;
+  const finalPrice = Math.max(0, baseNum - discAmt);
+  const pct        = discType === 'pct' ? discVal : Math.round(discVal / baseNum * 100);
+
+  // Strike original, show new price
+  priceEl.textContent = finalPrice.toLocaleString();
+  if (tnsCard) {
+    const origEl = document.createElement('div');
+    origEl.className = 'tns-orig-strike';
+    origEl.style.cssText = 'font-size:0.9rem;color:rgba(255,255,255,0.3);text-decoration:line-through;margin-bottom:2px;';
+    origEl.textContent = 'RM ' + baseNum.toLocaleString();
+    priceEl.closest('.pkg-price').insertAdjacentElement('beforebegin', origEl);
+
+    const saveBadge = document.createElement('div');
+    saveBadge.className = 'tns-disc-badge';
+    saveBadge.style.cssText = 'font-size:0.72rem;color:#4ade80;margin-top:4px;letter-spacing:0.5px;';
+    saveBadge.textContent = `SAVE RM ${discAmt} (${pct}% OFF)`;
+    priceEl.closest('.pkg-price').insertAdjacentElement('afterend', saveBadge);
+  }
 }
