@@ -352,7 +352,7 @@
     </div>
     <div id="reviewsSeeMore" style="text-align:center;margin-top:32px;display:none;">
       <button onclick="showAllReviews()" style="background:transparent;border:1px solid rgba(201,169,110,0.4);color:#c9a96e;padding:12px 32px;border-radius:8px;font-family:'Inter',sans-serif;font-size:0.85rem;cursor:pointer;letter-spacing:0.5px;transition:all .2s;" onmouseover="this.style.background='rgba(201,169,110,0.1)'" onmouseout="this.style.background='transparent'">
-        ✦ See All Reviews
+        ✦ Show More Reviews
       </button>
     </div>
   </section>
@@ -812,16 +812,13 @@
   ];
 
   var _allReviews = [];
-  var REVIEWS_SHOWN = 5;
+  var REVIEWS_SHOWN = 3;
 
   function starStr(n) { return '★'.repeat(n) + '☆'.repeat(5-n); }
 
-  function renderReviews(list) {
-    _allReviews = list;
-    const grid = document.getElementById('reviewsGrid');
-    if (!grid) return;
-    const visible = list.slice(0, REVIEWS_SHOWN);
-    grid.innerHTML = visible.map(r => `
+  function reviewCard(r) {
+    const dateStr = r.date ? new Date(r.date).toLocaleDateString('en-MY', { day:'numeric', month:'long', year:'numeric' }) : '';
+    return `
       <div class="review-card fade-in-up">
         <div class="review-stars">${starStr(r.stars)}</div>
         <p class="review-text">${r.text}</p>
@@ -830,10 +827,17 @@
           <div>
             <div class="review-name">${r.name}</div>
             <div class="review-pkg">${r.pkg}</div>
+            ${dateStr ? `<div style="font-size:0.7rem;color:#888;margin-top:3px;">📅 ${dateStr}</div>` : ''}
           </div>
         </div>
-      </div>`).join('');
-    // Show "See More" button if there are more than REVIEWS_SHOWN reviews
+      </div>`;
+  }
+
+  function renderReviews(list) {
+    _allReviews = list;
+    const grid = document.getElementById('reviewsGrid');
+    if (!grid) return;
+    grid.innerHTML = list.slice(0, REVIEWS_SHOWN).map(reviewCard).join('');
     const seeMoreBtn = document.getElementById('reviewsSeeMore');
     if (seeMoreBtn) seeMoreBtn.style.display = list.length > REVIEWS_SHOWN ? 'block' : 'none';
     observeFade();
@@ -842,18 +846,7 @@
   function showAllReviews() {
     const grid = document.getElementById('reviewsGrid');
     if (!grid) return;
-    grid.innerHTML = _allReviews.map(r => `
-      <div class="review-card fade-in-up">
-        <div class="review-stars">${starStr(r.stars)}</div>
-        <p class="review-text">${r.text}</p>
-        <div class="review-author">
-          <div class="review-avatar">${(r.name||'?')[0].toUpperCase()}</div>
-          <div>
-            <div class="review-name">${r.name}</div>
-            <div class="review-pkg">${r.pkg}</div>
-          </div>
-        </div>
-      </div>`).join('');
+    grid.innerHTML = _allReviews.map(reviewCard).join('');
     document.getElementById('reviewsSeeMore').style.display = 'none';
     observeFade();
   }
