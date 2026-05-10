@@ -1001,12 +1001,16 @@ function submitBooking(e) {
     document.getElementById('bLocation').focus();
     return;
   }
+  const _numSessions = sessionsForPkg();
   for (let i = 0; i < selectedDates.length; i++) {
-    const fn = document.getElementById(`evtFunc_${i}`)?.value || '';
-    const tm = document.getElementById(`evtTime_${i}`)?.value || '';
-    if (!fn || !tm) {
-      alert(`Please select the function and time for Day ${i + 1}.`);
-      return;
+    for (let s = 0; s < _numSessions; s++) {
+      const fn = document.getElementById(`evtFunc_${i}_${s}`)?.value || '';
+      const tm = document.getElementById(`evtTime_${i}_${s}`)?.value || '';
+      if (!fn || !tm) {
+        const label = _numSessions > 1 ? `Day ${i+1}, Session ${s+1}` : `Day ${i+1}`;
+        alert(`Please select the function and time for ${label}.`);
+        return;
+      }
     }
   }
 
