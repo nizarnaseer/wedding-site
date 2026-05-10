@@ -193,7 +193,7 @@ function updateStatus() {
 }
 
 /* ── Load gallery ── */
-fetch('/api/get-gallery')
+fetch('/api/gallery')
   .then(r => r.json())
   .then(d => {
     if (d.albums?.length) { albums = d.albums; renderAlbums(); return; }

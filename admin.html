@@ -311,7 +311,7 @@
     const loadEl = document.getElementById('reviewsLoadingMsg');
     const listEl = document.getElementById('reviewsList');
     try {
-      const res  = await fetch('/api/get-reviews');
+      const res  = await fetch('/api/reviews');
       const data = await res.json();
       const reviews = (data.reviews || []).filter(r => !r.id?.startsWith('s')); // exclude starters
       loadEl.style.display = 'none';
@@ -344,10 +344,10 @@
     btn.textContent = '…';
     btn.disabled = true;
     try {
-      const r = await fetch('/api/delete-review', {
+      const r = await fetch('/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ action: 'delete', id }),
       });
       const d = await r.json();
       if (d.ok) {

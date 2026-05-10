@@ -85,7 +85,7 @@ document.getElementById('mobileClose').addEventListener('click', () => {
 ══════════════════════════════════════ */
 let ALBUMS = [];
 
-fetch('/api/get-gallery')
+fetch('/api/gallery')
   .then(r => r.json())
   .then(data => {
     if (data.albums && data.albums.length > 0) {
