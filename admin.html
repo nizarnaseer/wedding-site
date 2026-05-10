@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+(function() {
+  if (sessionStorage.getItem("admin_auth") !== "true") {
+    var u = prompt("Username:");
+    var p = prompt("Password:");
+    if (u === "Admin" && p === "Administrator") {
+      sessionStorage.setItem("admin_auth", "true");
+    } else {
+      alert("Access Denied");
+      window.location.href = "/";
+    }
+  }
+})();
+</script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Admin Hub — Nizar Naseer Studio</title>
