@@ -30,7 +30,7 @@ window.STUDIO_CONFIG = {
   /* ── 4. CLOUDINARY (photo uploads — free CDN storage) ───────
      Sign up free at cloudinary.com → get Cloud Name from dashboard
      Settings → Upload → Add Upload Preset → set to Unsigned     */
-  cloudinary_cloud_name:    'YOUR_CLOUD_NAME',      // e.g. 'dxyz123abc'
-  cloudinary_upload_preset: 'YOUR_UPLOAD_PRESET',   // e.g. 'nizar_gallery'
+  cloudinary_cloud_name:    'dh5vjsskl',
+  cloudinary_upload_preset: 'Weddingclicks',
 
 };
