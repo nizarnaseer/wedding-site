@@ -27,6 +27,10 @@
         {
           "src": "images/zarif-anis/05.jpg",
           "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
+        },
+        {
+          "src": "https://res.cloudinary.com/dh5vjsskl/image/upload/v1778407847/src4f7tppqhur0gq6k9g.jpg",
+          "g": "linear-gradient(135deg,#1a1208,#2a1e0a)"
         }
       ]
     },
