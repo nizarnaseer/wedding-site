@@ -103,6 +103,31 @@ ul { list-style: none; }
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 200px;
 }
+.hero-mandala {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 140vh; height: 140vh; max-width: 140vw; max-height: 140vw;
+  animation: slowRotate 120s linear infinite; pointer-events: none;
+}
+@keyframes slowRotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+.dust {
+  position: absolute; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--gold); opacity: 0; filter: blur(2px);
+  animation: floatUp 15s linear infinite;
+}
+.dust-1 { left: 20%; bottom: -10%; animation-duration: 20s; animation-delay: 0s; width: 6px; height: 6px; }
+.dust-2 { left: 45%; bottom: -10%; animation-duration: 16s; animation-delay: 5s; width: 3px; height: 3px; }
+.dust-3 { left: 70%; bottom: -10%; animation-duration: 22s; animation-delay: 2s; width: 5px; height: 5px; }
+.dust-4 { left: 85%; bottom: -10%; animation-duration: 18s; animation-delay: 9s; width: 4px; height: 4px; }
+.dust-5 { left: 30%; bottom: -10%; animation-duration: 25s; animation-delay: 12s; width: 7px; height: 7px; }
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { transform: translateY(-120vh) scale(1.5); opacity: 0; }
+}
 .hero-content {
   position: relative; text-align: center; z-index: 1; padding: 0 20px;
   animation: fadeUp 1s ease both;
