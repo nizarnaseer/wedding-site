@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /approve.html
+Disallow: /discount.html
+Disallow: /package-editor.html
+Disallow: /studio-editor.html
+Disallow: /gallery-manager.html
+Disallow: /reviews-manager.html
+Disallow: /setup-whatsapp.html
+Disallow: /api/
+
+Sitemap: https://weddingclicks.us/sitemap.xml
