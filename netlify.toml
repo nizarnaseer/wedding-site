@@ -6,3 +6,15 @@
 # Scheduled function: send review requests daily at 8:00 AM UTC
 [functions."send-review-requests"]
   schedule = "0 8 * * *"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://w.behold.so https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://w.behold.so https://weddingclicks.us https://res.cloudinary.com; connect-src 'self' https://api.web3forms.com https://www.googleapis.com https://behold.so https://api.cloudinary.com; media-src 'self' https://cdn.pixabay.com; frame-src 'self'; object-src 'none';"
+
