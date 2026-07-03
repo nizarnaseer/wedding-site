@@ -17,304 +17,2842 @@
 </script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Admin Hub — Nizar Naseer Studio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <title>Admin Panel — Nizar Naseer Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
-    :root{--bg:#0a0a0a;--card:#111;--border:rgba(255,255,255,0.07);--gold:#c9a96e;--text:#e8e0d4;--muted:#7a7068;--green:#22c55e;--red:#ef4444;--amber:#f59e0b;}
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-weight:300;min-height:100vh;}
-    header{border-bottom:1px solid var(--border);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;}
-    .logo{font-family:'Cormorant Garamond',serif;font-size:1.1rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);}
-    .logo span{color:var(--text);}
-    .btn-sm{padding:7px 16px;border-radius:6px;font-size:0.78rem;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s;text-decoration:none;display:inline-block;}
-    .btn-sm:hover{border-color:var(--gold);color:var(--gold);}
-    main{max-width:960px;margin:0 auto;padding:36px 24px 80px;}
-    h1{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:6px;}
-    .subtitle{color:var(--muted);font-size:0.82rem;margin-bottom:36px;}
+    /* ─── RESET & BASE ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0b;
+      --card: #111114;
+      --card-light: #16161a;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(201, 169, 110, 0.4);
+      --text: #e8e6e0;
+      --muted: #7a7870;
+      --gold: #c9a96e;
+      --gold-light: #e8c98a;
+      --green: #22c55e;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --blue: #3b82f6;
+      --radius: 12px;
+      --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+    }
+    input, textarea, select {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color var(--transition);
+      width: 100%;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--border-focus);
+    }
+    button, .btn-sm {
+      font-family: 'Inter', sans-serif;
+    }
 
-    /* TOOL GRID */
-    .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:48px;}
-    .tool-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;text-decoration:none;color:var(--text);transition:all .25s;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden;}
-    .tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);opacity:0;transition:opacity .25s;}
-    .tool-card:hover{border-color:rgba(201,169,110,0.35);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.4);}
-    .tool-card:hover::before{opacity:1;}
-    .tool-icon{font-size:1.8rem;}
-    .tool-name{font-family:'Cormorant Garamond',serif;font-size:1.15rem;}
-    .tool-desc{font-size:0.78rem;color:var(--muted);line-height:1.6;}
-    .tool-arrow{margin-top:auto;font-size:0.75rem;color:var(--gold);opacity:0;transition:opacity .2s;}
-    .tool-card:hover .tool-arrow{opacity:1;}
+    /* ─── APP LAYOUT ─── */
+    .app-layout {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+    
+    /* ─── SIDEBAR ─── */
+    .app-sidebar {
+      width: 260px;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 100;
+    }
+    .sidebar-brand {
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-brand .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .sidebar-brand .logo span {
+      color: var(--text);
+    }
+    .sidebar-brand .subtitle {
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+    }
+    .nav-header {
+      font-size: 0.65rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 12px 4px;
+      font-weight: 600;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      border-radius: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+      border-left: 2px solid transparent;
+    }
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
+    }
+    .nav-item.active {
+      color: var(--gold);
+      background: rgba(201, 169, 110, 0.06);
+      border-left-color: var(--gold);
+      font-weight: 600;
+    }
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+    
+    /* ─── MAIN CONTAINER ─── */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .app-header {
+      height: 68px;
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: rgba(10, 10, 11, 0.8);
+      backdrop-filter: blur(12px);
+      z-index: 90;
+    }
+    .screen-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 300;
+      color: var(--text);
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .live-clock {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+    .btn-sm {
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition);
+    }
+    .btn-sm:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+    .btn-sm-gold {
+      background: var(--gold);
+      color: #000;
+      border-color: var(--gold);
+    }
+    .btn-sm-gold:hover {
+      background: var(--gold-light);
+      color: #000;
+      border-color: var(--gold-light);
+    }
+    .btn-sm-green {
+      background: rgba(34, 197, 94, 0.1);
+      border-color: rgba(34, 197, 94, 0.3);
+      color: var(--green);
+    }
+    .btn-sm-green:hover {
+      background: rgba(34, 197, 94, 0.2);
+    }
 
-    /* DIVIDER */
-    .section-label{font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;border-top:1px solid var(--border);padding-top:32px;}
+    /* ─── CONTENT AREA ─── */
+    .app-content {
+      padding: 32px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .section-pane {
+      display: none;
+    }
+    .section-pane.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-    /* STATS */
-    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
-    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;text-align:center;}
-    .stat-num{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;}
-    .stat-label{font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:4px;}
-    .stat-card.pending .stat-num{color:var(--amber);}
-    .stat-card.approved .stat-num{color:var(--green);}
-    .stat-card.declined .stat-num{color:var(--red);}
+    /* ─── GLOBAL UTILITIES ─── */
+    .card-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .notice-bar {
+      background: rgba(201, 169, 110, 0.06);
+      border: 1px solid rgba(201, 169, 110, 0.15);
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .notice-bar strong {
+      color: var(--gold);
+    }
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--gold);
+      color: #000;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .badge-pending { background: rgba(245, 158, 11, 0.12); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.25); }
+    .badge-approved { background: rgba(34, 197, 94, 0.12); color: var(--green); border: 1px solid rgba(34, 197, 94, 0.25); }
+    .badge-declined { background: rgba(239, 68, 68, 0.12); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.25); }
 
-    /* FILTER */
-    .filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
-    .filter-btn{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:0.78rem;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;}
-    .filter-btn.active,.filter-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,169,110,0.07);}
+    /* ─── SCREEN: OVERVIEW ─── */
+    .overview-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      transition: transform var(--transition), border-color var(--transition);
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(201, 169, 110, 0.2);
+    }
+    .stat-card .num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 300;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .stat-card .label {
+      font-size: 0.68rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .stat-card.pending .num { color: var(--amber); }
+    .stat-card.approved .num { color: var(--green); }
+    .stat-card.declined .num { color: var(--red); }
+    
+    .quick-actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .action-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all var(--transition);
+    }
+    .action-card:hover {
+      border-color: var(--border-focus);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    }
+    .action-card .icon {
+      font-size: 1.8rem;
+    }
+    .action-card .title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .action-card .desc {
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
 
-    /* BOOKING CARDS */
-    .booking-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:14px;transition:border-color .2s;}
-    .booking-card:hover{border-color:rgba(201,169,110,0.2);}
-    .card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
-    .card-ref{font-size:0.7rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
-    .card-name{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;margin-top:2px;}
-    .badge{padding:4px 12px;border-radius:20px;font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;}
-    .badge-pending{background:rgba(245,158,11,0.12);color:var(--amber);border:1px solid rgba(245,158,11,0.25);}
-    .badge-approved{background:rgba(34,197,94,0.12);color:var(--green);border:1px solid rgba(34,197,94,0.25);}
-    .badge-declined{background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25);}
-    .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:18px;}
-    .card-field-label{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px;}
-    .card-field-value{font-size:0.85rem;}
-    .card-actions{display:flex;gap:8px;}
-    .btn-approve{flex:1;padding:10px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--green);border-radius:8px;font-size:0.8rem;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;}
-    .btn-approve:hover{background:rgba(34,197,94,0.2);}
-    .btn-decline{flex:1;padding:10px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:var(--red);border-radius:8px;font-size:0.8rem;cursor:pointer;font-family:'Inter',sans-serif;}
-    .btn-wa{padding:10px 14px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);color:#25d366;border-radius:8px;font-size:0.8rem;cursor:pointer;font-family:'Inter',sans-serif;}
-    .submitted-at{font-size:0.7rem;color:var(--muted);margin-top:10px;}
-    .empty{text-align:center;padding:60px 20px;color:var(--muted);}
-    .loading{text-align:center;padding:40px;color:var(--muted);font-size:0.85rem;}
-    .error-msg{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:14px;color:var(--red);font-size:0.82rem;margin-bottom:20px;}
-    #setupPanel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:24px;}
-    #setupPanel h3{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:300;margin-bottom:10px;}
-    #setupPanel p{color:var(--muted);font-size:0.82rem;margin-bottom:20px;line-height:1.6;}
-    #setupPanel input{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-size:0.85rem;font-family:'Inter',sans-serif;margin-bottom:12px;outline:none;}
-    #setupPanel label{display:block;font-size:0.75rem;color:var(--muted);margin-bottom:5px;letter-spacing:1px;text-transform:uppercase;}
-    .btn-save{width:100%;padding:12px;background:var(--gold);color:#0a0a0a;border:none;border-radius:8px;font-size:0.85rem;font-weight:500;cursor:pointer;margin-top:4px;}
-    @media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr);}header{padding:14px 16px;}main{padding:20px 16px 60px;}}
+    /* ─── SCREEN: BOOKINGS (SPLIT PANEL) ─── */
+    .split-panel {
+      display: flex;
+      gap: 24px;
+      height: calc(100vh - 160px);
+    }
+    .split-left {
+      width: 320px;
+      display: flex;
+      flex-direction: column;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .split-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--card-light);
+    }
+    .split-tab {
+      flex: 1;
+      padding: 14px 0;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      cursor: pointer;
+      transition: color var(--transition);
+      border-bottom: 2px solid transparent;
+    }
+    .split-tab.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+      background: rgba(255, 255, 255, 0.01);
+    }
+    .split-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .booking-item-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .booking-item-card:hover {
+      border-color: rgba(201, 169, 110, 0.2);
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .booking-item-card.selected {
+      border-color: var(--gold);
+      background: rgba(201, 169, 110, 0.05);
+    }
+    .bi-ref {
+      font-family: monospace;
+      font-size: 0.72rem;
+      color: var(--gold);
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .bi-name {
+      font-size: 0.88rem;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    .bi-pkg {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .bi-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+      margin-top: 4px;
+    }
+    .split-right {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      overflow-y: auto;
+      min-width: 0;
+    }
+    .booking-detail-empty {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    
+    .detail-ref {
+      font-family: monospace;
+      font-size: 1.3rem;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      background: var(--card-light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+    .detail-field {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 0;
+      font-size: 0.82rem;
+    }
+    .detail-field-label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 4px;
+    }
+    .detail-field-value {
+      font-weight: 500;
+    }
+    .detail-field-value a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .detail-field-value a:hover {
+      color: var(--gold);
+    }
+    .detail-actions {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .detail-actions button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all var(--transition);
+    }
+    .btn-approve-action { background: var(--gold); color: #000; }
+    .btn-approve-action:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .btn-decline-action { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.25) !important; color: var(--red); }
+    .btn-decline-action:hover { background: rgba(239, 68, 68, 0.2); }
+    .btn-reset-action { background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid var(--border) !important; }
+    .btn-reset-action:hover { background: rgba(255,255,255,0.1); }
+    
+    .shooter-assignment-card {
+      background: var(--card-light);
+      border: 1px solid rgba(201, 169, 110, 0.15);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .shooter-assignment-card h3 {
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+    .shooter-actions-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .shooter-actions-row button {
+      flex: 1;
+      padding: 9px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      transition: all var(--transition);
+    }
+    .btn-shooter-wa:hover { background: #22c55e; border-color: #22c55e; color: #000; }
+    .btn-shooter-em:hover { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+
+    /* ─── CREDENTIALS SETUP BLOCK ─── */
+    .setup-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .setup-block h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .setup-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .setup-row input {
+      flex: 1;
+    }
+    .setup-row button {
+      white-space: nowrap;
+    }
+
+    /* ─── SCREEN: PACKAGES & CONCEPTS EDITORS ─── */
+    .editor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .editor-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .editor-card.featured {
+      border-color: rgba(201, 169, 110, 0.35);
+    }
+    .editor-card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--card-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .editor-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .editor-card-body {
+      padding: 20px;
+    }
+    .field-group {
+      margin-bottom: 14px;
+    }
+    .field-group label {
+      display: block;
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 4px;
+    }
+    .field-group input, .field-group textarea, .field-group select {
+      margin-top: 2px;
+    }
+    .field-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    /* ─── SCREEN: DISCOUNTS ─── */
+    .discount-row {
+      background: var(--card-light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .discount-info {
+      flex: 1;
+      min-width: 200px;
+    }
+    .discount-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .discount-pkg-base {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .discount-action-form {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .discount-type-toggle {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .discount-type-toggle button {
+      padding: 6px 12px;
+      font-size: 0.72rem;
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .discount-type-toggle button.active {
+      background: var(--gold);
+      color: #000;
+      font-weight: 600;
+    }
+    .discount-input-field {
+      width: 90px;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+    }
+    .promo-list {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .promo-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--card-light);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.82rem;
+    }
+    .promo-badge {
+      background: rgba(201, 169, 110, 0.1);
+      border: 1px solid rgba(201, 169, 110, 0.3);
+      color: var(--gold);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-family: monospace;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    
+    /* ─── SCREEN: REVIEWS ─── */
+    .review-grid-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .review-card-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .review-left-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .review-header-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .review-stars {
+      color: var(--gold);
+      letter-spacing: 1.5px;
+      font-size: 0.9rem;
+    }
+    .review-client-name {
+      font-weight: 600;
+      font-size: 0.88rem;
+    }
+    .review-badge {
+      font-size: 0.6rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      letter-spacing: 1px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .review-badge-real { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.25); color: #4ade80; }
+    .review-badge-demo { background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.25); color: #ffb300; }
+    .review-meta {
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .review-text {
+      font-size: 0.82rem;
+      color: #bbb;
+      line-height: 1.6;
+    }
+    .review-date {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .btn-delete-review {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #f87171;
+      border-radius: 6px;
+      padding: 7px 14px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-delete-review:hover {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+    
+    /* ─── SCREEN: GALLERY (ALBUMS) ─── */
+    .albums-grid-pane {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .album-card-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color var(--transition);
+    }
+    .album-card-box:hover {
+      border-color: rgba(201, 169, 110, 0.3);
+    }
+    .album-card-cover {
+      height: 140px;
+      background: linear-gradient(135deg,#1a1208,#2a1e0a);
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .album-card-badge {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      font-size: 0.62rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(0,0,0,0.6);
+      padding: 3px 8px;
+      border-radius: 4px;
+      backdrop-filter: blur(4px);
+    }
+    .album-card-body {
+      padding: 16px;
+    }
+    .album-card-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .album-card-meta {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .album-card-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .album-card-actions button {
+      flex: 1;
+      padding: 6px;
+      font-size: 0.72rem;
+    }
+    
+    /* ─── MODAL DIALOGS ─── */
+    .modal-overlay-custom {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .modal-overlay-custom.open {
+      display: flex;
+    }
+    .modal-custom {
+      background: #121216;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      width: 90%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+    }
+    .modal-custom h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--gold);
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      margin-top: 6px;
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--gold);
+      background: rgba(201, 169, 110, 0.05);
+    }
+    .upload-zone input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .upload-zone p {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+    .upload-zone span {
+      color: var(--gold);
+      font-weight: 600;
+    }
+    .progress-bar-wrap {
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: var(--gold);
+      width: 0%;
+      transition: width .3s;
+    }
+    .photo-manager-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+      margin-bottom: 6px;
+    }
+    .photo-manager-row img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .photo-manager-url {
+      flex: 1;
+      font-size: 0.7rem;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .btn-photo-action {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--gold);
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+    }
+    .btn-photo-action:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    /* ─── WHATSAPP SETUP CARDS ─── */
+    .whatsapp-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .whatsapp-card h3 {
+      font-size: 0.92rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .whatsapp-card p {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .whatsapp-status-indicator {
+      background: rgba(74, 222, 128, 0.1);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.25);
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.78rem;
+      text-align: center;
+      margin-top: 14px;
+    }
+
+    /* ─── SCROLLBARS ─── */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">Nizar Naseer <span>STUDIO</span></div>
-  <div style="display:flex;gap:10px;align-items:center;">
-    <button class="btn-sm" onclick="loadBookings()">⟳ Refresh</button>
-    <button class="btn-sm" onclick="document.getElementById('setupPanel').style.display=document.getElementById('setupPanel').style.display==='none'?'block':'none'">⚙ Setup</button>
-    <a href="index.html" class="btn-sm">← Website</a>
+<div class="app-layout">
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="app-sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">Nizar Naseer<span> STUDIO</span></div>
+      <div class="subtitle">Unified Dashboard</div>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="nav-header">Main</div>
+      <a class="nav-item active" id="nav-overview" onclick="switchSection('overview')">
+        <span>📊</span> Overview
+      </a>
+      <a class="nav-item" id="nav-bookings" onclick="switchSection('bookings')">
+        <span>📅</span> Bookings & Enquiries
+      </a>
+      
+      <div class="nav-header">Content & Pricing</div>
+      <a class="nav-item" id="nav-packages" onclick="switchSection('packages')">
+        <span>📝</span> Packages Editor
+      </a>
+      <a class="nav-item" id="nav-discounts" onclick="switchSection('discounts')">
+        <span>🏷️</span> Discount Manager
+      </a>
+      <a class="nav-item" id="nav-gallery" onclick="switchSection('gallery')">
+        <span>🖼️</span> Portfolio Gallery
+      </a>
+      <a class="nav-item" id="nav-reviews" onclick="switchSection('reviews')">
+        <span>⭐</span> Testimonials
+      </a>
+      <a class="nav-item" id="nav-studio" onclick="switchSection('studio')">
+        <span>🌙</span> Raya Concepts
+      </a>
+
+      <div class="nav-header">System</div>
+      <a class="nav-item" id="nav-whatsapp" onclick="switchSection('whatsapp')">
+        <span>💬</span> Notification Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="index.html" class="btn-sm btn-sm-gold" style="width:100%;justify-content:center">← Live Website</a>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN PANEL ─── -->
+  <main class="app-main">
+    <header class="app-header">
+      <div class="screen-title" id="screenTitle">Overview</div>
+      <div class="header-actions">
+        <span class="live-clock" id="liveClock"></span>
+        <button class="btn-sm" id="btn-global-refresh" onclick="refreshCurrentSection()">⟳ Refresh</button>
+      </div>
+    </header>
+
+    <div class="app-content">
+      
+      <!-- ══════════════════ SECTION: OVERVIEW ══════════════════ -->
+      <section id="section-overview" class="section-pane active">
+        <!-- Setup Notice -->
+        <div class="setup-block" id="netlifySetupBlock" style="display:none;">
+          <h3>⚙️ Netlify API Setup</h3>
+          <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">This is required once to fetch your incoming client enquiries from Netlify Forms. Stored locally in your browser.</p>
+          <div class="field-group">
+            <label>Netlify Site ID</label>
+            <input type="text" id="siteIdInput" placeholder="e.g. abcd1234-ab12-cd34-ef56-abcdef123456"/>
+          </div>
+          <div class="field-group" style="margin-top:10px;">
+            <label>Netlify Personal Access Token</label>
+            <input type="password" id="tokenInput" placeholder="Your Netlify personal access token"/>
+          </div>
+          <button class="btn-sm btn-sm-gold" onclick="saveNetlifySetup()" style="margin-top:12px;width:100%;justify-content:center">💾 Save & Load Bookings</button>
+        </div>
+
+        <div class="overview-stats" id="statsGrid">
+          <div class="stat-card">
+            <div class="num" id="statTotal">0</div>
+            <div class="label">Total Enquiries</div>
+          </div>
+          <div class="stat-card pending">
+            <div class="num" id="statPending">0</div>
+            <div class="label">⏳ Pending</div>
+          </div>
+          <div class="stat-card approved">
+            <div class="num" id="statApproved">0</div>
+            <div class="label">✅ Approved</div>
+          </div>
+          <div class="stat-card declined">
+            <div class="num" id="statDeclined">0</div>
+            <div class="label">❌ Declined</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <!-- Recent submissions -->
+          <div class="card-box" style="margin-bottom:0">
+            <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:14px;">Recent Booking Submissions</h3>
+            <div style="max-height: 380px; overflow-y: auto;" id="recentSubmissionsList">
+              <p style="color:var(--muted);font-size:0.8rem;">Loading recent enquiries…</p>
+            </div>
+          </div>
+
+          <!-- Shortcuts/Helpers -->
+          <div class="card-box" style="margin-bottom:0">
+            <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:14px;">Quick Actions</h3>
+            <div class="quick-actions-grid">
+              <a class="action-card" onclick="switchSection('bookings')">
+                <span class="icon">📅</span>
+                <span class="title">Review Bookings</span>
+                <span class="desc">Approve client bookings and assign shooters.</span>
+              </a>
+              <a class="action-card" onclick="switchSection('packages')">
+                <span class="icon">📝</span>
+                <span class="title">Edit Packages</span>
+                <span class="desc">Modify packages, descriptions, and variant prices.</span>
+              </a>
+              <a class="action-card" onclick="switchSection('discounts')">
+                <span class="icon">🏷️</span>
+                <span class="title">Discount Codes</span>
+                <span class="desc">Configure package discounts or custom promo codes.</span>
+              </a>
+              <a class="action-card" onclick="switchSection('gallery')">
+                <span class="icon">🖼️</span>
+                <span class="title">Portfolio Gallery</span>
+                <span class="desc">Upload portfolio images to showcase to clients.</span>
+              </a>
+            </div>
+            <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px;">
+              <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;margin-bottom:8px;">Live Spreadsheet Job Report</h3>
+              <p style="font-size:0.75rem;color:var(--muted);line-height:1.5;margin-bottom:12px;">All booking entries are also synced to your main spreadsheet database for long-term records.</p>
+              <a href="https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit?gid=0#gid=0" target="_blank" class="btn-sm">📊 Open Google Sheets Spreadsheet →</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ SECTION: BOOKINGS ══════════════════ -->
+      <section id="section-bookings" class="section-pane">
+        <div class="split-panel">
+          <!-- Left side: Booking list -->
+          <div class="split-left">
+            <div class="split-tabs">
+              <div class="split-tab active" id="tab-bookings-pending" onclick="setBookingsFilter('pending')">Pending</div>
+              <div class="split-tab" id="tab-bookings-all" onclick="setBookingsFilter('all')">All</div>
+            </div>
+            <div class="split-list" id="bookingsSplitList">
+              <div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:20px;">Loading bookings…</div>
+            </div>
+          </div>
+
+          <!-- Right side: Booking details -->
+          <div class="split-right" id="bookingDetailPanel">
+            <div class="booking-detail-empty">
+              <div>
+                <span style="font-size:2.5rem;display:block;margin-bottom:10px;">📋</span>
+                Select a booking enquiry from the list to review details, assign shooters, or approve slots.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ SECTION: PACKAGES ══════════════════ -->
+      <section id="section-packages" class="section-pane">
+        <!-- Git setup notice -->
+        <div class="setup-block" id="ghSetupBlockPackages">
+          <h3>🔑 GitHub Authentication</h3>
+          <p style="font-size:0.78rem;color:var(--muted);margin-bottom:12px;">This is required once to commit edits back to your code repository and trigger automatic deployment updates to Vercel.</p>
+          <div class="setup-row">
+            <input type="password" class="ghTokenInput" placeholder="GitHub Personal Access Token (repo scope)" />
+            <button class="btn-sm btn-sm-gold" onclick="saveGhToken()">Save Token</button>
+          </div>
+          <p style="font-size:0.68rem;color:var(--muted);margin-top:8px;">Saved locally in your browser session only. Repository: nizarnaseer/wedding-site</p>
+        </div>
+
+        <div class="notice-bar">
+          <strong>How it works:</strong> Edit package details below and click <strong>Publish All Packages</strong>. The settings will be saved to `packages.json` in your repository and go live in ~30 seconds.
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <button class="btn-sm btn-sm-gold" id="btn-publish-packages" onclick="publishPackages()">☁️ Publish All Packages</button>
+          </div>
+          <button class="btn-sm" onclick="addNewPackage('photography')">+ Add Photography Package</button>
+          <button class="btn-sm" onclick="addNewPackage('videography')">+ Add Videography Package</button>
+        </div>
+
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin:24px 0 14px;color:var(--gold)">📸 Photography Packages</h3>
+        <div class="editor-grid" id="photographyPackagesGrid"></div>
+
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin:32px 0 14px;color:var(--gold)">🎬 Videography Packages</h3>
+        <div class="editor-grid" id="videographyPackagesGrid"></div>
+      </section>
+
+      <!-- ══════════════════ SECTION: DISCOUNTS ══════════════════ -->
+      <section id="section-discounts" class="section-pane">
+        <div class="setup-block" id="ghSetupBlockDiscounts" style="display:none;">
+          <h3>🔑 GitHub Authentication</h3>
+          <div class="setup-row">
+            <input type="password" class="ghTokenInput" placeholder="GitHub Personal Access Token (repo scope)" />
+            <button class="btn-sm btn-sm-gold" onclick="saveGhToken()">Save Token</button>
+          </div>
+        </div>
+
+        <div class="notice-bar">
+          Set discounts per package or custom promo codes. Click <strong>Save & Sync Discounts</strong> to apply them to the live site.
+        </div>
+
+        <div class="toolbar" style="margin-bottom:20px;">
+          <button class="btn-sm btn-sm-gold" id="btn-sync-discounts" onclick="publishDiscounts()">☁️ Save & Sync Discounts</button>
+        </div>
+
+        <div class="grid-2">
+          <!-- Left: Package discounts -->
+          <div class="card-box">
+            <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:16px;color:var(--gold)">Package Discounts</h3>
+            <div id="packageDiscountsContainer">
+              <p style="color:var(--muted);font-size:0.8rem;">Loading packages…</p>
+            </div>
+          </div>
+
+          <!-- Right: Custom promo codes -->
+          <div class="card-box">
+            <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:12px;color:var(--gold)">Custom Promo Codes</h3>
+            <div style="display:flex;gap:8px;margin-bottom:18px;">
+              <input type="text" id="newPromoCode" placeholder="Code (e.g. RAYA2026)" style="flex:2;text-transform:uppercase"/>
+              <input type="number" id="newPromoVal" placeholder="Value (RM/%)" style="flex:1"/>
+              <select id="newPromoType" style="flex:1">
+                <option value="fixed">RM</option>
+                <option value="percent">%</option>
+              </select>
+              <button class="btn-sm btn-sm-gold" onclick="addNewPromoCode()" style="padding:10px 14px">Add</button>
+            </div>
+            <div class="promo-list" id="promoCodesListContainer">
+              <p style="color:var(--muted);font-size:0.8rem;">No custom promo codes active.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ SECTION: GALLERY ══════════════════ -->
+      <section id="section-gallery" class="section-pane">
+        <div class="notice-bar">
+          Manage your public portfolio work. Upload photos to Cloudinary, configure grid layout sizes, and click <strong>Save & Deploy Gallery</strong> to push updates to the live site.
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <button class="btn-sm btn-sm-gold" id="btn-save-gallery" onclick="publishGallery()">☁️ Save & Deploy Gallery</button>
+          </div>
+          <button class="btn-sm" onclick="openNewAlbumModal()">+ Create New Album</button>
+        </div>
+
+        <div class="status-bar" style="margin-top:16px;">
+          <span>Cloudinary status: <strong id="cldStatusIndicator" style="color:var(--gold)">Checking…</strong></span>
+        </div>
+
+        <div class="albums-grid-pane" id="galleryAlbumsGrid" style="margin-top:20px;">
+          <p style="color:var(--muted);font-size:0.8rem;grid-column:1/-1">Loading gallery albums…</p>
+        </div>
+      </section>
+
+      <!-- ══════════════════ SECTION: REVIEWS ══════════════════ -->
+      <section id="section-reviews" class="section-pane">
+        <div class="notice-bar">
+          View and manage customer reviews. Share this URL with your clients to collect testimonials:<br/>
+          <strong style="color:var(--gold)" id="reviewPageLink">https://weddingclicks.us/review.html</strong>
+        </div>
+
+        <div class="overview-stats" style="margin-bottom:24px;">
+          <div class="stat-card">
+            <div class="num" id="reviewStatTotal">0</div>
+            <div class="label">Total Reviews</div>
+          </div>
+          <div class="stat-card approved">
+            <div class="num" id="reviewStatReal">0</div>
+            <div class="label">From Clients</div>
+          </div>
+          <div class="stat-card pending">
+            <div class="num" id="reviewStatDemo">0</div>
+            <div class="label">Built-in Demo</div>
+          </div>
+        </div>
+
+        <div class="review-grid-list" id="reviewsContainerList">
+          <p style="color:var(--muted);font-size:0.8rem;">Loading reviews…</p>
+        </div>
+      </section>
+
+      <!-- ══════════════════ SECTION: STUDIO ══════════════════ -->
+      <section id="section-studio" class="section-pane">
+        <div class="setup-block" id="ghSetupBlockStudio" style="display:none;">
+          <h3>🔑 GitHub Authentication</h3>
+          <div class="setup-row">
+            <input type="password" class="ghTokenInput" placeholder="GitHub Personal Access Token (repo scope)" />
+            <button class="btn-sm btn-sm-gold" onclick="saveGhToken()">Save Token</button>
+          </div>
+        </div>
+
+        <div class="notice-bar">
+          Manage your Raya Studio Booking concepts (displayed on `studio.html`). Check <strong>Show on Homepage</strong> to show the promo banner. Click <strong>Publish Studio Concepts</strong> to sync.
+        </div>
+
+        <div class="toolbar">
+          <button class="btn-sm btn-sm-gold" id="btn-sync-studio" onclick="publishStudio()">☁️ Publish Studio Concepts</button>
+        </div>
+
+        <!-- Homepage studio banner toggle -->
+        <div class="card-box" style="margin:20px 0 24px;">
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:6px;">Homepage Promo Banner</h3>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <span id="studioBannerStatusLabel" style="font-size:0.82rem;color:var(--muted)">Loading status…</span>
+            <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer;">
+              <span style="font-size:0.82rem;color:var(--gold);font-weight:500;">Show Banner on Homepage</span>
+              <input type="checkbox" id="studioBannerToggle" onchange="toggleStudioBannerState()" style="width:20px;height:20px;accent-color:#c9a96e;cursor:pointer;">
+            </label>
+          </div>
+        </div>
+
+        <div class="editor-grid" id="studioConceptsEditorGrid"></div>
+      </section>
+
+      <!-- ══════════════════ SECTION: WHATSAPP ══════════════════ -->
+      <section id="section-whatsapp" class="section-pane">
+        <div class="notice-bar">
+          Configure contact email credentials and WhatsApp templates. Netlify forms trigger notifications using Web3Forms.
+        </div>
+
+        <div class="grid-2">
+          <!-- Web3Forms API Key -->
+          <div class="card-box">
+            <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:12px;color:var(--gold)">Email Notifications Setup</h3>
+            <p style="font-size:0.8rem;color:var(--muted);line-height:1.5;margin-bottom:16px;">Web3Forms handles incoming enquiries. If you don't have a key, fetch a free one at <a href="https://web3forms.com" target="_blank" style="color:var(--gold)">web3forms.com</a>.</p>
+            <div class="field-group">
+              <label>Web3Forms Access Key</label>
+              <input type="text" id="web3formsApiKeyInput" placeholder="Paste Access Key here"/>
+            </div>
+            <button class="btn-sm btn-sm-gold" onclick="saveWeb3formsSettings()" style="margin-top:14px;width:100%;justify-content:center">💾 Save API Key</button>
+            <button class="btn-sm" onclick="sendTestNotificationEmail()" style="margin-top:10px;width:100%;justify-content:center;background:transparent;">🧪 Send Test Email Alert</button>
+          </div>
+
+          <!-- WhatsApp Details -->
+          <div class="card-box">
+            <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:12px;color:var(--gold)">WhatsApp Alert Details</h3>
+            <p style="font-size:0.8rem;color:var(--muted);line-height:1.5;margin-bottom:16px;">WhatsApp notifications are triggered locally on the visitor's device. No configurations or external keys are needed.</p>
+            <div class="whatsapp-status-indicator">
+              ✓ WhatsApp Redirects are fully active on the booking form.
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- ══════════════════ MODAL: NEW/EDIT ALBUM ══════════════════ -->
+<div class="modal-overlay-custom" id="albumModalOverlay" onclick="closeAlbumModalOverlay(event)">
+  <div class="modal-custom">
+    <h2 id="albumModalTitle">New Album</h2>
+    <input type="hidden" id="editingAlbumIndex"/>
+    
+    <div class="form-row">
+      <label>Album Title</label>
+      <input type="text" id="albumTitleInput" placeholder="e.g. Ahmad & Siti Wedding" class="form-input"/>
+    </div>
+    
+    <div class="form-row-2" style="margin-top:12px;">
+      <div class="form-row" style="flex:1">
+        <label>Category</label>
+        <select id="albumCategoryInput" class="form-input">
+          <option value="Wedding">Wedding</option>
+          <option value="Engagement">Engagement</option>
+          <option value="Studio">Studio</option>
+          <option value="Portrait">Portrait</option>
+        </select>
+      </div>
+      <div class="form-row" style="flex:1">
+        <label>Date</label>
+        <input type="text" id="albumDateInput" placeholder="e.g. May 2026" class="form-input"/>
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-top:12px;">
+      <label>Layout Style</label>
+      <select id="albumLayoutInput" class="form-input">
+        <option value="">Standard (Square grid)</option>
+        <option value="layout-wide">Featured Wide (Landscape banner)</option>
+        <option value="layout-tall">Featured Tall (Portrait highlight)</option>
+      </select>
+    </div>
+
+    <!-- Cloudinary Image Uploader Zone -->
+    <div class="form-row" style="margin-top:16px;">
+      <label>Upload Images to Cloudinary</label>
+      <div class="upload-zone" id="cldUploadZone">
+        <p>Drag & drop photos here or <span>browse files</span></p>
+        <input type="file" id="cldFileInput" multiple accept="image/*" onchange="handleCloudinaryUploads(this.files)"/>
+      </div>
+      <div id="cldUploadProgressContainer" style="display:none;margin-top:12px;"></div>
+    </div>
+
+    <!-- Manual Image URL Add -->
+    <div class="form-row" style="margin-top:12px;">
+      <label>Or Add Image URL Manually</label>
+      <div style="display:flex;gap:8px;">
+        <input type="url" id="manualImageUrlInput" placeholder="https://res.cloudinary.com/..." class="form-input"/>
+        <button class="btn-sm btn-sm-gold" onclick="addManualPhotoUrl()">Add</button>
+      </div>
+    </div>
+
+    <!-- Photos list inside album -->
+    <div class="form-row" style="margin-top:18px;">
+      <label>Photos inside Album (First photo is Cover)</label>
+      <div class="photos-list" id="albumPhotosList" style="max-height:180px;overflow-y:auto;margin-top:6px;">
+        <p style="color:var(--muted);font-size:0.75rem;padding:6px 0;">No photos in this album yet.</p>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:24px;border-top:1px solid var(--border);padding-top:18px;">
+      <button class="btn-sm" onclick="closeAlbumModal()">Cancel</button>
+      <button class="btn-sm btn-sm-gold" onclick="saveAlbumSettings()">Save Album</button>
+    </div>
   </div>
-</header>
+</div>
 
-<main>
-  <h1>Admin Hub</h1>
-  <p class="subtitle">Manage all aspects of your studio from one place.</p>
+<div class="toast" id="appToast">Notification Message</div>
 
-  <!-- TOOL CARDS -->
-  <div class="tools-grid">
-
-    <a class="tool-card" href="approve.html">
-      <div class="tool-icon">✅</div>
-      <div class="tool-name">Approve Bookings</div>
-      <div class="tool-desc">Review client enquiries, send payment links, assign shooters and manage bookings.</div>
-      <div class="tool-arrow">Open → </div>
-    </a>
-
-    <a class="tool-card" href="discount.html">
-      <div class="tool-icon">🏷️</div>
-      <div class="tool-name">Discount Codes</div>
-      <div class="tool-desc">Create, manage and deactivate promotional discount codes for clients.</div>
-      <div class="tool-arrow">Open → </div>
-    </a>
-
-    <a class="tool-card" href="gallery-manager.html">
-      <div class="tool-icon">🖼️</div>
-      <div class="tool-name">Gallery Manager</div>
-      <div class="tool-desc">Upload, organise and publish portfolio images to your public gallery.</div>
-      <div class="tool-arrow">Open → </div>
-    </a>
-
-    <a class="tool-card" href="review.html" target="_blank">
-      <div class="tool-icon">⭐</div>
-      <div class="tool-name">Leave a Review</div>
-      <div class="tool-desc">Open the client review page — copy the URL and send to your client to collect their testimonial.</div>
-      <div class="tool-arrow">Copy Link → </div>
-    </a>
-
-    <a class="tool-card" href="reviews-manager.html">
-      <div class="tool-icon">🗂️</div>
-      <div class="tool-name">Reviews Manager</div>
-      <div class="tool-desc">View, manage and delete client reviews and testimonials displayed on the website.</div>
-      <div class="tool-arrow">Open → </div>
-    </a>
-
-    <a class="tool-card" href="setup-whatsapp.html">
-      <div class="tool-icon">💬</div>
-      <div class="tool-name">WhatsApp Setup</div>
-      <div class="tool-desc">Configure your WhatsApp number and notification message templates.</div>
-      <div class="tool-arrow">Open → </div>
-    </a>
-
-    <a class="tool-card" href="studio-editor.html">
-      <div class="tool-icon">🎨</div>
-      <div class="tool-name">Studio Editor</div>
-      <div class="tool-desc">Edit studio concept names, descriptions and images shown to clients on the booking page.</div>
-      <div class="tool-arrow">Open → </div>
-    </a>
-
-    <a class="tool-card" href="package-editor.html">
-      <div class="tool-icon">📝</div>
-      <div class="tool-name">Package Editor</div>
-      <div class="tool-desc">Edit wedding package names, prices, descriptions and what's included shown on the main website.</div>
-      <div class="tool-arrow">Open → </div>
-    </a>
-
-    <a class="tool-card" href="https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit?gid=0#gid=0" target="_blank">
-      <div class="tool-icon">📊</div>
-      <div class="tool-name">Live Job Report</div>
-      <div class="tool-desc">View the live-updating Google Sheets / Excel database containing all incoming bookings and studio enquiries.</div>
-      <div class="tool-arrow">Open Spreadsheet → </div>
-    </a>
-
-  </div>
-
-
-  <div class="section-label">📋 Booking Dashboard</div>
-
-  <div id="setupPanel" style="display:none;">
-    <h3>⚙️ Dashboard Setup</h3>
-    <p>One-time setup. Credentials saved in your browser only.</p>
-    <label>Netlify Site ID</label>
-    <input type="text" id="siteIdInput" placeholder="e.g. abcd1234-ab12-cd34-ef56-abcdef123456"/>
-    <label>Netlify Personal Access Token</label>
-    <input type="password" id="tokenInput" placeholder="Your Netlify personal access token"/>
-    <button class="btn-save" onclick="saveSetup()">Save & Load Bookings</button>
-  </div>
-
-  <div id="errorMsg" class="error-msg" style="display:none;"></div>
-
-  <div class="stats" id="statsGrid" style="display:none;">
-    <div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total</div></div>
-    <div class="stat-card pending"><div class="stat-num" id="statPending">0</div><div class="stat-label">Pending</div></div>
-    <div class="stat-card approved"><div class="stat-num" id="statApproved">0</div><div class="stat-label">Approved</div></div>
-    <div class="stat-card declined"><div class="stat-num" id="statDeclined">0</div><div class="stat-label">Declined</div></div>
-  </div>
-
-  <div class="filter-bar" id="filterBar" style="display:none;">
-    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
-    <button class="filter-btn" onclick="setFilter('pending',this)">⏳ Pending</button>
-    <button class="filter-btn" onclick="setFilter('approved',this)">✅ Approved</button>
-    <button class="filter-btn" onclick="setFilter('declined',this)">❌ Declined</button>
-  </div>
-
-  <div id="loadingMsg" class="loading" style="display:none;">Loading bookings…</div>
-  <div id="bookingList"></div>
-  <div id="emptyMsg" class="empty" style="display:none;">
-    <p style="font-size:0.9rem;">No bookings found</p>
-    <p style="font-size:0.78rem;margin-top:6px;">Bookings appear here after clients submit via the website.</p>
-  </div>
-</main>
-
+<!-- ══════════════════ JAVASCRIPT LOGIC ══════════════════ -->
+<script src="config.js"></script>
 <script>
-  let allBookings=[], currentFilter='all';
-  const getSiteId=()=>localStorage.getItem('netlify_site_id')||'';
-  const getToken=()=>localStorage.getItem('netlify_token')||'';
-  const getStatuses=()=>JSON.parse(localStorage.getItem('booking_statuses')||'{}');
-  const setStatus=(ref,status)=>{const s=getStatuses();s[ref]=status;localStorage.setItem('booking_statuses',JSON.stringify(s));};
+  /* ─── APP STATE ─── */
+  let activeSection = 'overview';
+  let bookingsData = [];
+  let bookingsFilter = 'pending';
+  
+  // Git settings
+  const REPO = 'nizarnaseer/wedding-site';
+  const BRANCH = 'main';
+  
+  // Data cache
+  let packagesEditCache = null;
+  let discountsEditCache = null;
+  let galleryAlbumsCache = [];
+  let studioConceptsCache = [];
+  let studioBannerActive = false;
 
-  window.addEventListener('DOMContentLoaded',()=>{
-    if(!getSiteId()||!getToken()){
-      document.getElementById('setupPanel').style.display='block';
-    } else { loadBookings(); }
+  /* ─── CLOCK & INIT ─── */
+  setInterval(() => {
+    document.getElementById('liveClock').textContent = new Date().toLocaleTimeString('en-MY', { hour12: true }) + ' | ' + new Date().toLocaleDateString('en-MY', { weekday:'short', day:'numeric', month:'short' });
+  }, 1000);
+
+  window.addEventListener('DOMContentLoaded', () => {
+    // Set review page link
+    document.getElementById('reviewPageLink').textContent = window.location.origin + '/review.html';
+    
+    // Switch to overview by default
+    switchSection('overview');
+
+    // Initialize Credentials fields
+    if (localStorage.getItem('netlify_site_id')) document.getElementById('siteIdInput').value = localStorage.getItem('netlify_site_id');
+    if (localStorage.getItem('netlify_token')) document.getElementById('tokenInput').value = localStorage.getItem('netlify_token');
+    
+    // Check Github Token
+    const tokens = document.querySelectorAll('.ghTokenInput');
+    const savedGh = localStorage.getItem('gh_admin_token');
+    if (savedGh) {
+      tokens.forEach(t => t.value = savedGh);
+      document.getElementById('ghSetupBlockPackages').style.display = 'none';
+      document.getElementById('ghSetupBlockDiscounts').style.display = 'none';
+      document.getElementById('ghSetupBlockStudio').style.display = 'none';
+    }
   });
 
-  function saveSetup(){
-    const id=document.getElementById('siteIdInput').value.trim();
-    const tok=document.getElementById('tokenInput').value.trim();
-    if(!id||!tok){alert('Please fill in both fields.');return;}
-    localStorage.setItem('netlify_site_id',id);
-    localStorage.setItem('netlify_token',tok);
-    document.getElementById('setupPanel').style.display='none';
-    loadBookings();
+  /* ─── ROUTING ─── */
+  function switchSection(secId) {
+    activeSection = secId;
+    document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    
+    document.getElementById('section-' + secId).classList.add('active');
+    document.getElementById('nav-' + secId).classList.add('active');
+    
+    // Set Header Title
+    const titles = {
+      overview: 'Overview & Stats',
+      bookings: 'Client Enquiries & Approvals',
+      packages: 'Packages Pricing Editor',
+      discounts: 'Package Discounts & Promo Codes',
+      gallery: 'Portfolio Gallery Manager',
+      reviews: 'Client Testimonials',
+      whatsapp: 'Notification Alerts Setup',
+      studio: 'Raya Studio Concept Editor'
+    };
+    document.getElementById('screenTitle').textContent = titles[secId] || 'Admin Hub';
+    
+    // Auto-load data for section
+    loadDataForSection(secId);
   }
 
-  async function loadBookings(){
-    const siteId=getSiteId(), token=getToken();
-    if(!siteId||!token){document.getElementById('setupPanel').style.display='block';return;}
-    showLoading(true); showError('');
-    try{
-      const formsRes=await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/forms`,{headers:{Authorization:`Bearer ${token}`}});
-      if(!formsRes.ok) throw new Error(`Auth failed (${formsRes.status}) — check your Site ID and Token`);
-      const forms=await formsRes.json();
-      const form=forms.find(f=>f.name==='booking-enquiry');
-      if(!form){showLoading(false);showError('No bookings yet — the booking form has no submissions.');return;}
-      const subsRes=await fetch(`https://api.netlify.com/api/v1/forms/${form.id}/submissions?per_page=100`,{headers:{Authorization:`Bearer ${token}`}});
-      const subs=await subsRes.json();
-      const statuses=getStatuses();
-      allBookings=subs.map(s=>({
-        ref:s.data.ref||s.id.slice(0,8).toUpperCase(),
-        name:s.data.client_name||'—',phone:s.data.phone||'—',email:s.data.email||'—',
-        package:s.data.package||'—',price:s.data.price||'—',date:s.data.date||'—',
-        notes:s.data.notes||'None',created:s.created_at,
-        status:statuses[s.data.ref]||'pending',
+  function refreshCurrentSection() {
+    loadDataForSection(activeSection, true);
+  }
+
+  function loadDataForSection(secId, forceRefresh = false) {
+    if (secId === 'overview') {
+      loadOverviewData();
+    } else if (secId === 'bookings') {
+      loadBookingsData();
+    } else if (secId === 'packages') {
+      loadPackagesData(forceRefresh);
+    } else if (secId === 'discounts') {
+      loadDiscountsData(forceRefresh);
+    } else if (secId === 'gallery') {
+      loadGalleryData(forceRefresh);
+    } else if (secId === 'reviews') {
+      loadReviewsData();
+    } else if (secId === 'studio') {
+      loadStudioData(forceRefresh);
+    } else if (secId === 'whatsapp') {
+      loadWhatsAppSettings();
+    }
+  }
+
+  /* ─── TOAST ─── */
+  function showToast(msg) {
+    const t = document.getElementById('appToast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(window._toastTimeout);
+    window._toastTimeout = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  /* ─── NETLIFY SETUP ─── */
+  function saveNetlifySetup() {
+    const id = document.getElementById('siteIdInput').value.trim();
+    const tok = document.getElementById('tokenInput').value.trim();
+    if(!id || !tok) { alert('Fill in Site ID and Personal Access Token.'); return; }
+    localStorage.setItem('netlify_site_id', id);
+    localStorage.setItem('netlify_token', tok);
+    document.getElementById('netlifySetupBlock').style.display = 'none';
+    showToast('⚙️ Netlify credentials saved!');
+    loadOverviewData();
+  }
+
+  /* ─── GITHUB TOKEN SETUP ─── */
+  function saveGhToken() {
+    const tokens = document.querySelectorAll('.ghTokenInput');
+    let value = '';
+    tokens.forEach(t => { if(t.value.trim()) value = t.value.trim(); });
+    if (!value) { alert('Please enter your Github Personal Access Token.'); return; }
+    
+    localStorage.setItem('gh_admin_token', value);
+    tokens.forEach(t => t.value = value);
+    
+    document.getElementById('ghSetupBlockPackages').style.display = 'none';
+    document.getElementById('ghSetupBlockDiscounts').style.display = 'none';
+    document.getElementById('ghSetupBlockStudio').style.display = 'none';
+    showToast('🔑 GitHub Token saved successfully!');
+  }
+
+  /* ─── DATA LOADER: OVERVIEW ─── */
+  async function loadOverviewData() {
+    const siteId = localStorage.getItem('netlify_site_id');
+    const token = localStorage.getItem('netlify_token');
+    
+    if(!siteId || !token) {
+      document.getElementById('netlifySetupBlock').style.display = 'block';
+      return;
+    }
+    
+    try {
+      const formsRes = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/forms`, { headers: { Authorization: `Bearer ${token}` } });
+      if(!formsRes.ok) throw new Error("Auth failed");
+      const forms = await formsRes.json();
+      const form = forms.find(f => f.name === 'booking-enquiry');
+      
+      if(!form) {
+        setOverviewStats(0, 0, 0, 0);
+        document.getElementById('recentSubmissionsList').innerHTML = '<p style="color:var(--muted);font-size:0.8rem;">No bookings found — enquiry form has no submissions.</p>';
+        return;
+      }
+      
+      const subsRes = await fetch(`https://api.netlify.com/api/v1/forms/${form.id}/submissions?per_page=100`, { headers: { Authorization: `Bearer ${token}` } });
+      const subs = await subsRes.json();
+      const statuses = JSON.parse(localStorage.getItem('booking_statuses') || '{}');
+      
+      bookingsData = subs.map(s => ({
+        id: s.id,
+        ref: s.data.ref || s.id.slice(0,8).toUpperCase(),
+        name: s.data.client_name || '—',
+        phone: s.data.phone || '—',
+        email: s.data.email || '—',
+        package: s.data.package || '—',
+        price: s.data.price || '—',
+        date: s.data.date || '—',
+        notes: s.data.notes || 'None',
+        created: s.created_at,
+        status: statuses[s.data.ref] || 'pending',
       }));
-      renderBookings();
-    }catch(err){showError(err.message);}finally{showLoading(false);}
+
+      // Render stats
+      const total = bookingsData.length;
+      const pending = bookingsData.filter(b => b.status === 'pending').length;
+      const approved = bookingsData.filter(b => b.status === 'approved').length;
+      const declined = bookingsData.filter(b => b.status === 'declined').length;
+      setOverviewStats(total, pending, approved, declined);
+      
+      // Render recent bookings
+      const recent = bookingsData.slice(0, 5);
+      if(!recent.length) {
+        document.getElementById('recentSubmissionsList').innerHTML = '<p style="color:var(--muted);font-size:0.8rem;">No enquiries yet.</p>';
+      } else {
+        document.getElementById('recentSubmissionsList').innerHTML = recent.map(r => {
+          const badgeClass = `badge badge-${r.status}`;
+          const statusText = r.status === 'pending' ? '⏳ Pending' : r.status === 'approved' ? '✅ Approved' : '❌ Declined';
+          return `
+            <div style="padding:12px;border-bottom:1px solid var(--border);display:flex;justify-content:between;align-items:center;">
+              <div style="flex:1;min-width:0;padding-right:12px;">
+                <div style="font-weight:600;font-size:0.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.name}</div>
+                <div style="font-size:0.75rem;color:var(--muted);margin-top:2px;">${r.package} · ${r.date}</div>
+              </div>
+              <span class="${badgeClass}" style="flex-shrink:0;font-size:0.6rem">${statusText}</span>
+            </div>
+          `;
+        }).join('');
+      }
+    } catch(err) {
+      document.getElementById('netlifySetupBlock').style.display = 'block';
+    }
   }
 
-  function renderBookings(){
-    const list=document.getElementById('bookingList');
-    const statuses=getStatuses();
-    allBookings.forEach(b=>{b.status=statuses[b.ref]||'pending';});
-    const filtered=currentFilter==='all'?allBookings:allBookings.filter(b=>b.status===currentFilter);
-    const pending=allBookings.filter(b=>b.status==='pending').length;
-    const approved=allBookings.filter(b=>b.status==='approved').length;
-    const declined=allBookings.filter(b=>b.status==='declined').length;
-    document.getElementById('statTotal').textContent=allBookings.length;
-    document.getElementById('statPending').textContent=pending;
-    document.getElementById('statApproved').textContent=approved;
-    document.getElementById('statDeclined').textContent=declined;
-    document.getElementById('statsGrid').style.display='grid';
-    document.getElementById('filterBar').style.display='flex';
-    if(filtered.length===0){list.innerHTML='';document.getElementById('emptyMsg').style.display='block';return;}
-    document.getElementById('emptyMsg').style.display='none';
-    list.innerHTML=filtered.map(b=>{
-      const badgeClass=`badge badge-${b.status}`;
-      const label=b.status==='pending'?'⏳ Pending':b.status==='approved'?'✅ Approved':'❌ Declined';
-      const created=b.created?new Date(b.created).toLocaleString('en-MY',{dateStyle:'medium',timeStyle:'short'}):'';
-      const waNum=b.phone.replace(/[\s\-\+\(\)]/g,'');
-      const approveUrl=`approve.html?ref=${encodeURIComponent(b.ref)}&name=${encodeURIComponent(b.name)}&email=${encodeURIComponent(b.email)}&phone=${encodeURIComponent(b.phone)}&package=${encodeURIComponent(b.package)}&price=${encodeURIComponent(b.price)}&date=${encodeURIComponent(b.date)}&notes=${encodeURIComponent(b.notes)}`;
-      const btns=b.status==='pending'?`
-        <button class="btn-approve" onclick="markApprove('${b.ref}','${approveUrl}')">✅ Approve</button>
-        <button class="btn-decline" onclick="markDecline('${b.ref}','${encodeURIComponent(b.name)}','${encodeURIComponent(b.date)}','${waNum}','${encodeURIComponent(b.email)}')">❌ Decline</button>
-        <button class="btn-wa" onclick="window.open('https://wa.me/${waNum}','_blank')">💬</button>`:`
-        <button class="btn-sm" onclick="resetStatus('${b.ref}')" style="padding:10px 14px">Reset</button>
-        <button class="btn-wa" onclick="window.open('https://wa.me/${waNum}','_blank')">💬</button>
-        <button class="btn-sm" onclick="window.open('${approveUrl}','_blank')" style="padding:10px 14px">Open</button>`;
-      return `<div class="booking-card" id="card-${b.ref}">
-        <div class="card-top"><div><div class="card-ref">${b.ref}</div><div class="card-name">${b.name}</div></div><span class="${badgeClass}">${label}</span></div>
-        <div class="card-grid">
-          <div class="card-field"><div class="card-field-label">📅 Date</div><div class="card-field-value">${b.date}</div></div>
-          <div class="card-field"><div class="card-field-label">📦 Package</div><div class="card-field-value">${b.package}</div></div>
-          <div class="card-field"><div class="card-field-label">💰 Price</div><div class="card-field-value">${b.price}</div></div>
-          <div class="card-field"><div class="card-field-label">📱 Phone</div><div class="card-field-value">${b.phone}</div></div>
-          <div class="card-field"><div class="card-field-label">📧 Email</div><div class="card-field-value">${b.email}</div></div>
-          <div class="card-field"><div class="card-field-label">📝 Notes</div><div class="card-field-value">${b.notes}</div></div>
+  function setOverviewStats(total, pending, approved, declined) {
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statPending').textContent = pending;
+    document.getElementById('statApproved').textContent = approved;
+    document.getElementById('statDeclined').textContent = declined;
+  }
+
+  /* ─── DATA LOADER: BOOKINGS SPLIT PANEL ─── */
+  async function loadBookingsData() {
+    const siteId = localStorage.getItem('netlify_site_id');
+    const token = localStorage.getItem('netlify_token');
+    if(!siteId || !token) {
+      document.getElementById('bookingsSplitList').innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px;">Setup Netlify credentials in Overview first.</div>';
+      return;
+    }
+    
+    try {
+      const formsRes = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/forms`, { headers: { Authorization: `Bearer ${token}` } });
+      const forms = await formsRes.json();
+      const form = forms.find(f => f.name === 'booking-enquiry');
+      if(!form) {
+        document.getElementById('bookingsSplitList').innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px;">No enquiries found.</div>';
+        return;
+      }
+      
+      const subsRes = await fetch(`https://api.netlify.com/api/v1/forms/${form.id}/submissions?per_page=100`, { headers: { Authorization: `Bearer ${token}` } });
+      const subs = await subsRes.json();
+      const statuses = JSON.parse(localStorage.getItem('booking_statuses') || '{}');
+      
+      bookingsData = subs.map(s => ({
+        id: s.id,
+        ref: s.data.ref || s.id.slice(0,8).toUpperCase(),
+        name: s.data.client_name || '—',
+        phone: s.data.phone || '—',
+        email: s.data.email || '—',
+        package: s.data.package || '—',
+        price: s.data.price || '—',
+        date: s.data.date || '—',
+        notes: s.data.notes || 'None',
+        created: s.created_at,
+        status: statuses[s.data.ref] || 'pending',
+      }));
+      
+      renderBookingsSplitList();
+    } catch(err) {
+      document.getElementById('bookingsSplitList').innerHTML = '<div style="color:var(--red);font-size:0.82rem;text-align:center;padding:24px;">Fetch failed. Refresh.</div>';
+    }
+  }
+
+  function setBookingsFilter(filter) {
+    bookingsFilter = filter;
+    document.getElementById('tab-bookings-pending').classList.toggle('active', filter === 'pending');
+    document.getElementById('tab-bookings-all').classList.toggle('active', filter === 'all');
+    renderBookingsSplitList();
+  }
+
+  function renderBookingsSplitList() {
+    const list = document.getElementById('bookingsSplitList');
+    const filtered = bookingsFilter === 'pending' 
+      ? bookingsData.filter(b => b.status === 'pending') 
+      : bookingsData;
+      
+    if(!filtered.length) {
+      list.innerHTML = `<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:24px;">No ${bookingsFilter === 'pending'?'pending ':''}bookings.</div>`;
+      return;
+    }
+    
+    list.innerHTML = filtered.map(b => {
+      const timeStr = b.created ? new Date(b.created).toLocaleDateString('en-MY', { day:'numeric', month:'short' }) : '';
+      return `
+        <div class="booking-item-card" id="bcard-${b.ref}" onclick="selectBookingDetail('${b.ref}')">
+          <div class="bi-ref"><span>${b.ref}</span><span style="font-weight:600">${b.status.toUpperCase()}</span></div>
+          <div class="bi-name">${b.name}</div>
+          <div class="bi-pkg">${b.package}</div>
+          <div class="bi-meta"><span>${b.date}</span><span>${timeStr}</span></div>
         </div>
-        <div class="card-actions">${btns}</div>
-        ${created?`<div class="submitted-at">Submitted: ${created}</div>`:''}
-      </div>`;
+      `;
     }).join('');
   }
 
-  function markApprove(ref,approveUrl){setStatus(ref,'approved');window.open(approveUrl,'_blank');renderBookings();}
-  function markDecline(ref,namEnc,dateEnc,waNum,emailEnc){
-    const name=decodeURIComponent(namEnc),date=decodeURIComponent(dateEnc),email=decodeURIComponent(emailEnc);
-    const msg=`Hi *${name}*, thank you for your interest in Nizar Naseer Studio.\n\nUnfortunately we are unable to accommodate your booking for *${date}* at this time. We'd love to work with you on another date!\n\nThank you 🙏`;
-    if(waNum&&waNum!=='Notprovided') window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`, '_blank');
-    setStatus(ref,'declined'); renderBookings();
+  function selectBookingDetail(refId) {
+    // highlight selected card
+    document.querySelectorAll('.booking-item-card').forEach(c => c.classList.remove('selected'));
+    const card = document.getElementById('bcard-' + refId);
+    if(card) card.classList.add('selected');
+    
+    const booking = bookingsData.find(b => b.ref === refId);
+    if(!booking) return;
+    
+    const rightPanel = document.getElementById('bookingDetailPanel');
+    const badgeClass = `status-badge ${booking.status}`;
+    const badgeText = booking.status === 'pending' ? 'Pending Approval' : booking.status === 'approved' ? 'Approved & Invoice Sent' : 'Declined';
+    
+    const waPhone = booking.phone.replace(/[\s\-\+\(\)]/g,'');
+    
+    let actionButtonsHTML = '';
+    if(booking.status === 'pending') {
+      actionButtonsHTML = `
+        <button class="btn-approve-action" onclick="setBookingStatus('${booking.ref}', 'approved')">✅ Approve & Generate Link</button>
+        <button class="btn-decline-action" onclick="setBookingStatus('${booking.ref}', 'declined')">❌ Decline</button>
+      `;
+    } else {
+      actionButtonsHTML = `
+        <button class="btn-reset-action" onclick="setBookingStatus('${booking.ref}', 'pending')">↺ Reset Status to Pending</button>
+      `;
+    }
+
+    rightPanel.innerHTML = `
+      <div class="${badgeClass}">
+        <div class="status-dot"></div>
+        <span>${badgeText}</span>
+      </div>
+      
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;margin-bottom:4px;">Booking Enquiry details</h2>
+      <div class="detail-ref">Ref: ${booking.ref}</div>
+      
+      <div class="detail-grid">
+        <div class="detail-field"><div class="detail-field-label">Client Name</div><div class="detail-field-value">${booking.name}</div></div>
+        <div class="detail-field">
+          <div class="detail-field-label">WhatsApp</div>
+          <div class="detail-field-value">
+            <a href="https://wa.me/${waPhone}" target="_blank" style="color:var(--gold);font-weight:500;">💬 ${booking.phone}</a>
+          </div>
+        </div>
+        <div class="detail-field"><div class="detail-field-label">Email</div><div class="detail-field-value">${booking.email}</div></div>
+        <div class="detail-field"><div class="detail-field-label">Date Selected</div><div class="detail-field-value">${booking.date}</div></div>
+        <div class="detail-field"><div class="detail-field-label">Requested Package</div><div class="detail-field-value">${booking.package}</div></div>
+        <div class="detail-field"><div class="detail-field-label">Package Base Price</div><div class="detail-field-value" style="color:var(--gold)">${booking.price}</div></div>
+        <div class="detail-field" style="grid-column: 1 / -1"><div class="detail-field-label">Enquiry Notes</div><div class="detail-field-value">${booking.notes}</div></div>
+      </div>
+      
+      <div class="detail-actions">
+        ${actionButtonsHTML}
+      </div>
+      
+      <!-- Shooter Assignment -->
+      <div class="shooter-assignment-card">
+        <h3>📷 Shooter Assignment</h3>
+        <p style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;">Optionally notify a second shooter or assistant about the event slot details.</p>
+        <div class="field-group">
+          <label>Shooter WhatsApp Number</label>
+          <input type="text" id="shooterWaInput" placeholder="e.g. 60123456789"/>
+        </div>
+        <div class="field-group" style="margin-top:10px;">
+          <label>Shooter Email Address</label>
+          <input type="email" id="shooterEmailInput" placeholder="shooter@email.com"/>
+        </div>
+        <div class="shooter-actions-row">
+          <button class="btn-shooter-wa" onclick="sendShooterAssignment('${booking.ref}', '${booking.date}', '${booking.package}', 'wa')">Send WhatsApp Alert</button>
+          <button class="btn-shooter-em" onclick="sendShooterAssignment('${booking.ref}', '${booking.date}', '${booking.package}', 'email')">Send Assignment Email</button>
+        </div>
+      </div>
+    `;
   }
-  function resetStatus(ref){setStatus(ref,'pending');renderBookings();}
-  function setFilter(filter,btn){currentFilter=filter;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderBookings();}
-  function showLoading(show){document.getElementById('loadingMsg').style.display=show?'block':'none';}
-  function showError(msg){const el=document.getElementById('errorMsg');el.style.display=msg?'block':'none';el.textContent=msg;}
+
+  function setBookingStatus(refId, status) {
+    const booking = bookingsData.find(b => b.ref === refId);
+    if(!booking) return;
+    
+    // Save in LocalStorage
+    const statuses = JSON.parse(localStorage.getItem('booking_statuses') || '{}');
+    statuses[refId] = status;
+    localStorage.setItem('booking_statuses', JSON.stringify(statuses));
+    booking.status = status;
+
+    const waPhone = booking.phone.replace(/[\s\-\+\(\)]/g,'');
+
+    if(status === 'approved') {
+      const priceVal = booking.price.replace(/[^0-9.]/g, '') || '100';
+      const invoiceUrl = `${window.location.origin}/payment-demo.html?ref=${refId}&desc=Deposit%20for%20${encodeURIComponent(booking.package)}&amount=${priceVal}`;
+      const waMsg = `Hi ${booking.name},\n\nGreat news! Your booking enquiry (${refId}) for *${booking.package}* has been approved by Nizar Naseer Studio.\n\nPlease click the secure link below to pay your deposit and confirm your slot:\n${invoiceUrl}\n\nThank you!`;
+      
+      window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(waMsg)}`, '_blank');
+      showToast('✅ Approved! WhatsApp invoice message ready.');
+    } else if(status === 'declined') {
+      const waMsg = `Hi ${booking.name},\n\nThank you for your interest in Nizar Naseer Studio. Unfortunately, we are fully booked on your requested date (${booking.date}) and are unable to accommodate your booking (${refId}).\n\nWe apologize for any inconvenience.`;
+      
+      window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(waMsg)}`, '_blank');
+      showToast('❌ Declined. WhatsApp decline message ready.');
+    } else {
+      showToast('↺ Booking reset back to pending.');
+    }
+
+    // Refresh UI
+    renderBookingsSplitList();
+    selectBookingDetail(refId);
+  }
+
+  function sendShooterAssignment(refId, date, pkg, type) {
+    if(type === 'wa') {
+      const wa = document.getElementById('shooterWaInput').value.trim().replace(/[^0-9]/g, '');
+      if(!wa) { alert('Enter shooter WhatsApp number.'); return; }
+      const msg = `ASSIGNMENT: ${refId}\nYou've been assigned a shoot for *${pkg}* on *${date}*. Please check the studio calendar.`;
+      window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`, '_blank');
+    } else {
+      const email = document.getElementById('shooterEmailInput').value.trim();
+      if(!email) { alert('Enter shooter Email.'); return; }
+      const subject = encodeURIComponent(`Shoot Assignment: ${refId}`);
+      const body = encodeURIComponent(`You've been assigned a shoot for ${pkg} on ${date}. Please check details.`);
+      window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+    }
+    showToast('📲 Assignment message sent!');
+  }
+
+  /* ─── DATA LOADER: PACKAGES ─── */
+  const DEFAULT_PACKAGES = { photography: [], videography: [] };
+
+  async function loadPackagesData(forceRefresh = false) {
+    const gridPhoto = document.getElementById('photographyPackagesGrid');
+    const gridVideo = document.getElementById('videographyPackagesGrid');
+    gridPhoto.innerHTML = '<p style="color:var(--muted);font-size:0.8rem">Loading packages…</p>';
+    gridVideo.innerHTML = '<p style="color:var(--muted);font-size:0.8rem">Loading packages…</p>';
+
+    try {
+      if(!packagesEditCache || forceRefresh) {
+        const res = await fetch('packages.json?v=' + Date.now());
+        packagesEditCache = await res.json();
+      }
+      
+      renderPackagesEditor();
+    } catch(err) {
+      gridPhoto.innerHTML = '<p style="color:var(--red);font-size:0.8rem">Failed to load packages.</p>';
+      gridVideo.innerHTML = '<p style="color:var(--red);font-size:0.8rem">Failed to load packages.</p>';
+    }
+  }
+
+  function renderPackagesEditor() {
+    const gridPhoto = document.getElementById('photographyPackagesGrid');
+    const gridVideo = document.getElementById('videographyPackagesGrid');
+    
+    gridPhoto.innerHTML = '';
+    gridVideo.innerHTML = '';
+
+    const renderCard = (p, idx, type) => {
+      const isFeatured = p.featured ? 'checked' : '';
+      const isTNS = p.type === 'tns';
+      
+      let priceHTML = '';
+      if(isTNS) {
+        priceHTML = `
+          <div class="tns-variant" style="margin-top:8px;">
+            <label>TNS Variant Prices</label>
+            ${(p.variants || []).map((v, vIdx) => `
+              <div class="variant-row" style="margin-top:6px;">
+                <span style="font-size:0.75rem;color:var(--muted);width:80px;display:block">${v.name}</span>
+                <input type="number" value="${v.price}" onchange="updatePackageVariantPrice('${type}', ${idx}, ${vIdx}, this.value)" style="width:100px;padding:6px;"/>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        priceHTML = `
+          <div class="field-group">
+            <label>Price (RM)</label>
+            <input type="number" value="${p.price || 0}" onchange="updatePackageField('${type}', ${idx}, 'price', this.value)"/>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="editor-card ${p.featured?'featured':''}">
+          <div class="editor-card-header">
+            <span class="editor-card-title">${p.name || 'Custom Package'}</span>
+            <button class="btn-sm btn-sm-green" onclick="deletePackage('${type}', ${idx})" style="padding:4px 8px;font-size:0.7rem">Delete</button>
+          </div>
+          <div class="editor-card-body">
+            <div class="field-group">
+              <label>Badge</label>
+              <input type="text" value="${p.badge || ''}" onchange="updatePackageField('${type}', ${idx}, 'badge', this.value)"/>
+            </div>
+            
+            ${!isTNS ? `
+              <div class="field-group">
+                <label>Package Name</label>
+                <input type="text" value="${p.name || ''}" onchange="updatePackageField('${type}', ${idx}, 'name', this.value)"/>
+              </div>
+            ` : ''}
+            
+            ${priceHTML}
+            
+            <div class="field-group" style="margin-top:10px;">
+              <label>Included Features (one per line)</label>
+              <textarea onchange="updatePackageField('${type}', ${idx}, 'features', this.value)">${(p.features || []).join('\n')}</textarea>
+            </div>
+            
+            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px;">
+              <input type="checkbox" ${isFeatured} onchange="updatePackageField('${type}', ${idx}, 'featured', this.checked)" style="width:16px;height:16px;accent-color:#c9a96e;"/>
+              <span style="font-size:0.75rem;color:var(--gold);">Set as Featured (Popular)</span>
+            </label>
+          </div>
+        </div>
+      `;
+    };
+
+    if(packagesEditCache.photography && packagesEditCache.photography.length) {
+      gridPhoto.innerHTML = packagesEditCache.photography.map((p, idx) => renderCard(p, idx, 'photography')).join('');
+    } else {
+      gridPhoto.innerHTML = '<p style="color:var(--muted);font-size:0.8rem">No photography packages configured.</p>';
+    }
+
+    if(packagesEditCache.videography && packagesEditCache.videography.length) {
+      gridVideo.innerHTML = packagesEditCache.videography.map((p, idx) => renderCard(p, idx, 'videography')).join('');
+    } else {
+      gridVideo.innerHTML = '<p style="color:var(--muted);font-size:0.8rem">No videography packages configured.</p>';
+    }
+  }
+
+  function updatePackageField(type, idx, field, value) {
+    if(field === 'features') {
+      packagesEditCache[type][idx][field] = value.split('\n').map(x => x.trim()).filter(Boolean);
+    } else if(field === 'price') {
+      packagesEditCache[type][idx][field] = parseFloat(value) || 0;
+    } else {
+      packagesEditCache[type][idx][field] = value;
+    }
+    renderPackagesEditor();
+  }
+
+  function updatePackageVariantPrice(type, idx, vIdx, value) {
+    packagesEditCache[type][idx].variants[vIdx].price = parseFloat(value) || 0;
+    renderPackagesEditor();
+  }
+
+  function addNewPackage(type) {
+    const newPkg = {
+      id: type.slice(0,3) + Date.now(),
+      badge: 'New Package',
+      name: 'New Package Title',
+      price: 999,
+      featured: false,
+      features: ['Feature line 1', 'Feature line 2']
+    };
+    if(!packagesEditCache[type]) packagesEditCache[type] = [];
+    packagesEditCache[type].push(newPkg);
+    renderPackagesEditor();
+    showToast('✨ Added new empty package template.');
+  }
+
+  function deletePackage(type, idx) {
+    if(!confirm('Delete this package template permanently?')) return;
+    packagesEditCache[type].splice(idx, 1);
+    renderPackagesEditor();
+    showToast('🗑️ Package removed.');
+  }
+
+  async function publishPackages() {
+    const token = localStorage.getItem('gh_admin_token');
+    if(!token) {
+      document.getElementById('ghSetupBlockPackages').style.display = 'block';
+      document.getElementById('ghSetupBlockPackages').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    
+    const btn = document.getElementById('btn-publish-packages');
+    btn.textContent = '⏳ Saving…'; btn.disabled = true;
+
+    try {
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(packagesEditCache, null, 2))));
+      const FILE_PATH = 'packages.json';
+      
+      // Get current SHA
+      let sha = null;
+      const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, { headers: { Authorization: 'Bearer ' + token } });
+      if(check.ok) {
+        const j = await check.json();
+        sha = j.sha;
+      }
+
+      const body = { message: 'admin: publish package updates', content, branch: BRANCH };
+      if(sha) body.sha = sha;
+
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
+        method: 'PUT',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if(res.ok) {
+        btn.textContent = '✅ Published! Live in ~30s';
+        showToast('☁️ Packages updated and committed live!');
+        setTimeout(() => { btn.textContent = '☁️ Publish All Packages'; btn.disabled = false; }, 4000);
+      } else {
+        const err = await res.json();
+        throw new Error(err.message);
+      }
+    } catch(err) {
+      btn.textContent = '☁️ Publish All Packages'; btn.disabled = false;
+      alert('Failed: ' + err.message + '\n\nEnsure your token is valid.');
+    }
+  }
+
+  /* ─── DATA LOADER: DISCOUNTS ─── */
+  async function loadDiscountsData(forceRefresh = false) {
+    const container = document.getElementById('packageDiscountsContainer');
+    container.innerHTML = '<p style="color:var(--muted);font-size:0.8rem">Loading discounts…</p>';
+    
+    try {
+      if(!discountsEditCache || forceRefresh) {
+        const res = await fetch('discounts.json?v=' + Date.now());
+        discountsEditCache = await res.json();
+      }
+      
+      // Load packages if cache is null
+      if(!packagesEditCache) {
+        const res = await fetch('packages.json?v=' + Date.now());
+        packagesEditCache = await res.json();
+      }
+
+      renderDiscountsEditor();
+    } catch(err) {
+      container.innerHTML = '<p style="color:var(--red);font-size:0.8rem">Failed to load discounts config.</p>';
+    }
+  }
+
+  function renderDiscountsEditor() {
+    const container = document.getElementById('packageDiscountsContainer');
+    container.innerHTML = '';
+    
+    const discounts = discountsEditCache.pkg_discounts || {};
+    
+    const renderRow = (name, basePrice) => {
+      const activeDisc = discounts[name] || { v: 0, t: 'fixed' };
+      const val = activeDisc.v || 0;
+      const type = activeDisc.t || 'fixed';
+      
+      return `
+        <div class="discount-row">
+          <div class="discount-info">
+            <div class="discount-name">${name}</div>
+            <div class="discount-pkg-base">Base Price: ${basePrice}</div>
+            ${val > 0 ? `
+              <div style="font-size:0.75rem;color:var(--green);margin-top:4px;">
+                Active: -${type==='percent'? val + '%' : 'RM ' + val}
+              </div>
+            ` : ''}
+          </div>
+          <div class="discount-action-form">
+            <div class="discount-type-toggle">
+              <button class="${type==='fixed'?'active':''}" onclick="setDiscountType('${name}', 'fixed')">RM</button>
+              <button class="${type==='percent'?'active':''}" onclick="setDiscountType('${name}', 'percent')">%</button>
+            </div>
+            <input type="number" class="discount-input-field" value="${val}" onchange="setDiscountVal('${name}', this.value)"/>
+          </div>
+        </div>
+      `;
+    };
+
+    let html = '';
+    
+    // Add Photograhy packages
+    if(packagesEditCache.photography && packagesEditCache.photography.length) {
+      html += '<h4 style="font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">📸 Photography</h4>';
+      packagesEditCache.photography.forEach(p => {
+        if(p.type === 'tns') {
+          p.variants.forEach(v => {
+            html += renderRow(`TNS — ${v.name}`, 'RM ' + v.price);
+          });
+        } else {
+          html += renderRow(p.name, 'RM ' + p.price);
+        }
+      });
+    }
+
+    // Add Videography packages
+    if(packagesEditCache.videography && packagesEditCache.videography.length) {
+      html += '<h4 style="font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:18px 0 10px;">🎬 Videography</h4>';
+      packagesEditCache.videography.forEach(p => {
+        html += renderRow(p.name, 'RM ' + p.price);
+      });
+    }
+
+    container.innerHTML = html;
+    
+    // Render Promo Codes
+    renderPromoCodesList();
+  }
+
+  function setDiscountType(name, type) {
+    if(!discountsEditCache.pkg_discounts) discountsEditCache.pkg_discounts = {};
+    if(!discountsEditCache.pkg_discounts[name]) discountsEditCache.pkg_discounts[name] = { v: 0, t: 'fixed' };
+    
+    discountsEditCache.pkg_discounts[name].t = type;
+    renderDiscountsEditor();
+  }
+
+  function setDiscountVal(name, val) {
+    if(!discountsEditCache.pkg_discounts) discountsEditCache.pkg_discounts = {};
+    if(!discountsEditCache.pkg_discounts[name]) discountsEditCache.pkg_discounts[name] = { v: 0, t: 'fixed' };
+    
+    discountsEditCache.pkg_discounts[name].v = parseFloat(val) || 0;
+    renderDiscountsEditor();
+  }
+
+  function renderPromoCodesList() {
+    const list = document.getElementById('promoCodesListContainer');
+    const promos = discountsEditCache.promo_codes || {};
+    
+    if(Object.keys(promos).length === 0) {
+      list.innerHTML = '<p style="color:var(--muted);font-size:0.8rem;padding:10px 0;">No promo codes currently configured.</p>';
+      return;
+    }
+    
+    list.innerHTML = Object.entries(promos).map(([code, p]) => {
+      const displayVal = p.t === 'percent' ? p.v + '%' : 'RM ' + p.v;
+      return `
+        <div class="promo-item">
+          <div>
+            <span class="promo-badge">${code}</span>
+            <span style="color:var(--muted);margin-left:8px;">Discount:</span>
+            <strong style="color:var(--green);margin-left:4px;">-${displayVal}</strong>
+          </div>
+          <button class="btn-sm btn-delete-review" onclick="removePromoCode('${code}')" style="padding:4px 10px;font-size:0.7rem;">Remove</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function addNewPromoCode() {
+    const code = document.getElementById('newPromoCode').value.trim().toUpperCase();
+    const val = parseFloat(document.getElementById('newPromoVal').value.trim()) || 0;
+    const type = document.getElementById('newPromoType').value;
+    
+    if(!code || val <= 0) { alert('Enter promo code and a valid discount value.'); return; }
+    
+    if(!discountsEditCache.promo_codes) discountsEditCache.promo_codes = {};
+    discountsEditCache.promo_codes[code] = { v: val, t: type };
+    
+    document.getElementById('newPromoCode').value = '';
+    document.getElementById('newPromoVal').value = '';
+    
+    renderDiscountsEditor();
+    showToast('🏷️ Added promo code: ' + code);
+  }
+
+  function removePromoCode(code) {
+    if(!confirm(`Delete promo code "${code}"?`)) return;
+    delete discountsEditCache.promo_codes[code];
+    renderDiscountsEditor();
+    showToast('🗑️ Promo code removed.');
+  }
+
+  async function publishDiscounts() {
+    const token = localStorage.getItem('gh_admin_token');
+    if(!token) {
+      document.getElementById('ghSetupBlockDiscounts').style.display = 'block';
+      document.getElementById('ghSetupBlockDiscounts').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    
+    const btn = document.getElementById('btn-sync-discounts');
+    btn.textContent = '⏳ Saving…'; btn.disabled = true;
+
+    try {
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(discountsEditCache, null, 2))));
+      const FILE_PATH = 'discounts.json';
+      
+      // Get current SHA
+      let sha = null;
+      const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, { headers: { Authorization: 'Bearer ' + token } });
+      if(check.ok) {
+        const j = await check.json();
+        sha = j.sha;
+      }
+
+      const body = { message: 'admin: sync package discounts', content, branch: BRANCH };
+      if(sha) body.sha = sha;
+
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
+        method: 'PUT',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if(res.ok) {
+        btn.textContent = '✅ Synced! Live in ~30s';
+        showToast('☁️ Discounts saved and synced live!');
+        
+        // Save in localStorage too to keep in sync immediately
+        localStorage.setItem('pkg_discounts', JSON.stringify(discountsEditCache.pkg_discounts || {}));
+        localStorage.setItem('promo_codes', JSON.stringify(discountsEditCache.promo_codes || {}));
+        
+        setTimeout(() => { btn.textContent = '☁️ Save & Sync Discounts'; btn.disabled = false; }, 4000);
+      } else {
+        const err = await res.json();
+        throw new Error(err.message);
+      }
+    } catch(err) {
+      btn.textContent = '☁️ Save & Sync Discounts'; btn.disabled = false;
+      alert('Failed: ' + err.message);
+    }
+  }
+
+  /* ─── DATA LOADER: PORTFOLIO GALLERY ─── */
+  async function loadGalleryData(forceRefresh = false) {
+    const grid = document.getElementById('galleryAlbumsGrid');
+    grid.innerHTML = '<p style="color:var(--muted);font-size:0.8rem">Loading gallery albums…</p>';
+    
+    // Check Cloudinary keys status
+    const cldStatus = document.getElementById('cldStatusIndicator');
+    if (window.STUDIO_CONFIG && window.STUDIO_CONFIG.cloudinary_cloud_name && !window.STUDIO_CONFIG.cloudinary_cloud_name.startsWith('YOUR')) {
+      cldStatus.textContent = 'Cloudinary Connected ✓';
+      cldStatus.style.color = 'var(--green)';
+    } else {
+      cldStatus.textContent = 'Cloudinary Setup Pending (Edit config.js)';
+      cldStatus.style.color = 'var(--amber)';
+    }
+
+    try {
+      if(!galleryAlbumsCache.length || forceRefresh) {
+        const res = await fetch('/api/gallery');
+        const data = await res.json();
+        if(data.albums) {
+          galleryAlbumsCache = data.albums;
+        } else {
+          // Fallback to static
+          const staticRes = await fetch('gallery.json?v=' + Date.now());
+          const staticData = await staticRes.json();
+          galleryAlbumsCache = staticData.albums || [];
+        }
+      }
+      
+      renderGalleryAlbums();
+    } catch(err) {
+      grid.innerHTML = '<p style="color:var(--red);font-size:0.8rem">Failed to fetch gallery albums.</p>';
+    }
+  }
+
+  function renderGalleryAlbums() {
+    const grid = document.getElementById('galleryAlbumsGrid');
+    
+    if(!galleryAlbumsCache.length) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><h3>No albums yet</h3><p>Click "+ Create New Album" to add your first portfolio shoot</p></div>';
+      return;
+    }
+    
+    grid.innerHTML = galleryAlbumsCache.map((a, i) => {
+      const coverImg = a.teasers?.[0]?.src || '';
+      const bgStyle = coverImg ? `background-image:url('${coverImg}')` : `background:${a.coverGradient || '#1c1610'}`;
+      
+      return `
+        <div class="album-card-box">
+          <div class="album-card-cover" style="${bgStyle}">
+            <span class="album-card-badge">${a.category}</span>
+          </div>
+          <div class="album-card-body">
+            <div class="album-card-title">${a.title}</div>
+            <div class="album-card-meta">${a.date} · ${a.teasers?.length || 0} photos</div>
+            <div class="album-card-actions">
+              <button class="btn-sm btn-sm-gold" onclick="openEditAlbumModal(${i})">✏️ Edit</button>
+              <button class="btn-sm btn-sm-green" onclick="deleteAlbum(${i})" style="background:rgba(239,68,68,0.1);color:var(--red);border-color:rgba(239,68,68,0.25);">🗑 Delete</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  /* ─── ALBUM MODAL EDITING ─── */
+  let currentAlbumPhotos = [];
+
+  function openNewAlbumModal() {
+    currentAlbumPhotos = [];
+    document.getElementById('editingAlbumIndex').value = '';
+    document.getElementById('albumModalTitle').textContent = 'Create New Portfolio Album';
+    document.getElementById('albumTitleInput').value = '';
+    document.getElementById('albumDateInput').value = '';
+    document.getElementById('albumCategoryInput').value = 'Wedding';
+    document.getElementById('albumLayoutInput').value = '';
+    document.getElementById('albumPhotosList').innerHTML = '<p style="color:var(--muted);font-size:0.75rem;padding:6px 0;">No photos in this album yet.</p>';
+    document.getElementById('cldUploadProgressContainer').innerHTML = '';
+    document.getElementById('cldUploadProgressContainer').style.display = 'none';
+    
+    document.getElementById('albumModalOverlay').classList.add('open');
+  }
+
+  function openEditAlbumModal(idx) {
+    const album = galleryAlbumsCache[idx];
+    currentAlbumPhotos = (album.teasers || []).map(t => ({ src: t.src, preview: t.src }));
+    
+    document.getElementById('editingAlbumIndex').value = idx;
+    document.getElementById('albumModalTitle').textContent = 'Edit Album: ' + album.title;
+    document.getElementById('albumTitleInput').value = album.title;
+    document.getElementById('albumDateInput').value = album.date;
+    document.getElementById('albumCategoryInput').value = album.category;
+    document.getElementById('albumLayoutInput').value = album.layout || '';
+    
+    renderAlbumPhotosList();
+    document.getElementById('cldUploadProgressContainer').innerHTML = '';
+    document.getElementById('cldUploadProgressContainer').style.display = 'none';
+    
+    document.getElementById('albumModalOverlay').classList.add('open');
+  }
+
+  function closeAlbumModal() {
+    document.getElementById('albumModalOverlay').classList.remove('open');
+  }
+
+  function closeAlbumModalOverlay(e) {
+    if(e.target.id === 'albumModalOverlay') closeAlbumModal();
+  }
+
+  function renderAlbumPhotosList() {
+    const list = document.getElementById('albumPhotosList');
+    if(!currentAlbumPhotos.length) {
+      list.innerHTML = '<p style="color:var(--muted);font-size:0.75rem;padding:6px 0;">No photos in this album yet.</p>';
+      return;
+    }
+    
+    const total = currentAlbumPhotos.length;
+    list.innerHTML = currentAlbumPhotos.map((p, idx) => `
+      <div class="photo-manager-row">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <button class="btn-photo-action" onclick="moveAlbumPhoto(${idx}, -1)" ${idx===0?'disabled':''}>▲</button>
+          <button class="btn-photo-action" onclick="moveAlbumPhoto(${idx}, 1)" ${idx===total-1?'disabled':''}>▼</button>
+        </div>
+        <img src="${p.preview}" onerror="this.style.display='none'"/>
+        <span class="photo-manager-url">${idx===0?'<strong style="color:var(--gold)">[COVER]</strong> ':''} ${p.src}</span>
+        <button class="btn-photo-action" onclick="removeAlbumPhoto(${idx})" style="color:var(--red);border-color:rgba(239,68,68,0.25)">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function moveAlbumPhoto(idx, dir) {
+    const j = idx + dir;
+    if(j < 0 || j >= currentAlbumPhotos.length) return;
+    [currentAlbumPhotos[idx], currentAlbumPhotos[j]] = [currentAlbumPhotos[j], currentAlbumPhotos[idx]];
+    renderAlbumPhotosList();
+  }
+
+  function removeAlbumPhoto(idx) {
+    if(!confirm('Remove this photo?')) return;
+    const photo = currentAlbumPhotos[idx];
+    currentAlbumPhotos.splice(idx, 1);
+    renderAlbumPhotosList();
+
+    // Optionally call Cloudinary delete via API (silently)
+    if(photo.src && photo.src.includes('cloudinary.com')) {
+      const match = photo.src.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.\w+)?$/);
+      if(match && match[1]) {
+        fetch('/api/gallery', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ publicId: match[1] })
+        }).catch(() => {});
+      }
+    }
+  }
+
+  function addManualPhotoUrl() {
+    const urlInput = document.getElementById('manualImageUrlInput');
+    const url = urlInput.value.trim();
+    if(!url) return;
+    currentAlbumPhotos.push({ src: url, preview: url });
+    urlInput.value = '';
+    renderAlbumPhotosList();
+    showToast('🔗 Added image link.');
+  }
+
+  /* Cloudinary direct upload integration */
+  async function handleCloudinaryUploads(files) {
+    const cldName = window.STUDIO_CONFIG ? window.STUDIO_CONFIG.cloudinary_cloud_name : '';
+    const cldPreset = window.STUDIO_CONFIG ? window.STUDIO_CONFIG.cloudinary_upload_preset : '';
+    
+    if(!cldName || cldName.startsWith('YOUR')) {
+      alert('Please configure your Cloudinary credentials inside config.js first.');
+      return;
+    }
+
+    const progContainer = document.getElementById('cldUploadProgressContainer');
+    progContainer.style.display = 'block';
+    
+    for(const file of files) {
+      const id = 'up-' + Date.now();
+      progContainer.insertAdjacentHTML('beforeend', `
+        <div style="display:flex;align-items:center;gap:10px;font-size:0.75rem;padding:6px;background:rgba(255,255,255,0.02);border-radius:6px;margin-bottom:4px;" id="${id}">
+          <span style="width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${file.name}</span>
+          <div class="progress-bar-wrap"><div class="progress-bar" id="bar_${id}"></div></div>
+          <span id="st_${id}" style="color:var(--muted)">Uploading…</span>
+        </div>
+      `);
+      
+      try {
+        const url = await uploadFileToCloudinary(file, id, cldName, cldPreset);
+        document.getElementById('bar_' + id).style.width = '100%';
+        document.getElementById('st_' + id).textContent = '✅';
+        document.getElementById('st_' + id).style.color = 'var(--green)';
+        currentAlbumPhotos.push({ src: url, preview: url });
+        renderAlbumPhotosList();
+      } catch(err) {
+        document.getElementById('st_' + id).textContent = '❌';
+        document.getElementById('st_' + id).style.color = 'var(--red)';
+      }
+    }
+  }
+
+  function uploadFileToCloudinary(file, id, name, preset) {
+    return new Promise((resolve, reject) => {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', preset);
+      
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${name}/image/upload`);
+      
+      xhr.upload.onprogress = (e) => {
+        if(e.lengthComputable) {
+          document.getElementById('bar_' + id).style.width = Math.round((e.loaded / e.total) * 90) + '%';
+        }
+      };
+      
+      xhr.onload = () => {
+        const res = JSON.parse(xhr.responseText);
+        if(res.secure_url) {
+          resolve(res.secure_url);
+        } else {
+          reject(new Error(res.error?.message || 'Upload failed'));
+        }
+      };
+      
+      xhr.onerror = () => reject(new Error('Network error'));
+      xhr.send(fd);
+    });
+  }
+
+  function saveAlbumSettings() {
+    const title = document.getElementById('albumTitleInput').value.trim();
+    const date = document.getElementById('albumDateInput').value.trim();
+    const category = document.getElementById('albumCategoryInput').value;
+    const layout = document.getElementById('albumLayoutInput').value;
+    
+    if(!title) { alert('Please enter an album title.'); return; }
+    if(!currentAlbumPhotos.length) { alert('Please add at least one photo.'); return; }
+    
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+    const teasers = currentAlbumPhotos.map(p => ({ src: p.src, g: 'linear-gradient(135deg,#1a1208,#2a1e0a)' }));
+    
+    const albumObj = {
+      id: slug,
+      title,
+      date,
+      category,
+      layout,
+      coverGradient: 'linear-gradient(135deg,#1a1208,#2a1e0a)',
+      teasers
+    };
+
+    const idxVal = document.getElementById('editingAlbumIndex').value;
+    if(idxVal !== '') {
+      galleryAlbumsCache[parseInt(idxVal)] = albumObj;
+    } else {
+      galleryAlbumsCache.unshift(albumObj);
+    }
+    
+    renderGalleryAlbums();
+    closeAlbumModal();
+    showToast('💾 Album settings saved internally.');
+  }
+
+  function deleteAlbum(idx) {
+    if(!confirm(`Delete "${galleryAlbumsCache[idx].title}" permanently?`)) return;
+    galleryAlbumsCache.splice(idx, 1);
+    renderGalleryAlbums();
+    showToast('🗑️ Album removed.');
+  }
+
+  async function publishGallery() {
+    const btn = document.getElementById('btn-save-gallery');
+    btn.textContent = '⏳ Deploying…'; btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/update-gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ albums: galleryAlbumsCache })
+      });
+      
+      const data = await res.json();
+      if(data.ok) {
+        btn.textContent = '✅ Live in ~30s';
+        showToast('☁️ Gallery committed and deployed live!');
+        setTimeout(() => { btn.textContent = '☁️ Save & Deploy Gallery'; btn.disabled = false; }, 8000);
+      } else {
+        throw new Error(data.error || 'Server error');
+      }
+    } catch(err) {
+      btn.textContent = '☁️ Save & Deploy Gallery'; btn.disabled = false;
+      alert('Deployment failed: ' + err.message + '\n\nEnsure GITHUB_TOKEN and GITHUB_REPO env variables are set on Vercel.');
+    }
+  }
+
+  /* ─── DATA LOADER: REVIEWS ─── */
+  async function loadReviewsData() {
+    const container = document.getElementById('reviewsContainerList');
+    container.innerHTML = '<p style="color:var(--muted);font-size:0.8rem">Loading reviews…</p>';
+
+    try {
+      const res = await fetch('/api/reviews');
+      const data = await res.json();
+      
+      const reviews = data.reviews || [];
+      const real = reviews.filter(r => !r.id?.startsWith('s'));
+      const demo = reviews.filter(r => r.id?.startsWith('s'));
+      
+      document.getElementById('reviewStatTotal').textContent = reviews.length;
+      document.getElementById('reviewStatReal').textContent = real.length;
+      document.getElementById('reviewStatDemo').textContent = demo.length;
+      
+      if(!reviews.length) {
+        container.innerHTML = '<p style="color:var(--muted);font-size:0.8rem;text-align:center;padding:24px;">No reviews found.</p>';
+        return;
+      }
+
+      let html = '';
+      const starStr = (n) => '★'.repeat(n || 5) + '☆'.repeat(5 - (n || 5));
+
+      if(real.length) {
+        html += '<h4 style="font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Client Testimonials</h4>';
+        html += real.map(r => `
+          <div class="review-card-item" id="rcard-${r.id}">
+            <div class="review-left-content">
+              <div class="review-header-row">
+                <div class="review-stars">${starStr(r.stars)}</div>
+                <div class="review-client-name">${r.name || 'Anonymous'}</div>
+                <span class="review-badge review-badge-real">Client</span>
+              </div>
+              <div class="review-meta">${r.pkg || ''}</div>
+              <div class="review-text">${r.text || ''}</div>
+              <div class="review-date">📅 ${r.date ? new Date(r.date).toLocaleDateString('en-MY', {dateStyle:'medium'}) : '—'}</div>
+            </div>
+            <button class="btn-delete-review" onclick="deleteReviewsEndpoint('${r.id}')">🗑 Delete</button>
+          </div>
+        `).join('');
+      }
+
+      if(demo.length) {
+        html += '<h4 style="font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:24px 0 12px;">Built-in Demo Reviews</h4>';
+        html += demo.map(r => `
+          <div class="review-card-item" id="rcard-${r.id}">
+            <div class="review-left-content">
+              <div class="review-header-row">
+                <div class="review-stars">${starStr(r.stars)}</div>
+                <div class="review-client-name">${r.name || 'Anonymous'}</div>
+                <span class="review-badge review-badge-demo">Demo</span>
+              </div>
+              <div class="review-meta">${r.pkg || ''}</div>
+              <div class="review-text">${r.text || ''}</div>
+            </div>
+            <span style="font-size:0.7rem;color:var(--muted);padding-top:4px;">Protected</span>
+          </div>
+        `).join('');
+      }
+
+      container.innerHTML = html;
+    } catch(err) {
+      container.innerHTML = '<p style="color:var(--red);font-size:0.8rem">Failed to load reviews.</p>';
+    }
+  }
+
+  async function deleteReviewsEndpoint(id) {
+    if(!confirm('Delete this review permanently?')) return;
+    
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', id })
+      });
+      
+      const data = await res.json();
+      if(data.ok) {
+        const card = document.getElementById('rcard-' + id);
+        if(card) {
+          card.style.opacity = '0';
+          setTimeout(() => { card.remove(); loadReviewsData(); }, 300);
+        }
+        showToast('✅ Review deleted!');
+      } else {
+        showToast('✕ Delete failed.');
+      }
+    } catch(err) {
+      showToast('✕ Error deleting review.');
+    }
+  }
+
+  /* ─── DATA LOADER: WHATSAPP SETTINGS ─── */
+  function loadWhatsAppSettings() {
+    const saved = localStorage.getItem('web3forms_key');
+    if(saved) {
+      document.getElementById('web3formsApiKeyInput').value = saved;
+    }
+  }
+
+  function saveWeb3formsSettings() {
+    const key = document.getElementById('web3formsApiKeyInput').value.trim();
+    if(!key) { alert('Enter Web3Forms access key.'); return; }
+    localStorage.setItem('web3forms_key', key);
+    localStorage.removeItem('formspree_id');
+    showToast('💾 Web3Forms API key saved successfully!');
+  }
+
+  async function sendTestNotificationEmail() {
+    const key = localStorage.getItem('web3forms_key') || document.getElementById('web3formsApiKeyInput').value.trim();
+    if(!key) { alert('Please save your API key first.'); return; }
+    
+    showToast('⏳ Sending test alert email…');
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          access_key: key,
+          subject: '🧪 Test Booking Enquiry Alert — WeddingClicks',
+          name: 'Nizar Naseer Test',
+          email: 'test@example.com',
+          message: 'Web3Forms integration is active and working correctly!',
+          ref: 'ENQ-TEST-OK'
+        })
+      });
+      const data = await res.json();
+      if(data.success) {
+        showToast('✓ Test email sent! Check your inbox.');
+      } else throw new Error(data.message);
+    } catch(err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  /* ─── DATA LOADER: STUDIO CONCEPTS ─── */
+  async function loadStudioData(forceRefresh = false) {
+    const grid = document.getElementById('studioConceptsEditorGrid');
+    grid.innerHTML = '<p style="color:var(--muted);font-size:0.8rem">Loading studio concepts…</p>';
+
+    try {
+      if(!studioConceptsCache.length || forceRefresh) {
+        const res = await fetch('studio-concepts.json?v=' + Date.now());
+        studioConceptsCache = await res.json();
+      }
+      
+      // Load homepage banner status
+      const bannerRes = await fetch('gallery.json?v=' + Date.now());
+      const bannerData = await bannerRes.json();
+      studioBannerActive = !!bannerData.showStudioBanner;
+      
+      document.getElementById('studioBannerToggle').checked = studioBannerActive;
+      document.getElementById('studioBannerStatusLabel').textContent = studioBannerActive ? 'Active (Popup is visible on main homepage)' : 'Inactive (Popup is hidden)';
+      document.getElementById('studioBannerStatusLabel').style.color = studioBannerActive ? 'var(--green)' : 'var(--muted)';
+
+      renderStudioEditor();
+    } catch(err) {
+      grid.innerHTML = '<p style="color:var(--red);font-size:0.8rem">Failed to load studio concepts.</p>';
+    }
+  }
+
+  function renderStudioEditor() {
+    const grid = document.getElementById('studioConceptsEditorGrid');
+    grid.innerHTML = '';
+    
+    grid.innerHTML = studioConceptsCache.map((c, idx) => `
+      <div class="editor-card">
+        <div class="editor-card-header">
+          <span class="editor-card-title">Concept ${c.key}: ${c.name}</span>
+        </div>
+        <div class="editor-card-body">
+          <div class="field-group">
+            <label>Concept Name</label>
+            <input type="text" value="${c.name || ''}" onchange="updateStudioField(${idx}, 'name', this.value)"/>
+          </div>
+          <div class="field-group">
+            <label>Description</label>
+            <textarea onchange="updateStudioField(${idx}, 'desc', this.value)">${c.desc || ''}</textarea>
+          </div>
+          <div class="form-row-2" style="display:flex;gap:12px;margin-top:10px;">
+            <div class="field-group" style="flex:1">
+              <label>Icon Emoji</label>
+              <input type="text" value="${c.emoji || ''}" onchange="updateStudioField(${idx}, 'emoji', this.value)"/>
+            </div>
+            <div class="field-group" style="flex:2">
+              <label>Concept Image URL</label>
+              <input type="text" value="${c.imgUrl || ''}" placeholder="e.g. /images/studio-b.jpg" onchange="updateStudioField(${idx}, 'imgUrl', this.value)"/>
+            </div>
+          </div>
+          <div class="form-row-2" style="display:flex;gap:12px;margin-top:10px;">
+            <div class="field-group" style="flex:1">
+              <label>Gradient color 1</label>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <input type="color" value="${c.bg1 || '#0a0a0a'}" onchange="updateStudioField(${idx}, 'bg1', this.value)" style="width:40px;height:34px;padding:2px;cursor:pointer"/>
+                <input type="text" value="${c.bg1 || ''}" onchange="updateStudioField(${idx}, 'bg1', this.value)" style="flex:1;font-size:0.75rem;padding:6px;"/>
+              </div>
+            </div>
+            <div class="field-group" style="flex:1">
+              <label>Gradient color 2</label>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <input type="color" value="${c.bg2 || '#1a1a1a'}" onchange="updateStudioField(${idx}, 'bg2', this.value)" style="width:40px;height:34px;padding:2px;cursor:pointer"/>
+                <input type="text" value="${c.bg2 || ''}" onchange="updateStudioField(${idx}, 'bg2', this.value)" style="flex:1;font-size:0.75rem;padding:6px;"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function updateStudioField(idx, field, value) {
+    studioConceptsCache[idx][field] = value;
+    renderStudioEditor();
+  }
+
+  async function toggleStudioBannerState() {
+    const isChecked = document.getElementById('studioBannerToggle').checked;
+    studioBannerActive = isChecked;
+    
+    document.getElementById('studioBannerStatusLabel').textContent = studioBannerActive ? 'Active (Popup is visible on main homepage)' : 'Inactive (Popup is hidden)';
+    document.getElementById('studioBannerStatusLabel').style.color = studioBannerActive ? 'var(--green)' : 'var(--muted)';
+  }
+
+  async function publishStudio() {
+    const token = localStorage.getItem('gh_admin_token');
+    if(!token) {
+      document.getElementById('ghSetupBlockStudio').style.display = 'block';
+      document.getElementById('ghSetupBlockStudio').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    
+    const btn = document.getElementById('btn-sync-studio');
+    btn.textContent = '⏳ Saving…'; btn.disabled = true;
+
+    try {
+      // 1. Sync Concepts JSON
+      const conceptContent = btoa(unescape(encodeURIComponent(JSON.stringify(studioConceptsCache, null, 2))));
+      let conceptSha = null;
+      const conceptCheck = await fetch(`https://api.github.com/repos/${REPO}/contents/studio-concepts.json`, { headers: { Authorization: 'Bearer ' + token } });
+      if(conceptCheck.ok) {
+        const j = await conceptCheck.json();
+        conceptSha = j.sha;
+      }
+      
+      const conceptBody = { message: 'admin: publish studio concepts', content: conceptContent, branch: BRANCH };
+      if(conceptSha) conceptBody.sha = conceptSha;
+      
+      await fetch(`https://api.github.com/repos/${REPO}/contents/studio-concepts.json`, {
+        method: 'PUT',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(conceptBody)
+      });
+
+      // 2. Sync Homepage Banner Visibility (via gallery.json updates)
+      let galleryData = { albums: [], showStudioBanner: false };
+      let gallerySha = null;
+      const galleryCheck = await fetch(`https://api.github.com/repos/${REPO}/contents/gallery.json`, { headers: { Authorization: 'Bearer ' + token } });
+      if(galleryCheck.ok) {
+        const j = await galleryCheck.json();
+        gallerySha = j.sha;
+        galleryData = JSON.parse(decodeURIComponent(escape(atob(j.content))));
+      }
+      
+      galleryData.showStudioBanner = studioBannerActive;
+      
+      const galleryContent = btoa(unescape(encodeURIComponent(JSON.stringify(galleryData, null, 2))));
+      const galleryBody = { message: 'admin: toggle studio banner', content: galleryContent, branch: BRANCH };
+      if(gallerySha) galleryBody.sha = gallerySha;
+      
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/gallery.json`, {
+        method: 'PUT',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(galleryBody)
+      });
+
+      if(res.ok) {
+        btn.textContent = '✅ Published! Live in ~30s';
+        showToast('☁️ Studio concepts and banner toggled live!');
+        setTimeout(() => { btn.textContent = '☁️ Publish Studio Concepts'; btn.disabled = false; }, 4000);
+      } else {
+        const err = await res.json();
+        throw new Error(err.message);
+      }
+    } catch(err) {
+      btn.textContent = '☁️ Publish Studio Concepts'; btn.disabled = false;
+      alert('Failed: ' + err.message);
+    }
+  }
 </script>
+
 </body>
 </html>
