@@ -326,13 +326,36 @@ async function loadCalendarBusy() {
     const savedBooked = JSON.parse(localStorage.getItem('bookedDates') || '[]');
     savedBooked.forEach(d => busyDates.add(d));
 
+    // Load database-driven booked dates from booked-dates.json
+    try {
+      const dbRes = await fetch('booked-dates.json?v=' + Date.now());
+      if (dbRes.ok) {
+        const dbDates = await dbRes.json();
+        if (Array.isArray(dbDates)) {
+          dbDates.forEach(d => busyDates.add(d));
+        }
+      }
+    } catch (e) {
+      console.warn('DB dates error:', e);
+    }
+
     gcalConnected = true;
-    showConnectedBanner('📅 Google Calendar synced — busy dates greyed out');
+    showConnectedBanner('📅 Booking Calendar synced — busy dates greyed out');
     renderCalendar();
   } catch (err) {
     console.warn('Calendar API error:', err.message);
+    // Try to load booked-dates.json even if GCAL fails
+    try {
+      const dbRes = await fetch('booked-dates.json?v=' + Date.now());
+      if (dbRes.ok) {
+        const dbDates = await dbRes.json();
+        if (Array.isArray(dbDates)) {
+          dbDates.forEach(d => busyDates.add(d));
+        }
+      }
+    } catch (e) {}
     gcalConnected = true;
-    renderCalendar(); // show all available
+    renderCalendar(); // show available
   }
 }
 

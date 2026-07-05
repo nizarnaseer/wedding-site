@@ -1037,8 +1037,38 @@
       background: rgba(255, 255, 255, 0.1);
       border-radius: 4px;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.2);
+    /* Calendar Grid cells styling */
+    .cal-grid-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all var(--transition);
+    }
+    .cal-grid-day:hover {
+      border-color: var(--border-focus);
+      background: rgba(255,255,255,0.05);
+    }
+    .cal-grid-day.blocked {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: var(--red);
+      color: var(--red);
+      font-weight: 600;
+    }
+    .cal-grid-day.empty {
+      background: transparent;
+      border: none;
+      cursor: default;
+      pointer-events: none;
+    }
+    .cal-grid-day.today {
+      border-color: var(--gold);
     }
   </style>
 </head>
@@ -1058,7 +1088,10 @@
         <span>📊</span> Overview
       </a>
       <a class="nav-item" id="nav-bookings" onclick="switchSection('bookings')">
-        <span>📅</span> Bookings & Enquiries
+        <span>📥</span> Bookings & Enquiries
+      </a>
+      <a class="nav-item" id="nav-calendar" onclick="switchSection('calendar')">
+        <span>📅</span> Calendar Manager
       </a>
       
       <div class="nav-header">Content & Pricing</div>
@@ -1396,6 +1429,49 @@
         </div>
       </section>
 
+      <!-- ══════════════════ SECTION: CALENDAR ══════════════════ -->
+      <section id="section-calendar" class="section-pane">
+        <div class="setup-block" id="ghSetupBlockCalendar" style="display:none;">
+          <h3>🔑 GitHub Authentication</h3>
+          <p style="font-size:0.78rem;color:var(--muted);margin-bottom:12px;">This is required once to commit edits back to your code repository and trigger automatic deployment updates to Vercel.</p>
+          <div class="setup-row">
+            <input type="password" class="ghTokenInput" placeholder="GitHub Personal Access Token (repo scope)" />
+            <button class="btn-sm btn-sm-gold" onclick="saveGhToken()">Save Token</button>
+          </div>
+          <p style="font-size:0.68rem;color:var(--muted);margin-top:8px;">Saved locally in your browser session only. Repository: nizarnaseer/wedding-site</p>
+        </div>
+
+        <div class="notice-bar">
+          Manage your availability database. Click dates on the calendar below to toggle their status between **Free (Available)** and **Blocked (Busy)**. Click <strong>Save & Publish Calendar</strong> to push changes live.
+        </div>
+
+        <div class="toolbar" style="margin-bottom:20px;">
+          <button class="btn-sm btn-sm-gold" id="btn-sync-calendar" onclick="publishCalendar()">☁️ Save & Publish Calendar</button>
+        </div>
+
+        <div class="card-box" style="max-width:440px;margin:0 auto 24px;">
+          <!-- Calendar Month Header -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <button class="btn-sm" onclick="adjustCalendarMonth(-1)">◀ Prev</button>
+            <h3 id="adminCalMonthLabel" style="font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;">Month Year</h3>
+            <button class="btn-sm" onclick="adjustCalendarMonth(1)">Next ▶</button>
+          </div>
+
+          <!-- Calendar Grid -->
+          <div style="display:grid;grid-template-columns:repeat(7, 1fr);gap:8px;text-align:center;font-weight:600;font-size:0.75rem;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">
+            <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+          </div>
+          <div id="adminCalGrid" style="display:grid;grid-template-columns:repeat(7, 1fr);gap:8px;"></div>
+        </div>
+
+        <div class="card-box" style="max-width:500px;margin:0 auto;">
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;margin-bottom:10px;">Blocked Dates List</h3>
+          <div id="adminBlockedDatesList" style="max-height:160px;overflow-y:auto;font-size:0.8rem;color:var(--muted);">
+            No dates currently blocked.
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
 </div>
@@ -1520,6 +1596,7 @@
       document.getElementById('ghSetupBlockPackages').style.display = 'none';
       document.getElementById('ghSetupBlockDiscounts').style.display = 'none';
       document.getElementById('ghSetupBlockStudio').style.display = 'none';
+      document.getElementById('ghSetupBlockCalendar').style.display = 'none';
     }
   });
 
@@ -1536,6 +1613,7 @@
     const titles = {
       overview: 'Overview & Stats',
       bookings: 'Client Enquiries & Approvals',
+      calendar: 'Calendar & Availability Manager',
       packages: 'Packages Pricing Editor',
       discounts: 'Package Discounts & Promo Codes',
       gallery: 'Portfolio Gallery Manager',
@@ -1566,6 +1644,8 @@
       loadGalleryData(forceRefresh);
     } else if (secId === 'reviews') {
       loadReviewsData();
+    } else if (secId === 'calendar') {
+      loadCalendarData();
     } else if (secId === 'studio') {
       loadStudioData(forceRefresh);
     } else if (secId === 'whatsapp') {
@@ -1853,6 +1933,12 @@
       const invoiceUrl = `${window.location.origin}/payment-demo.html?ref=${refId}&desc=Deposit%20for%20${encodeURIComponent(booking.package)}&amount=${priceVal}`;
       const waMsg = `Hi ${booking.name},\n\nGreat news! Your booking enquiry (${refId}) for *${booking.package}* has been approved by Nizar Naseer Studio.\n\nPlease click the secure link below to pay your deposit and confirm your slot:\n${invoiceUrl}\n\nThank you!`;
       
+      // Auto block dates
+      if(booking.date) {
+        addBookingDateToBlockedList(booking.date);
+        backgroundPublishCalendar();
+      }
+
       window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(waMsg)}`, '_blank');
       showToast('✅ Approved! WhatsApp invoice message ready.');
     } else if(status === 'declined') {
@@ -2862,6 +2948,211 @@
       }
     } catch(err) {
       btn.textContent = '☁️ Publish Studio Concepts'; btn.disabled = false;
+      alert('Failed: ' + err.message);
+    }
+  }
+
+  /* ─── CALENDAR MANAGER ─── */
+  let adminBlockedDates = [];
+  let adminCalMonth = new Date().getMonth();
+  let adminCalYear = new Date().getFullYear();
+
+  async function loadCalendarData(forceRefresh = false) {
+    const grid = document.getElementById('adminCalGrid');
+    grid.innerHTML = '<p style="color:var(--muted);font-size:0.8rem;grid-column:1/-1">Loading calendar…</p>';
+    
+    // Check Github Token
+    const savedGh = localStorage.getItem('gh_admin_token');
+    if (savedGh) {
+      document.getElementById('ghSetupBlockCalendar').style.display = 'none';
+    } else {
+      document.getElementById('ghSetupBlockCalendar').style.display = 'block';
+    }
+
+    try {
+      if (adminBlockedDates.length === 0 || forceRefresh) {
+        const res = await fetch('booked-dates.json?v=' + Date.now());
+        if (res.ok) {
+          adminBlockedDates = await res.json();
+        } else {
+          adminBlockedDates = [];
+        }
+      }
+      renderAdminCalendar();
+    } catch (err) {
+      adminBlockedDates = [];
+      renderAdminCalendar();
+    }
+  }
+
+  function renderAdminCalendar() {
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('adminCalMonthLabel').textContent = `${months[adminCalMonth]} ${adminCalYear}`;
+    
+    const grid = document.getElementById('adminCalGrid');
+    grid.innerHTML = '';
+    
+    const today = new Date();
+    const firstDay = new Date(adminCalYear, adminCalMonth, 1).getDay();
+    const daysInMo = new Date(adminCalYear, adminCalMonth + 1, 0).getDate();
+
+    // Empty cells before start day of month
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'cal-grid-day empty';
+      grid.appendChild(empty);
+    }
+
+    const pad = (n) => String(n).padStart(2, '0');
+    const toYMDStr = (y, m, d) => `${y}-${pad(m + 1)}-${pad(d)}`;
+
+    for (let d = 1; d <= daysInMo; d++) {
+      const cell = document.createElement('div');
+      const ymd = toYMDStr(adminCalYear, adminCalMonth, d);
+      const isBlocked = adminBlockedDates.includes(ymd);
+      const isToday = ymd === toYMDStr(today.getFullYear(), today.getMonth(), today.getDate());
+      
+      cell.className = 'cal-grid-day';
+      if (isBlocked) cell.classList.add('blocked');
+      if (isToday) cell.classList.add('today');
+      cell.textContent = d;
+      
+      cell.onclick = () => toggleAdminCalendarDate(ymd);
+      grid.appendChild(cell);
+    }
+
+    // Render text list of blocked dates
+    renderBlockedDatesList();
+  }
+
+  function renderBlockedDatesList() {
+    const container = document.getElementById('adminBlockedDatesList');
+    if (!adminBlockedDates.length) {
+      container.innerHTML = '<p style="color:var(--muted);font-size:0.75rem;padding:6px 0;">No dates blocked in calendar.</p>';
+      return;
+    }
+    
+    // Sort chronologically
+    const sorted = [...adminBlockedDates].sort();
+    
+    container.innerHTML = `
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+        ${sorted.map(d => `
+          <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(239, 68, 68, 0.08);border:1px solid rgba(239, 68, 68, 0.2);color:var(--red);padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:500;">
+            📅 ${d}
+            <button onclick="toggleAdminCalendarDate('${d}')" style="background:none;border:none;color:inherit;cursor:pointer;font-weight:700;font-size:0.75rem;">✕</button>
+          </span>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function toggleAdminCalendarDate(ymd) {
+    const idx = adminBlockedDates.indexOf(ymd);
+    if (idx >= 0) {
+      adminBlockedDates.splice(idx, 1);
+      showToast(`🔓 Date ${ymd} marked as FREE`);
+    } else {
+      adminBlockedDates.push(ymd);
+      showToast(`🔒 Date ${ymd} marked as BLOCKED`);
+    }
+    renderAdminCalendar();
+  }
+
+  function adjustCalendarMonth(delta) {
+    adminCalMonth += delta;
+    if (adminCalMonth < 0) {
+      adminCalMonth = 11;
+      adminCalYear -= 1;
+    } else if (adminCalMonth > 11) {
+      adminCalMonth = 0;
+      adminCalYear += 1;
+    }
+    renderAdminCalendar();
+  }
+
+  function addBookingDateToBlockedList(dateStr) {
+    if (!dateStr || dateStr === '—') return;
+    const parts = dateStr.split(/[,,&]/);
+    parts.forEach(part => {
+      const clean = part.trim();
+      if (!clean) return;
+      const parsed = Date.parse(clean);
+      if (!isNaN(parsed)) {
+        const d = new Date(parsed);
+        const ymd = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        if (!adminBlockedDates.includes(ymd)) {
+          adminBlockedDates.push(ymd);
+        }
+      }
+    });
+  }
+
+  async function backgroundPublishCalendar() {
+    const token = localStorage.getItem('gh_admin_token');
+    if (!token) return;
+    try {
+      const sortedDates = [...adminBlockedDates].sort();
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(sortedDates, null, 2))));
+      const FILE_PATH = 'booked-dates.json';
+      let sha = null;
+      const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, { headers: { Authorization: 'Bearer ' + token } });
+      if (check.ok) {
+        const j = await check.json();
+        sha = j.sha;
+      }
+      const body = { message: 'admin: auto-block date on booking approval', content, branch: BRANCH };
+      if (sha) body.sha = sha;
+      await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
+        method: 'PUT',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+    } catch (e) {}
+  }
+
+  async function publishCalendar() {
+    const token = localStorage.getItem('gh_admin_token');
+    if (!token) {
+      document.getElementById('ghSetupBlockCalendar').style.display = 'block';
+      document.getElementById('ghSetupBlockCalendar').scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    
+    const btn = document.getElementById('btn-sync-calendar');
+    btn.textContent = '⏳ Publishing…'; btn.disabled = true;
+
+    try {
+      const sortedDates = [...adminBlockedDates].sort();
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(sortedDates, null, 2))));
+      const FILE_PATH = 'booked-dates.json';
+      
+      let sha = null;
+      const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, { headers: { Authorization: 'Bearer ' + token } });
+      if (check.ok) {
+        const j = await check.json();
+        sha = j.sha;
+      }
+
+      const body = { message: 'admin: publish availability schedule updates', content, branch: BRANCH };
+      if (sha) body.sha = sha;
+
+      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
+        method: 'PUT',
+        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        btn.textContent = '✅ Published! Live in ~30s';
+        showToast('☁️ Calendar availability published live!');
+        setTimeout(() => { btn.textContent = '☁️ Save & Publish Calendar'; btn.disabled = false; }, 4000);
+      } else {
+        const err = await res.json();
+        throw new Error(err.message);
+      }
+    } catch (err) {
+      btn.textContent = '☁️ Save & Publish Calendar'; btn.disabled = false;
       alert('Failed: ' + err.message);
     }
   }
