@@ -3,8 +3,9 @@
     {
       "id": "zarif-weds-anis",
       "title": "Zarif Weds Anis",
-      "date": "14 December 2024 · Dewan Sri Penang",
+      "date": "14 December 2024",
       "category": "Wedding",
+      "venue": "Dewan Sri Penang",
       "layout": "span2",
       "coverGradient": "linear-gradient(135deg,#1a1208,#2a1e0a)",
       "teasers": [
@@ -33,8 +34,9 @@
     {
       "id": "farah-studio-portrait",
       "title": "Farah · Studio Portrait",
-      "date": "March 2025 · Kuala Lumpur",
+      "date": "March 2025",
       "category": "Portrait",
+      "venue": "Kuala Lumpur",
       "layout": "tall",
       "coverGradient": "linear-gradient(135deg,#1a1208,#2a1e0a)",
       "teasers": [
@@ -63,8 +65,9 @@
     {
       "id": "haziq-hana-nikah",
       "title": "Haziq & Hana · Nikah",
-      "date": "5 April 2025 · Masjid Wilayah, KL",
+      "date": "5 April 2025",
       "category": "Wedding",
+      "venue": "Masjid Wilayah, KL",
       "layout": "",
       "coverGradient": "linear-gradient(135deg,#1a1208,#2a1e0a)",
       "teasers": [
@@ -93,8 +96,9 @@
     {
       "id": "izzatul-azim-sanding",
       "title": "Izzatul & Azim · Sanding",
-      "date": "22 November 2024 · Nilai Springs",
+      "date": "22 November 2024",
       "category": "Wedding",
+      "venue": "Nilai Springs",
       "layout": "",
       "coverGradient": "linear-gradient(135deg,#1a1208,#2a1e0a)",
       "teasers": [

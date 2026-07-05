@@ -177,7 +177,7 @@ function buildGallery(filter = 'all') {
         <div class="gallery-placeholder">${album.title}</div>
         <div class="gallery-overlay">
           <div>
-            <span style="display:block;font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">${album.category}</span>
+            <span style="display:block;font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">${album.category}${album.venue ? ' · ' + album.venue : ''}</span>
             <span style="font-size:0.9rem;color:var(--text);font-family:'Cormorant Garamond',serif;">${album.title}</span>
           </div>
         </div>`;

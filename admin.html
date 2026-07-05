@@ -1424,6 +1424,11 @@
     </div>
 
     <div class="form-row" style="margin-top:12px;">
+      <label>Venue / Location (for Venue SEO, e.g. Glasshouse Seputeh)</label>
+      <input type="text" id="albumVenueInput" placeholder="e.g. Glasshouse Seputeh, KL" class="form-input"/>
+    </div>
+
+    <div class="form-row" style="margin-top:12px;">
       <label>Layout Style</label>
       <select id="albumLayoutInput" class="form-input">
         <option value="">Standard (Square grid)</option>
@@ -2318,7 +2323,7 @@
           </div>
           <div class="album-card-body">
             <div class="album-card-title">${a.title}</div>
-            <div class="album-card-meta">${a.date} · ${a.teasers?.length || 0} photos</div>
+            <div class="album-card-meta">${a.date} · ${a.teasers?.length || 0} photos${a.venue ? ' · ' + a.venue : ''}</div>
             <div class="album-card-actions">
               <button class="btn-sm btn-sm-gold" onclick="openEditAlbumModal(${i})">✏️ Edit</button>
               <button class="btn-sm btn-sm-green" onclick="deleteAlbum(${i})" style="background:rgba(239,68,68,0.1);color:var(--red);border-color:rgba(239,68,68,0.25);">🗑 Delete</button>
@@ -2337,6 +2342,7 @@
     document.getElementById('editingAlbumIndex').value = '';
     document.getElementById('albumModalTitle').textContent = 'Create New Portfolio Album';
     document.getElementById('albumTitleInput').value = '';
+    document.getElementById('albumVenueInput').value = '';
     document.getElementById('albumDateInput').value = '';
     document.getElementById('albumCategoryInput').value = 'Wedding';
     document.getElementById('albumLayoutInput').value = '';
@@ -2354,6 +2360,7 @@
     document.getElementById('editingAlbumIndex').value = idx;
     document.getElementById('albumModalTitle').textContent = 'Edit Album: ' + album.title;
     document.getElementById('albumTitleInput').value = album.title;
+    document.getElementById('albumVenueInput').value = album.venue || '';
     document.getElementById('albumDateInput').value = album.date;
     document.getElementById('albumCategoryInput').value = album.category;
     document.getElementById('albumLayoutInput').value = album.layout || '';
@@ -2498,6 +2505,7 @@
 
   function saveAlbumSettings() {
     const title = document.getElementById('albumTitleInput').value.trim();
+    const venue = document.getElementById('albumVenueInput').value.trim();
     const date = document.getElementById('albumDateInput').value.trim();
     const category = document.getElementById('albumCategoryInput').value;
     const layout = document.getElementById('albumLayoutInput').value;
@@ -2513,6 +2521,7 @@
       title,
       date,
       category,
+      venue,
       layout,
       coverGradient: 'linear-gradient(135deg,#1a1208,#2a1e0a)',
       teasers
