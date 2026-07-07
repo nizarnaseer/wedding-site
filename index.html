@@ -344,6 +344,28 @@
       <p class="section-label">Pricing</p>
       <h2 class="section-title">Packages <em>Photography</em></h2>
       <p class="section-desc">Select a package and pick an available date. Deposit RM 50 to confirm your slot.</p>
+      <div style="margin-top: 20px; display: flex; justify-content: center;">
+        <button onclick="openAiAdvisor()" style="
+          background: linear-gradient(135deg, #1a1208 0%, #2a1e0a 100%);
+          border: 1px solid var(--gold);
+          color: var(--gold);
+          font-family: 'Inter', sans-serif;
+          font-size: 0.8rem;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          padding: 10px 24px;
+          border-radius: 30px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          box-shadow: 0 4px 15px rgba(201, 169, 110, 0.15);
+        " onmouseover="this.style.background='var(--gold)';this.style.color='#000'"
+           onmouseout="this.style.background='linear-gradient(135deg, #1a1208 0%, #2a1e0a 100%)';this.style.color='var(--gold)'">
+          ✨ Ask AI Package Advisor
+        </button>
+      </div>
     </div>
 
     <div class="packages-grid">
@@ -963,6 +985,43 @@
       <div class="lightbox-cta">
         <p>Love this style? Book a similar session.</p>
         <a href="#packages" class="btn btn-solid" onclick="closeLightbox()">Book Now</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ AI ADVISOR MODAL ═══════════════════════════ -->
+  <div id="aiAdvisorOverlay" class="lightbox-overlay" onclick="if(event.target===this)closeAiAdvisor()" style="display:none; justify-content:center; align-items:center; z-index:2100;">
+    <div class="lightbox-box" style="max-width:520px; background:#0e0e0c; border:1px solid rgba(201,169,110,0.3); border-radius:20px; padding:32px; box-shadow:0 10px 40px rgba(0,0,0,0.8); overflow-y:auto; max-height:90vh; display:block;">
+      
+      <!-- Modal Header -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:16px; margin-bottom:24px;">
+        <div>
+          <span style="font-size:0.65rem; color:var(--gold); text-transform:uppercase; letter-spacing:3px; display:block; margin-bottom:4px;" id="aiHeaderEyebrow">Virtual Assistant</span>
+          <h3 style="font-family:'Cormorant Garamond',serif; font-size:1.6rem; color:#e8e4df; font-weight:300; margin:0;" id="aiHeaderTitle">✨ AI Package Advisor</h3>
+        </div>
+        <button onclick="closeAiAdvisor()" style="background:none; border:none; color:#e8e4df; font-size:1.2rem; cursor:pointer;">✕</button>
+      </div>
+
+      <!-- Step Progress Bar -->
+      <div id="aiProgressBarWrap" style="margin-bottom:24px; display:none;">
+        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--muted); margin-bottom:6px;">
+          <span id="aiStepIndicator">Step 1 of 3</span>
+          <span id="aiProgressText">Select your events</span>
+        </div>
+        <div style="width:100%; height:4px; background:rgba(255,255,255,0.05); border-radius:2px; overflow:hidden;">
+          <div id="aiProgressBar" style="width:33.33%; height:100%; background:var(--gold); transition:width 0.3s ease;"></div>
+        </div>
+      </div>
+
+      <!-- Content wrapper (dynamically populated by JS based on step and language) -->
+      <div id="aiAdvisorContent"></div>
+
+      <!-- Modal Footer Controls -->
+      <div id="aiFooterControls" style="display:none; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.08); padding-top:20px; margin-top:28px;">
+        <button class="btn" id="aiBtnPrev" onclick="prevAiStep()" style="background:transparent; border:1px solid rgba(255,255,255,0.1); color:var(--muted); padding:10px 20px;">Back</button>
+        <div style="flex-grow:1;"></div>
+        <button class="btn btn-solid" id="aiBtnNext" onclick="nextAiStep()" style="padding:10px 28px;">Continue</button>
       </div>
 
     </div>

@@ -1479,3 +1479,488 @@ function _applyTNSDiscount(discounts) {
     priceEl.closest('.pkg-price').insertAdjacentElement('afterend', saveBadge);
   }
 }
+
+/* ══════════════════════════════════════
+   AI PACKAGE ADVISOR (BILINGUAL LOCAL ENGINE)
+══════════════════════════════════════ */
+let aiCurrentStep = 0;
+let aiLang = 'en';
+let aiSelEvents = [];
+let aiSelService = 'photo';
+let aiSelBudget = 'standard';
+let packagesDataCache = { photography: [], videography: [] };
+
+// Fetch package configurations to match prices dynamically
+fetch('/packages.json?v=' + Date.now())
+  .then(r => r.json())
+  .then(data => { packagesDataCache = data; })
+  .catch(() => {});
+
+const AI_LANG = {
+  en: {
+    eyebrow: "Virtual Assistant",
+    title: "✨ AI Package Advisor",
+    step: "Step",
+    of: "of",
+    prevBtn: "Back",
+    nextBtn: "Continue",
+    finishBtn: "Close Advisor",
+    bookBtn: "📅 Confirm & Book This Package",
+    estimateTotal: "Estimated Total",
+    comboDiscount: "🎁 Combo Bundle Discount",
+    suggestionHeader: "Your Suggested Package",
+    suggestionSub: "Based on your choices, the AI advisor recommends:",
+    adviceTitle: "💡 Advisor Advice:",
+    alertNoSelect: "Please select at least one event to help us recommend.",
+    
+    // Step 1: Events
+    q1: "Which events are you planning for your wedding celebration? (Select all that apply)",
+    evtNikahTitle: "Nikah (Solemnization)",
+    evtNikahDesc: "The core marriage contract ceremony",
+    evtSandingTitle: "Sanding (Reception)",
+    evtSandingDesc: "The main feast & throne sitting ceremony",
+    evtTandangTitle: "Tandang (Bertandang)",
+    evtTandangDesc: "The reception hosting by the groom's side",
+    evtTunangTitle: "Bertunang (Engagement)",
+    evtTunangDesc: "The traditional engagement ring exchange",
+    evtPrewedTitle: "Pre-Wedding Shoot",
+    evtPrewedDesc: "Professional couple portrait session before the main day",
+    evtBirthdayTitle: "Birthday / Other Events",
+    evtBirthdayDesc: "Family reunions, birthday parties, cukur jambul, aqiqah",
+
+    // Step 2: Services
+    q2: "What services are you looking to book for these events?",
+    srvPhotoTitle: "Photography Only",
+    srvPhotoDesc: "Stills capture of all moments and outdoor sessions",
+    srvVideoTitle: "Videography Only",
+    srvVideoDesc: "Event highlight reels and full cinematic footage",
+    srvComboTitle: "Photo + Video Combo",
+    srvComboDesc: "Complete wedding documentation at a combined package discount",
+
+    // Step 3: Budget
+    q3: "What is your target budget for your wedding photography and videography?",
+    budgetValueTitle: "Budget / Value Focused",
+    budgetValueDesc: "Essential high-quality coverages (Under RM 1,200)",
+    budgetStandardTitle: "Standard / Balanced",
+    budgetStandardDesc: "Highly popular packages and combos (RM 1,200 - RM 2,500)",
+    budgetPremiumTitle: "Premium / Complete",
+    budgetPremiumDesc: "No compromises, full day coverage and drone options (RM 2,500+)"
+  },
+  ms: {
+    eyebrow: "Pembantu Maya",
+    title: "✨ Penasihat Pakej AI",
+    step: "Langkah",
+    of: "daripada",
+    prevBtn: "Kembali",
+    nextBtn: "Seterusnya",
+    finishBtn: "Tutup Penasihat",
+    bookBtn: "📅 Sahkan & Tempah Pakej Ini",
+    estimateTotal: "Anggaran Jumlah",
+    comboDiscount: "🎁 Diskaun Kombo Komplit",
+    suggestionHeader: "Cadangan Pakej Anda",
+    suggestionSub: "Berdasarkan pilihan anda, penasihat AI mencadangkan:",
+    adviceTitle: "💡 Nasihat Penasihat:",
+    alertNoSelect: "Sila pilih sekurang-kurangnya satu acara untuk membantu kami mencadangkan pakej.",
+    
+    // Step 1: Events
+    q1: "Apakah acara yang sedang anda rancang untuk majlis perkahwinan anda? (Pilih semua yang berkenaan)",
+    evtNikahTitle: "Nikah (Akad Nikah)",
+    evtNikahDesc: "Upacara akad nikah dan akad perkahwinan teras",
+    evtSandingTitle: "Sanding (Resepsi)",
+    evtSandingDesc: "Majlis bersanding dan kenduri perkahwinan utama",
+    evtTandangTitle: "Tandang (Bertandang)",
+    evtTandangDesc: "Majlis bertandang pihak lelaki",
+    evtTunangTitle: "Bertunang (Tunang)",
+    evtTunangDesc: "Majlis pertunangan dan pertukaran cincin",
+    evtPrewedTitle: "Sesi Pre-Wedding",
+    evtPrewedDesc: "Sesi fotografi potret pasangan sebelum hari perkahwinan",
+    evtBirthdayTitle: "Hari Lahir / Acara Lain",
+    evtBirthdayDesc: "Hari lahir, perjumpaan keluarga, cukur jambul, aqiqah",
+
+    // Step 2: Services
+    q2: "Apakah perkhidmatan yang ingin anda tempah untuk acara tersebut?",
+    srvPhotoTitle: "Fotografi Sahaja",
+    srvPhotoDesc: "Tangkapan foto untuk semua momen beserta sesi outdoor",
+    srvVideoTitle: "Videography Sahaja",
+    srvVideoDesc: "Montaj video highlights dan rakaman sinematik penuh",
+    srvComboTitle: "Kombo Foto + Video",
+    srvComboDesc: "Dokumentasi perkahwinan lengkap pada harga diskaun gabungan",
+
+    // Step 3: Budget
+    q3: "Apakah sasaran bajet anda untuk fotografi dan videografi perkahwinan anda?",
+    budgetValueTitle: "Fokus Bajet / Nilai",
+    budgetValueDesc: "Liputan berkualiti tinggi yang ringkas (Bawah RM 1,200)",
+    budgetStandardTitle: "Standard / Seimbang",
+    budgetStandardDesc: "Pakej dan kombo yang sangat popular (RM 1,200 - RM 2,500)",
+    budgetPremiumTitle: "Premium / Lengkap",
+    budgetPremiumDesc: "Tanpa kompromi, liputan penuh sepanjang hari & pilihan drone (RM 2,500+)"
+  }
+};
+
+function openAiAdvisor() {
+  aiCurrentStep = 0;
+  aiSelEvents = [];
+  aiSelService = 'photo';
+  aiSelBudget = 'standard';
+  
+  showAiStep(0);
+  document.getElementById('aiAdvisorOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAiAdvisor() {
+  document.getElementById('aiAdvisorOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function setAiLanguage(lang) {
+  aiLang = lang;
+  showAiStep(1);
+}
+
+function renderCheckbox(name, value, title, desc) {
+  return `
+    <label style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:10px; padding:12px 16px; cursor:pointer;" class="ai-opt-label">
+      <input type="checkbox" name="${name}" value="${value}" style="accent-color:var(--gold); width:18px; height:18px;"/>
+      <div>
+        <strong style="display:block; font-size:0.85rem; color:#e8e4df;">${title}</strong>
+        <span style="font-size:0.7rem; color:var(--muted);">${desc}</span>
+      </div>
+    </label>
+  `;
+}
+
+function renderRadio(name, value, title, desc, checked = false) {
+  return `
+    <label style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:10px; padding:12px 16px; cursor:pointer;" class="ai-opt-label">
+      <input type="radio" name="${name}" value="${value}" ${checked ? 'checked' : ''} style="accent-color:var(--gold); width:18px; height:18px;"/>
+      <div>
+        <strong style="display:block; font-size:0.85rem; color:#e8e4df;">${title}</strong>
+        <span style="font-size:0.7rem; color:var(--muted);">${desc}</span>
+      </div>
+    </label>
+  `;
+}
+
+function showAiStep(step) {
+  aiCurrentStep = step;
+  
+  const content = document.getElementById('aiAdvisorContent');
+  const progressBarWrap = document.getElementById('aiProgressBarWrap');
+  const progressBar = document.getElementById('aiProgressBar');
+  const stepIndicator = document.getElementById('aiStepIndicator');
+  const progressText = document.getElementById('aiProgressText');
+  const footerControls = document.getElementById('aiFooterControls');
+  const btnPrev = document.getElementById('aiBtnPrev');
+  const btnNext = document.getElementById('aiBtnNext');
+
+  // Step 0: Language Select Screen
+  if (step === 0) {
+    progressBarWrap.style.display = 'none';
+    footerControls.style.display = 'none';
+    
+    document.getElementById('aiHeaderTitle').textContent = "✨ AI Advisor";
+    
+    content.innerHTML = `
+      <p style="font-size:0.85rem; color:var(--text); line-height:1.6; text-align:center; margin-bottom:24px;">
+        Choose your preferred language / Pilih bahasa pilihan anda untuk memulakan penasihat pakej AI.
+      </p>
+      <div style="display:flex; flex-direction:column; gap:12px; max-width:280px; margin:0 auto;">
+        <button onclick="setAiLanguage('en')" style="background:linear-gradient(135deg,#1a1208 0%,#2a1e0a 100%); border:1px solid var(--gold); color:var(--gold); border-radius:12px; padding:14px; font-weight:600; font-size:0.9rem; cursor:pointer; font-family:'Inter',sans-serif;">🇬🇧 English</button>
+        <button onclick="setAiLanguage('ms')" style="background:linear-gradient(135deg,#1a1208 0%,#2a1e0a 100%); border:1px solid var(--gold); color:var(--gold); border-radius:12px; padding:14px; font-weight:600; font-size:0.9rem; cursor:pointer; font-family:'Inter',sans-serif;">🇲🇾 Bahasa Melayu</button>
+      </div>
+    `;
+    return;
+  }
+
+  progressBarWrap.style.display = 'block';
+  footerControls.style.display = 'flex';
+  progressBar.style.background = 'var(--gold)'; // Reset green progress bar color
+
+  const tx = AI_LANG[aiLang];
+  document.getElementById('aiHeaderEyebrow').textContent = tx.eyebrow;
+  document.getElementById('aiHeaderTitle').textContent = tx.title;
+  btnPrev.textContent = tx.prevBtn;
+  btnNext.textContent = step === 3 ? (aiLang === 'ms' ? 'Analisis Pakej' : 'Analyze & Recommend') : tx.nextBtn;
+  btnPrev.style.visibility = step === 1 ? 'hidden' : 'visible';
+
+  if (step === 1) {
+    progressBar.style.width = '33.33%';
+    stepIndicator.textContent = `${tx.step} 1 ${tx.of} 3`;
+    progressText.textContent = aiLang === 'ms' ? 'Pilih acara' : 'Select events';
+    
+    content.innerHTML = `
+      <p style="font-size:0.85rem; color:var(--text); line-height:1.6; margin-bottom:20px;">${tx.q1}</p>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        ${renderCheckbox('aiEvent', 'nikah', tx.evtNikahTitle, tx.evtNikahDesc)}
+        ${renderCheckbox('aiEvent', 'sanding', tx.evtSandingTitle, tx.evtSandingDesc)}
+        ${renderCheckbox('aiEvent', 'tandang', tx.evtTandangTitle, tx.evtTandangDesc)}
+        ${renderCheckbox('aiEvent', 'tunang', tx.evtTunangTitle, tx.evtTunangDesc)}
+        ${renderCheckbox('aiEvent', 'prewed', tx.evtPrewedTitle, tx.evtPrewedDesc)}
+        ${renderCheckbox('aiEvent', 'birthday', tx.evtBirthdayTitle, tx.evtBirthdayDesc)}
+      </div>
+    `;
+    // Restore checkbox selection
+    aiSelEvents.forEach(val => {
+      const input = content.querySelector(`input[value="${val}"]`);
+      if (input) input.checked = true;
+    });
+
+  } else if (step === 2) {
+    progressBar.style.width = '66.66%';
+    stepIndicator.textContent = `${tx.step} 2 ${tx.of} 3`;
+    progressText.textContent = aiLang === 'ms' ? 'Pilih perkhidmatan' : 'Select services';
+    
+    content.innerHTML = `
+      <p style="font-size:0.85rem; color:var(--text); line-height:1.6; margin-bottom:20px;">${tx.q2}</p>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        ${renderRadio('aiService', 'photo', tx.srvPhotoTitle, tx.srvPhotoDesc, aiSelService === 'photo')}
+        ${renderRadio('aiService', 'video', tx.srvVideoTitle, tx.srvVideoDesc, aiSelService === 'video')}
+        ${renderRadio('aiService', 'combo', tx.srvComboTitle, tx.srvComboDesc, aiSelService === 'combo')}
+      </div>
+    `;
+
+  } else if (step === 3) {
+    progressBar.style.width = '100%';
+    stepIndicator.textContent = `${tx.step} 3 ${tx.of} 3`;
+    progressText.textContent = aiLang === 'ms' ? 'Tentukan bajet' : 'Define budget';
+    
+    content.innerHTML = `
+      <p style="font-size:0.85rem; color:var(--text); line-height:1.6; margin-bottom:20px;">${tx.q3}</p>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        ${renderRadio('aiBudget', 'budget', tx.budgetValueTitle, tx.budgetValueDesc, aiSelBudget === 'budget')}
+        ${renderRadio('aiBudget', 'standard', tx.budgetStandardTitle, tx.budgetStandardDesc, aiSelBudget === 'standard')}
+        ${renderRadio('aiBudget', 'premium', tx.budgetPremiumTitle, tx.budgetPremiumDesc, aiSelBudget === 'premium')}
+      </div>
+    `;
+
+  } else if (step === 4) {
+    progressBar.style.width = '100%';
+    progressBar.style.background = '#4ade80'; // Green on success
+    stepIndicator.textContent = tx.suggestionHeader;
+    progressText.textContent = tx.suggestionSub;
+    btnNext.textContent = tx.finishBtn;
+    btnNext.onclick = () => closeAiAdvisor();
+  }
+}
+
+function nextAiStep() {
+  if (aiCurrentStep === 1) {
+    const checked = Array.from(document.querySelectorAll('input[name="aiEvent"]:checked')).map(c => c.value);
+    if (checked.length === 0) {
+      alert(AI_LANG[aiLang].alertNoSelect);
+      return;
+    }
+    aiSelEvents = checked;
+  } else if (aiCurrentStep === 2) {
+    aiSelService = document.querySelector('input[name="aiService"]:checked').value;
+  } else if (aiCurrentStep === 3) {
+    aiSelBudget = document.querySelector('input[name="aiBudget"]:checked').value;
+    calculateAiRecommendation();
+    return;
+  }
+  showAiStep(aiCurrentStep + 1);
+}
+
+function prevAiStep() {
+  showAiStep(aiCurrentStep - 1);
+}
+
+function calculateAiRecommendation() {
+  let photoRec = null;
+  let videoRec = null;
+  let advice = '';
+
+  const photos = packagesDataCache.photography || [];
+  const videos = packagesDataCache.videography || [];
+  const tx = AI_LANG[aiLang];
+
+  // 1. Photographic Matches
+  if (aiSelService === 'photo' || aiSelService === 'combo') {
+    // If Pre-wedding only
+    if (aiSelEvents.length === 1 && aiSelEvents.includes('prewed')) {
+      photoRec = photos.find(p => p.id === 'pkg4') || { name: 'Pre Wed Photography', price: 550, id: 'pkg4' };
+      advice = aiLang === 'ms' 
+        ? 'Sesi Pre-Wedding 2-jam kami adalah pilihan paling sesuai untuk sesi outdoor pasangan yang kasual.'
+        : 'Since you only need a couple session, our 2-hour Pre-Wedding option is ideal.';
+    }
+    // If Birthday / events only
+    else if (aiSelEvents.length === 1 && aiSelEvents.includes('birthday')) {
+      photoRec = {
+        id: 'pkg1',
+        name: aiLang === 'ms' ? 'Pakej Single Event (Aqiqah/Birthday)' : 'Single Event Package (Aqiqah/Birthday)',
+        price: 900,
+        features: ['Unlimited pictures, fully edited', 'Free outdoor session', 'Cover 3-4 hours']
+      };
+      advice = aiLang === 'ms'
+        ? 'Untuk perjumpaan keluarga, hari lahir atau cukur jambul, variasi Single Event kami memberikan liputan 3-4 jam yang komplit.'
+        : 'For family events, birthdays or cukur jambul, our Single Event variant provides a complete 3-4 hours of coverage.';
+    }
+    // If only one wedding event (Nikah, Sanding or Tunang)
+    else if (aiSelEvents.length === 1) {
+      const ev = aiSelEvents[0];
+      const tnsNames = { nikah: 'Nikah', sanding: 'Sanding', tunang: 'Tunang' };
+      const eventName = tnsNames[ev] || 'Nikah';
+      const variantPrice = ev === 'nikah' ? 700 : 900;
+      photoRec = {
+        id: 'pkg1',
+        name: `Single Event — ${eventName}`,
+        price: variantPrice,
+        features: ['Unlimited pictures, fully edited', 'Free outdoor session', 'Cover 3-4 hours']
+      };
+      advice = aiLang === 'ms'
+        ? `Bagi satu acara sahaja (${eventName}), memilih variasi ini di dalam Pakej Single adalah penyelesaian paling jimat.`
+        : `For a single event (${eventName}), booking this variant on the Single Package is the most cost-effective solution.`;
+    }
+    // If Nikah + Sanding (2 events)
+    else if (aiSelEvents.length === 2 && aiSelEvents.includes('nikah') && aiSelEvents.includes('sanding')) {
+      photoRec = photos.find(p => p.id === 'pkg2') || { name: 'Nikah & Sanding Photography', price: 1450, id: 'pkg2' };
+      advice = aiLang === 'ms'
+        ? 'Oleh kerana anda mengadakan majlis Akad Nikah & Resepsi Bersanding, pakej kombo khas ini akan menjimatkan sehingga RM 150 berbanding tempahan secara berasingan.'
+        : 'Since you are hosting both Nikah and Sanding, booking the combined Nikah & Sanding photography package saves you RM 150 compared to booking them separately.';
+    }
+    // If 3 events (Tunang, Nikah, Sanding)
+    else if (aiSelEvents.length === 3 && aiSelEvents.includes('nikah') && aiSelEvents.includes('sanding') && aiSelEvents.includes('tunang')) {
+      photoRec = photos.find(p => p.id === 'pkg5') || { name: 'Tunang + Nikah + Sanding Combo', price: 2000, id: 'pkg5' };
+      advice = aiLang === 'ms'
+        ? 'Bagi liputan lengkap 3 acara perkahwinan (Tunang, Nikah & Sanding), pakej ini menawarkan penjimatan maksimum sebanyak RM 500 dengan liputan hari penuh.'
+        : 'For all 3 events, the Tunang + Nikah + Sanding package offers maximum value, saving you RM 500 in total with full day coverages.';
+    }
+    // Default fallback (multiple arbitrary events)
+    else {
+      photoRec = photos.find(p => p.id === 'pkg3') || { name: 'TRIO E (3 Events)', price: 2400, id: 'pkg3' };
+      advice = aiLang === 'ms'
+        ? 'Pakej TRIO E kami merangkumi sehingga tiga tarikh acara yang berbeza mengikut perancangan fleksibel anda.'
+        : 'Our TRIO E multi-event package covers up to three arbitrary wedding sessions on separate dates.';
+    }
+  }
+
+  // 2. Videographic Matches
+  if (aiSelService === 'video' || aiSelService === 'combo') {
+    // If 1 event (Nikah focus)
+    if (aiSelEvents.includes('nikah') && aiSelEvents.length === 1) {
+      videoRec = videos.find(v => v.id === 'vid1') || { name: 'Nikah Video', price: 950, id: 'vid1' };
+    }
+    // If 2 events (Nikah + Sanding)
+    else if (aiSelEvents.includes('nikah') && aiSelEvents.includes('sanding') && aiSelEvents.length <= 2) {
+      videoRec = videos.find(v => v.id === 'vid2') || { name: 'Nikah + Sanding Video', price: 1500, id: 'vid2' };
+    }
+    // If 3 events
+    else {
+      videoRec = videos.find(v => v.id === 'vid3') || { name: 'Full Package Video (3 Events)', price: 2200, id: 'vid3' };
+    }
+  }
+
+  // Render Results HTML
+  const content = document.getElementById('aiAdvisorContent');
+  let resultHtml = `
+    <div style="text-align:center; padding:10px 0 20px;">
+      <span style="font-size:2.5rem; display:block; margin-bottom:10px;">✨</span>
+      <h4 style="font-family:'Cormorant Garamond',serif; font-size:1.4rem; color:var(--gold); font-weight:300; margin:0 0 6px;">${tx.suggestionHeader}</h4>
+      <p style="font-size:0.75rem; color:var(--muted); margin:0;">${tx.suggestionSub}</p>
+    </div>
+    <div style="background:rgba(201,169,110,0.05); border:1px solid rgba(201,169,110,0.25); border-radius:15px; padding:20px; margin-bottom:24px;">
+  `;
+  
+  let totalPrice = 0;
+
+  if (photoRec) {
+    resultHtml += `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:${videoRec ? '1px solid rgba(255,255,255,0.06)' : 'none'}; padding-bottom:${videoRec ? '12px' : '0'}; margin-bottom:${videoRec ? '12px' : '0'};">
+        <div>
+          <span style="font-size:0.6rem; color:var(--gold); text-transform:uppercase; letter-spacing:1px; display:block;">📸 ${aiLang === 'ms' ? 'Cadangan Fotografi' : 'Photography Suggested'}</span>
+          <strong style="font-size:0.9rem; color:#e8e4df; font-family:'Inter',sans-serif;">${photoRec.name}</strong>
+        </div>
+        <strong style="color:var(--gold); font-size:1.1rem;">RM ${photoRec.price}</strong>
+      </div>
+    `;
+    totalPrice += photoRec.price;
+  }
+
+  if (videoRec) {
+    resultHtml += `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="font-size:0.6rem; color:var(--gold); text-transform:uppercase; letter-spacing:1px; display:block;">🎬 ${aiLang === 'ms' ? 'Cadangan Videografi' : 'Videography Suggested'}</span>
+          <strong style="font-size:0.9rem; color:#e8e4df; font-family:'Inter',sans-serif;">${videoRec.name}</strong>
+        </div>
+        <strong style="color:var(--gold); font-size:1.1rem;">RM ${videoRec.price}</strong>
+      </div>
+    `;
+    totalPrice += videoRec.price;
+  }
+
+  // Combo discount check
+  if (aiSelService === 'combo' && photoRec && videoRec) {
+    const comboDiscount = 150; // Special bundle discount
+    totalPrice -= comboDiscount;
+    resultHtml += `
+      <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed rgba(201,169,110,0.3); padding-top:12px; margin-top:12px;">
+        <span style="font-size:0.75rem; color:#4ade80;">${tx.comboDiscount}</span>
+        <strong style="color:#4ade80; font-size:0.85rem;">- RM ${comboDiscount}</strong>
+      </div>
+    `;
+  }
+
+  resultHtml += `
+    <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.1); padding-top:16px; margin-top:16px;">
+      <strong style="font-size:0.85rem; color:#e8e4df; letter-spacing:1px; text-transform:uppercase;">${tx.estimateTotal}</strong>
+      <strong style="color:var(--gold); font-size:1.4rem; font-family:'Cormorant Garamond',serif;">RM ${totalPrice}</strong>
+    </div>
+  </div>
+  `;
+
+  // Action Button to Pre-book
+  const packageToBook = photoRec ? photoRec.id : (videoRec ? videoRec.id : '');
+  resultHtml += `
+    <div style="margin-bottom:24px;">
+      <button onclick="aiAdvisorBook('${packageToBook}', ${totalPrice})" style="width:100%; background:var(--gold); border:none; color:#000; font-weight:700; font-family:'Inter',sans-serif; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; padding:14px 0; border-radius:10px; cursor:pointer;">
+        ${tx.bookBtn}
+      </button>
+    </div>
+  `;
+
+  // Advice text box
+  resultHtml += `
+    <div style="font-size:0.78rem; color:var(--muted); line-height:1.6; background:rgba(255,255,255,0.02); padding:14px; border-radius:10px;">
+      <strong style="color:#e8e4df; display:block; margin-bottom:4px;">${tx.adviceTitle}</strong>
+      ${advice} ${aiLang === 'ms' 
+        ? 'Semua fail foto/video akan dihantar dalam format digital resolusi tinggi, diedit secara profesional dan sedia untuk dicetak atau dikongsi di media sosial.' 
+        : 'All capture deliverables will be sent in high-resolution digital format, with professional colors and details optimized for printing and online sharing.'}
+    </div>
+  `;
+
+  content.innerHTML = resultHtml;
+  showAiStep(4);
+}
+
+function aiAdvisorBook(pkgId, price) {
+  closeAiAdvisor();
+  
+  if (pkgId === 'pkg1') {
+    // If it's single event (Nikah, Sanding or Tunang)
+    // We pre-select variant in single event card and open modal
+    const ev = aiSelEvents[0] || 'nikah';
+    const select = document.getElementById('tnsSelect');
+    if (select) {
+      const val = ev === 'nikah' ? 'Nikah|700' : (ev === 'tunang' ? 'Tunang|600' : 'Sanding|900');
+      select.value = val;
+      updateTNS();
+    }
+    openBookingModal('Single Event Photography', ev === 'nikah' ? 'RM 700' : 'RM 900');
+  } else if (pkgId) {
+    // Open targeted package modal directly
+    const photos = packagesDataCache.photography || [];
+    const videos = packagesDataCache.videography || [];
+    const pkg = photos.find(p => p.id === pkgId) || videos.find(v => v.id === pkgId);
+    
+    if (pkg) {
+      openBookingModal(pkg.name || pkg.variants?.[0]?.name, 'RM ' + (pkg.price || pkg.variants?.[0]?.price));
+    } else {
+      document.getElementById('packages').scrollIntoView({ behavior: 'smooth' });
+    }
+  } else {
+    document.getElementById('packages').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
