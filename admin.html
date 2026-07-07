@@ -1292,9 +1292,17 @@
         <div class="grid-2">
           <!-- Left: Package discounts -->
           <div class="card-box">
-            <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:16px;color:var(--gold)">Package Discounts</h3>
             <div id="packageDiscountsContainer">
               <p style="color:var(--muted);font-size:0.8rem;">Loading packages…</p>
+            </div>
+            
+            <div style="border-top: 1px solid var(--border); margin-top: 24px; padding-top: 20px;">
+              <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;margin-bottom:12px;color:var(--gold)">✨ AI Package Advisor Combo Discount</h3>
+              <p style="font-size:0.75rem;color:var(--muted);line-height:1.4;margin-bottom:14px;">Set the discount amount applied when a client selects a photo + video combo in the AI Package Advisor.</p>
+              <div class="field-group" style="display:flex; align-items:center; gap:12px;">
+                <label style="margin:0; font-size:0.8rem; color:var(--muted); flex-shrink:0;">Combo Discount (RM)</label>
+                <input type="number" id="inputComboDiscount" style="width:100px; padding:6px 10px;" onchange="setComboDiscountVal(this.value)"/>
+              </div>
             </div>
           </div>
 
@@ -2240,6 +2248,11 @@
 
     container.innerHTML = html;
     
+    const comboInput = document.getElementById('inputComboDiscount');
+    if(comboInput) {
+      comboInput.value = discountsEditCache.combo_bundle_discount !== undefined ? discountsEditCache.combo_bundle_discount : 150;
+    }
+    
     // Render Promo Codes
     renderPromoCodesList();
   }
@@ -2258,6 +2271,10 @@
     
     discountsEditCache.pkg_discounts[name].v = parseFloat(val) || 0;
     renderDiscountsEditor();
+  }
+
+  function setComboDiscountVal(val) {
+    discountsEditCache.combo_bundle_discount = parseInt(val) || 0;
   }
 
   function renderPromoCodesList() {
@@ -2347,6 +2364,7 @@
         // Save in localStorage too to keep in sync immediately
         localStorage.setItem('pkg_discounts', JSON.stringify(discountsEditCache.pkg_discounts || {}));
         localStorage.setItem('promo_codes', JSON.stringify(discountsEditCache.promo_codes || {}));
+        localStorage.setItem('combo_bundle_discount', String(discountsEditCache.combo_bundle_discount !== undefined ? discountsEditCache.combo_bundle_discount : 150));
         
         setTimeout(() => { btn.textContent = '☁️ Save & Sync Discounts'; btn.disabled = false; }, 4000);
       } else {

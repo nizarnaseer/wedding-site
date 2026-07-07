@@ -1359,6 +1359,7 @@ function applyDiscountsToPkgCards() {
       const promos    = data.promo_codes   || {};
       localStorage.setItem('pkg_discounts', JSON.stringify(discounts));
       localStorage.setItem('promo_codes',   JSON.stringify(promos));
+      localStorage.setItem('combo_bundle_discount', String(data.combo_bundle_discount !== undefined ? data.combo_bundle_discount : 150));
       _renderDiscountCards(discounts);
     })
     .catch(() => {
@@ -1892,7 +1893,7 @@ function calculateAiRecommendation() {
 
   // Combo discount check
   if (aiSelService === 'combo' && photoRec && videoRec) {
-    const comboDiscount = 150; // Special bundle discount
+    const comboDiscount = parseInt(localStorage.getItem('combo_bundle_discount') || '150'); // Special bundle discount
     totalPrice -= comboDiscount;
     resultHtml += `
       <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed rgba(201,169,110,0.3); padding-top:12px; margin-top:12px;">
