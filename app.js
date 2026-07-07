@@ -1604,12 +1604,12 @@ function openAiAdvisor() {
   aiSelBudget = 'standard';
   
   showAiStep(0);
-  document.getElementById('aiAdvisorOverlay').style.display = 'flex';
+  document.getElementById('aiAdvisorOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function closeAiAdvisor() {
-  document.getElementById('aiAdvisorOverlay').style.display = 'none';
+  document.getElementById('aiAdvisorOverlay').classList.remove('open');
   document.body.style.overflow = '';
 }
 
