@@ -1992,6 +1992,7 @@ function calculateAiRecommendation() {
 
   content.innerHTML = resultHtml;
   showAiStep(8);
+  submitAiLeadToWeb3Forms(pkgNameCombined, totalPrice);
 }
 
 function aiAdvisorBook(pkgId, price) {
@@ -2089,5 +2090,42 @@ Would love to discuss further and secure my date slot! Thank you!`;
 
   const encoded = encodeURIComponent(msg);
   window.open(`https://wa.me/${targetPhone}?text=${encoded}`, '_blank');
+}
+
+async function submitAiLeadToWeb3Forms(pkgName, price) {
+  const key = (window.STUDIO_CONFIG || {}).web3forms_key || '6be870cf-b9ec-42bd-a26f-8d5f09067bf3';
+  if (!key) return;
+
+  const eventList = aiSelEvents.map(e => e.toUpperCase()).join(', ');
+
+  const formData = {
+    access_key: key,
+    subject: `✨ [AI Lead] ${aiName} — RM ${price}`,
+    from_name: 'WeddingClicks AI Advisor',
+    name: aiName,
+    phone: aiPhone,
+    date: aiDate,
+    venue: aiVenue,
+    events: eventList,
+    service: aiSelService.toUpperCase(),
+    budget_tier: aiSelBudget.toUpperCase(),
+    recommended_package: pkgName,
+    estimated_price: 'RM ' + price,
+    language_selected: aiLang.toUpperCase()
+  };
+
+  try {
+    await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    });
+    console.log('AI Lead submitted successfully to Web3Forms.');
+  } catch (err) {
+    console.error('Failed to submit AI Lead to Web3Forms:', err);
+  }
 }
 
