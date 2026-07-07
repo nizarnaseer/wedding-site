@@ -1995,8 +1995,228 @@ function calculateAiRecommendation() {
   submitAiLeadToWeb3Forms(pkgNameCombined, totalPrice);
 }
 
+let aiConverted = false;
+let aiExitSurveyShown = false;
+
+function closeAiAdvisor() {
+  // If they are on Step 0 (language select), already converted, or survey was shown: close directly
+  if (aiCurrentStep === 0 || aiConverted || aiExitSurveyShown) {
+    closeAiAdvisorDirectly();
+    return;
+  }
+  
+  // Show exit survey
+  aiExitSurveyShown = true;
+  triggerExitSurvey();
+}
+
+function closeAiAdvisorDirectly() {
+  document.getElementById('aiAdvisorOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function triggerExitSurvey() {
+  const content = document.getElementById('aiAdvisorContent');
+  const progressBarWrap = document.getElementById('aiProgressBarWrap');
+  const footerControls = document.getElementById('aiFooterControls');
+  
+  progressBarWrap.style.display = 'none';
+  footerControls.style.display = 'none';
+  
+  document.getElementById('aiHeaderTitle').textContent = aiLang === 'ms' ? 'Maklum Balas / Feedback' : 'Feedback Survey';
+
+  if (aiLang === 'ms') {
+    content.innerHTML = `
+      <p style="font-size:0.85rem; color:var(--text); line-height:1.6; text-align:center; margin-bottom:20px;">
+        Sebelum anda pergi, boleh kami tahu mengapa anda menutup penasihat pakej ini?
+      </p>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+        <button onclick="submitExitFeedback(1)" onmouseover="this.style.background='rgba(201,169,110,0.1)';this.style.borderColor='var(--gold)';" onmouseout="this.style.background='rgba(255,255,255,0.02)';this.style.borderColor='rgba(255,255,255,0.08)';" style="text-align:left; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); padding:12px 16px; border-radius:10px; color:#e8e4df; cursor:pointer; font-size:0.8rem; font-family:'Inter',sans-serif; transition:all 0.2s ease;">💰 Harga terlalu tinggi untuk bajet saya</button>
+        <button onclick="submitExitFeedback(2)" onmouseover="this.style.background='rgba(201,169,110,0.1)';this.style.borderColor='var(--gold)';" onmouseout="this.style.background='rgba(255,255,255,0.02)';this.style.borderColor='rgba(255,255,255,0.08)';" style="text-align:left; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); padding:12px 16px; border-radius:10px; color:#e8e4df; cursor:pointer; font-size:0.8rem; font-family:'Inter',sans-serif; transition:all 0.2s ease;">📅 Tarikh majlis belum tetap / muktamad</button>
+        <button onclick="submitExitFeedback(3)" onmouseover="this.style.background='rgba(201,169,110,0.1)';this.style.borderColor='var(--gold)';" onmouseout="this.style.background='rgba(255,255,255,0.02)';this.style.borderColor='rgba(255,255,255,0.08)';" style="text-align:left; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); padding:12px 16px; border-radius:10px; color:#e8e4df; cursor:pointer; font-size:0.8rem; font-family:'Inter',sans-serif; transition:all 0.2s ease;">❌ Tiada pakej yang sesuai dengan kehendak saya</button>
+        <button onclick="submitExitFeedback(4)" onmouseover="this.style.background='rgba(201,169,110,0.1)';this.style.borderColor='var(--gold)';" onmouseout="this.style.background='rgba(255,255,255,0.02)';this.style.borderColor='rgba(255,255,255,0.08)';" style="text-align:left; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); padding:12px 16px; border-radius:10px; color:#e8e4df; cursor:pointer; font-size:0.8rem; font-family:'Inter',sans-serif; transition:all 0.2s ease;">🔍 Saja tengok-tengok / Survey sahaja</button>
+      </div>
+      <div style="text-align:center;">
+        <button onclick="closeAiAdvisorDirectly()" style="background:transparent; border:none; color:var(--muted); font-size:0.75rem; text-decoration:underline; cursor:pointer; font-family:'Inter',sans-serif;">Tutup Sahaja</button>
+      </div>
+    `;
+  } else {
+    content.innerHTML = `
+      <p style="font-size:0.85rem; color:var(--text); line-height:1.6; text-align:center; margin-bottom:20px;">
+        Before you go, could you let us know why you are closing the package advisor?
+      </p>
+      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+        <button onclick="submitExitFeedback(1)" onmouseover="this.style.background='rgba(201,169,110,0.1)';this.style.borderColor='var(--gold)';" onmouseout="this.style.background='rgba(255,255,255,0.02)';this.style.borderColor='rgba(255,255,255,0.08)';" style="text-align:left; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); padding:12px 16px; border-radius:10px; color:#e8e4df; cursor:pointer; font-size:0.8rem; font-family:'Inter',sans-serif; transition:all 0.2s ease;">💰 Prices are above my target budget</button>
+        <button onclick="submitExitFeedback(2)" onmouseover="this.style.background='rgba(201,169,110,0.1)';this.style.borderColor='var(--gold)';" onmouseout="this.style.background='rgba(255,255,255,0.02)';this.style.borderColor='rgba(255,255,255,0.08)';" style="text-align:left; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); padding:12px 16px; border-radius:10px; color:#e8e4df; cursor:pointer; font-size:0.8rem; font-family:'Inter',sans-serif; transition:all 0.2s ease;">📅 My wedding date is not finalized yet</button>
+        <button onclick="submitExitFeedback(3)" onmouseover="this.style.background='rgba(201,169,110,0.1)';this.style.borderColor='var(--gold)';" onmouseout="this.style.background='rgba(255,255,255,0.02)';this.style.borderColor='rgba(255,255,255,0.08)';" style="text-align:left; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); padding:12px 16px; border-radius:10px; color:#e8e4df; cursor:pointer; font-size:0.8rem; font-family:'Inter',sans-serif; transition:all 0.2s ease;">❌ I couldn't find the package details I needed</button>
+        <button onclick="submitExitFeedback(4)" onmouseover="this.style.background='rgba(201,169,110,0.1)';this.style.borderColor='var(--gold)';" onmouseout="this.style.background='rgba(255,255,255,0.02)';this.style.borderColor='rgba(255,255,255,0.08)';" style="text-align:left; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); padding:12px 16px; border-radius:10px; color:#e8e4df; cursor:pointer; font-size:0.8rem; font-family:'Inter',sans-serif; transition:all 0.2s ease;">🔍 Just browsing / Surveying</button>
+      </div>
+      <div style="text-align:center;">
+        <button onclick="closeAiAdvisorDirectly()" style="background:transparent; border:none; color:var(--muted); font-size:0.75rem; text-decoration:underline; cursor:pointer; font-family:'Inter',sans-serif;">Just Close</button>
+      </div>
+    `;
+  }
+}
+
+function submitExitFeedback(option) {
+  const reasonsEn = {
+    1: "Prices are above target budget",
+    2: "Wedding date is not finalized yet",
+    3: "Couldn't find the package details needed",
+    4: "Just browsing / surveying"
+  };
+  const reasonsMs = {
+    1: "Harga terlalu tinggi untuk bajet saya",
+    2: "Tarikh majlis belum tetap / muktamad",
+    3: "Tiada pakej yang sesuai dengan kehendak saya",
+    4: "Saja tengok-tengok / Survey sahaja"
+  };
+  
+  const chosenReason = aiLang === 'ms' ? reasonsMs[option] : reasonsEn[option];
+  sendExitFeedbackToWeb3Forms(chosenReason);
+
+  const content = document.getElementById('aiAdvisorContent');
+  let replyHtml = '';
+
+  if (option === 1) {
+    replyHtml = aiLang === 'ms' 
+      ? `
+        <div style="text-align:center; padding:10px 0;">
+          <span style="font-size:2rem; display:block; margin-bottom:12px;">💡</span>
+          <strong style="color:var(--gold); display:block; margin-bottom:8px; font-size:1.1rem; font-family:'Inter',sans-serif;">Hubungi Kami untuk Bajet Khas!</strong>
+          <p style="font-size:0.8rem; color:var(--text); line-height:1.6; margin-bottom:20px; font-family:'Inter',sans-serif;">
+            Kami faham setiap perkahwinan mempunyai bajet yang berbeza. Kami boleh reka (customize) pakej khas mengikut kemampuan anda!
+          </p>
+          <button onclick="window.open('https://wa.me/601187381984?text=Hai Nizar! Saya berminat untuk dapatkan sebut harga custom mengikut bajet saya.', '_blank')" style="background:#25d366; border:none; color:#fff; font-weight:700; font-family:'Inter',sans-serif; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; padding:12px 20px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+            💬 Runding di WhatsApp
+          </button>
+        </div>
+      `
+      : `
+        <div style="text-align:center; padding:10px 0;">
+          <span style="font-size:2rem; display:block; margin-bottom:12px;">💡</span>
+          <strong style="color:var(--gold); display:block; margin-bottom:8px; font-size:1.1rem; font-family:'Inter',sans-serif;">Custom Budget Pricing!</strong>
+          <p style="font-size:0.8rem; color:var(--text); line-height:1.6; margin-bottom:20px; font-family:'Inter',sans-serif;">
+            We understand budgets differ! Feel free to chat with us. We can build a bespoke custom package matching your exact limit.
+          </p>
+          <button onclick="window.open('https://wa.me/601187381984?text=Hi Nizar! I would love to request a custom photography package based on my budget.', '_blank')" style="background:#25d366; border:none; color:#fff; font-weight:700; font-family:'Inter',sans-serif; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; padding:12px 20px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+            💬 Custom Quote via WhatsApp
+          </button>
+        </div>
+      `;
+  } else if (option === 2) {
+    replyHtml = aiLang === 'ms'
+      ? `
+        <div style="text-align:center; padding:10px 0;">
+          <span style="font-size:2rem; display:block; margin-bottom:12px;">📅</span>
+          <strong style="color:var(--gold); display:block; margin-bottom:8px; font-size:1.1rem; font-family:'Inter',sans-serif;">Kami Sentiasa Bersedia!</strong>
+          <p style="font-size:0.8rem; color:var(--text); line-height:1.6; margin-bottom:20px; font-family:'Inter',sans-serif;">
+            Tiada masalah! Anda boleh tanda (bookmark) halaman ini dan kembali apabila tarikh perkahwinan anda telah ditetapkan.
+          </p>
+        </div>
+      `
+      : `
+        <div style="text-align:center; padding:10px 0;">
+          <span style="font-size:2rem; display:block; margin-bottom:12px;">📅</span>
+          <strong style="color:var(--gold); display:block; margin-bottom:8px; font-size:1.1rem; font-family:'Inter',sans-serif;">We Will Be Ready!</strong>
+          <p style="font-size:0.8rem; color:var(--text); line-height:1.6; margin-bottom:20px; font-family:'Inter',sans-serif;">
+            No worries at all! Bookmark this website and come back when you have finalized your event date. We look forward to capturing your wedding!
+          </p>
+        </div>
+      `;
+  } else if (option === 3) {
+    replyHtml = aiLang === 'ms'
+      ? `
+        <div style="text-align:center; padding:10px 0;">
+          <span style="font-size:2rem; display:block; margin-bottom:12px;">🛠️</span>
+          <strong style="color:var(--gold); display:block; margin-bottom:8px; font-size:1.1rem; font-family:'Inter',sans-serif;">Dapatkan Pakej Custom!</strong>
+          <p style="font-size:0.8rem; color:var(--text); line-height:1.6; margin-bottom:20px; font-family:'Inter',sans-serif;">
+            Kami menawarkan khidmat custom sepenuhnya. Hubungi kami di WhatsApp dan nyatakan senarai acara anda untuk kami sediakan sebut harga khas!
+          </p>
+          <button onclick="window.open('https://wa.me/601187381984?text=Hai Nizar! Saya berminat untuk dapatkan sebut harga custom mengikut senarai acara saya.', '_blank')" style="background:#25d366; border:none; color:#fff; font-weight:700; font-family:'Inter',sans-serif; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; padding:12px 20px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+            💬 WhatsApp Pakej Custom
+          </button>
+        </div>
+      `
+      : `
+        <div style="text-align:center; padding:10px 0;">
+          <span style="font-size:2rem; display:block; margin-bottom:12px;">🛠️</span>
+          <strong style="color:var(--gold); display:block; margin-bottom:8px; font-size:1.1rem; font-family:'Inter',sans-serif;">Let's Build a Custom Package!</strong>
+          <p style="font-size:0.8rem; color:var(--text); line-height:1.6; margin-bottom:20px; font-family:'Inter',sans-serif;">
+            We offer fully custom event photography/videography lists. Message us on WhatsApp with your exact requirements for a direct quote.
+          </p>
+          <button onclick="window.open('https://wa.me/601187381984?text=Hi Nizar! I would love to discuss custom event requirements for my wedding.', '_blank')" style="background:#25d366; border:none; color:#fff; font-weight:700; font-family:'Inter',sans-serif; font-size:0.8rem; text-transform:uppercase; letter-spacing:1px; padding:12px 20px; border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+            💬 WhatsApp Custom Requirements
+          </button>
+        </div>
+      `;
+  } else {
+    replyHtml = aiLang === 'ms'
+      ? `
+        <div style="text-align:center; padding:10px 0;">
+          <span style="font-size:2rem; display:block; margin-bottom:12px;">🌸</span>
+          <strong style="color:var(--gold); display:block; margin-bottom:8px; font-size:1.1rem; font-family:'Inter',sans-serif;">Terima Kasih Melawat Kami!</strong>
+          <p style="font-size:0.8rem; color:var(--text); line-height:1.6; margin-bottom:20px; font-family:'Inter',sans-serif;">
+            Selamat melayari galeri portfolio kami. Jangan ragu-ragu untuk menghubungi kami jika ada sebarang pertanyaan!
+          </p>
+        </div>
+      `
+      : `
+        <div style="text-align:center; padding:10px 0;">
+          <span style="font-size:2rem; display:block; margin-bottom:12px;">🌸</span>
+          <strong style="color:var(--gold); display:block; margin-bottom:8px; font-size:1.1rem; font-family:'Inter',sans-serif;">Thank You for Visiting!</strong>
+          <p style="font-size:0.8rem; color:var(--text); line-height:1.6; margin-bottom:20px; font-family:'Inter',sans-serif;">
+            Enjoy browsing through our wedding and event photography galleries! Let us know if you need any help.
+          </p>
+        </div>
+      `;
+  }
+
+  replyHtml += `
+    <div style="margin-top:28px; border-top:1px solid rgba(255,255,255,0.08); padding-top:20px; text-align:center;">
+      <button onclick="closeAiAdvisorDirectly()" class="btn btn-solid" style="padding:10px 28px; font-family:'Inter',sans-serif;">
+        ${aiLang === 'ms' ? 'Tutup Penasihat' : 'Close Advisor'}
+      </button>
+    </div>
+  `;
+
+  content.innerHTML = replyHtml;
+}
+
+async function sendExitFeedbackToWeb3Forms(reason) {
+  const key = (window.STUDIO_CONFIG || {}).web3forms_key || '6be870cf-b9ec-42bd-a26f-8d5f09067bf3';
+  if (!key) return;
+
+  const formData = {
+    access_key: key,
+    subject: `⚠️ [AI Feedback] Exit Intent Survey`,
+    from_name: 'WeddingClicks AI Advisor',
+    client_name: aiName || 'Anonymous / Just Browsing',
+    client_phone: aiPhone || 'Not Provided',
+    client_date: aiDate || 'Not Provided',
+    client_venue: aiVenue || 'Not Provided',
+    exit_reason: reason,
+    language_selected: aiLang.toUpperCase()
+  };
+
+  try {
+    await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    });
+    console.log('Exit feedback submitted to Web3Forms.');
+  } catch (err) {
+    console.error('Failed to submit exit feedback:', err);
+  }
+}
+
 function aiAdvisorBook(pkgId, price) {
-  closeAiAdvisor();
+  aiConverted = true;
+  closeAiAdvisorDirectly();
   
   let pkgName = '';
   if (pkgId === 'pkg1') {
@@ -2020,36 +2240,31 @@ function aiAdvisorBook(pkgId, price) {
 
   if(!pkgName) pkgName = 'Custom AI Package';
 
-  // 1. Open booking modal
   openBookingModal(pkgName, 'RM ' + price);
   
-  // 2. Select Date (bypass resets)
   if (aiDate) {
     selectedDates = [aiDate];
     selectedDate = aiDate;
   }
 
-  // 3. Populate form fields
   const nameParts = aiName.trim().split(/\s+/);
   document.getElementById('bFirstName').value = nameParts[0] || '';
   document.getElementById('bLastName').value = nameParts.slice(1).join(' ') || '';
   document.getElementById('bPhone').value = aiPhone || '';
   document.getElementById('bLocation').value = aiVenue || '';
   
-  // Trigger distance lookups
   onLocationInput();
 
-  // Populate Notes
   const eventList = aiSelEvents.map(e => e.toUpperCase()).join(', ');
   document.getElementById('bNotes').value = aiLang === 'ms' 
     ? `[Penasihat AI - Butiran Klien]\nAcara: ${eventList}\nTarikh Pilihan: ${aiDate}\nLokasi: ${aiVenue}\nBajet Pilihan: ${aiSelBudget.toUpperCase()}`
     : `[AI Advisor Lead Detail]\nEvents: ${eventList}\nPreferred Date: ${aiDate}\nVenue/Location: ${aiVenue}\nBudget Tier: ${aiSelBudget.toUpperCase()}`;
 
-  // Advance user straight to summary step (Step 2) in calendar booking wizard
   goToStep2(false);
 }
 
 function sendAiWhatsApp(pkgName, price) {
+  aiConverted = true;
   const targetPhone = '601187381984'; // WeddingClicks official WhatsApp number
   const eventList = aiSelEvents.map(e => e.toUpperCase()).join(', ');
   
