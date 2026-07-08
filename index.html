@@ -85,7 +85,10 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  </noscript>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -373,7 +376,8 @@
       <!-- CARD 1 — Tunang / Nikah / Sanding (dropdown) -->
       <div class="package-card" id="pkg1">
         <div class="pkg-badge">Tunang / Nikah / Sanding</div>
-        <select id="tnsSelect" onchange="updateTNS()" style="
+        <label for="tnsSelect" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">Select Event Variant</label>
+        <select id="tnsSelect" aria-label="Select Event Variant" onchange="updateTNS()" style="
           width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(201,169,110,0.3);
           border-radius:10px; color:#e8e4df; font-family:'Inter',sans-serif;
           font-size:0.82rem; padding:10px 12px; margin-bottom:18px; cursor:pointer; outline:none;
@@ -827,36 +831,36 @@
           <!-- Groom & Bride Names -->
           <div class="form-row">
             <div class="form-group">
-              <label>🤵 Groom's Name</label>
+              <label for="bGroomName">🤵 Groom's Name</label>
               <input type="text" id="bGroomName" placeholder="e.g. Ahmad Razali" />
             </div>
             <div class="form-group">
-              <label>👰 Bride's Name</label>
+              <label for="bBrideName">👰 Bride's Name</label>
               <input type="text" id="bBrideName" placeholder="e.g. Siti Nurhaliza" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>First Name <span style="color:var(--muted);font-size:0.8rem">(Contact Person)</span></label>
+              <label for="bFirstName">First Name <span style="color:var(--muted);font-size:0.8rem">(Contact Person)</span></label>
               <input type="text" id="bFirstName" placeholder="Ahmad" required />
             </div>
             <div class="form-group">
-              <label>Last Name</label>
+              <label for="bLastName">Last Name</label>
               <input type="text" id="bLastName" placeholder="Razali" required />
             </div>
           </div>
           <div class="form-group">
-            <label>Email Address</label>
+            <label for="bEmail">Email Address</label>
             <input type="email" id="bEmail" placeholder="you@example.com" required />
           </div>
           <div class="form-group">
-            <label>Phone / WhatsApp Number *</label>
+            <label for="bPhone">Phone / WhatsApp Number *</label>
             <input type="tel" id="bPhone" placeholder="e.g. 01118736810" required />
           </div>
-
+ 
           <!-- Location + Travel Fee -->
           <div class="form-group">
-            <label>Event Location *</label>
+            <label for="bLocation">Event Location *</label>
             <div style="position:relative;">
               <input type="text" id="bLocation" placeholder="e.g. Masjid Wilayah, Kuala Lumpur" oninput="onLocationInput()" autocomplete="off" required />
               <div id="locationSuggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1a1a1a;border:1px solid rgba(255,255,255,0.1);border-radius:8px;z-index:99;max-height:180px;overflow-y:auto;"></div>
@@ -866,10 +870,10 @@
             </div>
             <div id="travelFeeBox" style="display:none;margin-top:8px;padding:10px 12px;border-radius:8px;font-size:0.8rem;"></div>
           </div>
-
+ 
           <!-- Tentative Schedule -->
           <div class="form-group">
-            <label>Tentative Schedule &amp; Notes <span style="color:var(--muted);font-weight:300;">(required)</span></label>
+            <label for="bNotes">Tentative Schedule &amp; Notes <span style="color:var(--muted);font-weight:300;">(required)</span></label>
             <textarea id="bNotes" rows="4" placeholder="Please include your event timeline, e.g.&#10;• Nikah: 10:00am — Masjid Al-Hidayah&#10;• Sanding: 2:00pm — Dewan Utama&#10;• Any special requests or notes…" required></textarea>
           </div>
 
@@ -1028,8 +1032,8 @@
   </div>
 
   <!-- Scripts -->
-  <script src="config.js"></script>
-  <script src="app.js?v=12"></script>
+  <script src="config.js" defer></script>
+  <script src="app.js?v=12" defer></script>
   <script>
   /* ── DYNAMIC REVIEWS LOADER ── */
   const STARTER_REVIEWS = [

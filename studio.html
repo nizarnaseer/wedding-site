@@ -210,13 +210,13 @@
       </div>
 
       <div class="form-grid">
-        <div class="form-group"><label>First Name *</label><input type="text" id="sFirst" placeholder="Ahmad" required/></div>
-        <div class="form-group"><label>Last Name *</label><input type="text" id="sLast" placeholder="Abdullah" required/></div>
-        <div class="form-group"><label>WhatsApp Number *</label><input type="tel" id="sPhone" placeholder="011-2345678" required/></div>
-        <div class="form-group"><label>Email *</label><input type="email" id="sEmail" placeholder="email@example.com" required/></div>
+        <div class="form-group"><label for="sFirst">First Name *</label><input type="text" id="sFirst" placeholder="Ahmad" required/></div>
+        <div class="form-group"><label for="sLast">Last Name *</label><input type="text" id="sLast" placeholder="Abdullah" required/></div>
+        <div class="form-group"><label for="sPhone">WhatsApp Number *</label><input type="tel" id="sPhone" placeholder="011-2345678" required/></div>
+        <div class="form-group"><label for="sEmail">Email *</label><input type="email" id="sEmail" placeholder="email@example.com" required/></div>
         <div class="form-group">
-          <label>Session Date *</label>
-          <select id="sDate" required onchange="refreshTimeSlots()">
+          <label for="sDate">Session Date *</label>
+          <select id="sDate" aria-label="Session Date" required onchange="refreshTimeSlots()">
             <option value="">— Select date —</option>
           </select>
         </div>
@@ -227,13 +227,13 @@
           <input type="hidden" id="sTime" />
         </div>
         <div class="form-group">
-          <label>Number of Pax *</label>
-          <select id="sPax" required>
+          <label for="sPax">Number of Pax *</label>
+          <select id="sPax" aria-label="Number of Pax" required>
             <option value="">— Select —</option>
             <option>1–2 pax</option><option>3–5 pax</option><option>6–10 pax</option><option>10+ pax</option>
           </select>
         </div>
-        <div class="form-group full"><label>Special Requests / Notes</label>
+        <div class="form-group full"><label for="sNotes">Special Requests / Notes</label>
           <textarea id="sNotes" placeholder="e.g. We have a baby, need prayer mat, colour theme preference…"></textarea>
         </div>
       </div>

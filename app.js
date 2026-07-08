@@ -140,10 +140,33 @@ function addReveal(el) { el.classList.add('reveal'); revealObserver.observe(el);
 
 
 /* ─── GALLERY BUILD ─── */
+const lazyBgObserver = new IntersectionObserver((entries, observer) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const src = el.dataset.src;
+      const fallback = el.dataset.fallback;
+      const g = el.dataset.g;
+      setElBgDirect(el, src, fallback, g);
+      observer.unobserve(el);
+    }
+  });
+}, { rootMargin: '0px 0px 300px 0px' });
+
 /* Set background with auto-fallback: tries local path → Unsplash → gradient */
 function setElBg(el, localSrc, fallbackSrc, gradient) {
   const darkColor = gradient.match(/#[0-9a-f]+/i)?.[0] || '#111';
   el.style.backgroundColor = darkColor;
+  el.style.background = gradient;
+  
+  el.dataset.src = localSrc || '';
+  el.dataset.fallback = fallbackSrc || '';
+  el.dataset.g = gradient || '';
+  
+  lazyBgObserver.observe(el);
+}
+
+function setElBgDirect(el, localSrc, fallbackSrc, gradient) {
   el.style.backgroundSize  = 'cover';
   el.style.backgroundPosition = 'center';
   const tryLoad = (src, onFail) => {
@@ -785,12 +808,12 @@ function goToStep2(enquiry = false) {
           ${sessions > 1 ? `<p style="font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">${sessionLabel}</p>` : ''}
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
             <div class="form-group">
-              <label>Function / Event</label>
-              <select id="evtFunc_${i}_${s}" required style="${selectStyle}">${funcOptions}</select>
+              <label for="evtFunc_${i}_${s}">Function / Event</label>
+              <select id="evtFunc_${i}_${s}" aria-label="Function or Event type" required style="${selectStyle}">${funcOptions}</select>
             </div>
             <div class="form-group">
-              <label>Start Time</label>
-              <select id="evtTime_${i}_${s}" required style="${selectStyle}">${timeOptions}</select>
+              <label for="evtTime_${i}_${s}">Start Time</label>
+              <select id="evtTime_${i}_${s}" aria-label="Function start time" required style="${selectStyle}">${timeOptions}</select>
             </div>
           </div>
         </div>`;
