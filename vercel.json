@@ -21,11 +21,15 @@
       ]
     },
     {
+      "source": "/",
+      "headers": [{"key": "Cache-Control", "value": "no-store, no-cache, must-revalidate"}]
+    },
+    {
       "source": "/(.*\\.html)",
       "headers": [{"key": "Cache-Control", "value": "no-store, no-cache, must-revalidate"}]
     },
     {
-      "source": "/app.js",
+      "source": "/(app.js|app.min.js)",
       "headers": [{"key": "Cache-Control", "value": "no-store, no-cache, must-revalidate"}]
     },
     {
