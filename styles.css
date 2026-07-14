@@ -588,6 +588,7 @@ ul { list-style: none; }
 .lightbox-img-wrap { flex: 1; position: relative; border-radius: 8px; overflow: hidden; }
 .lightbox-img {
   width: 100%;
+  height: 60vh;
   max-height: 65vh;
   background-size: contain;
   background-position: center;
@@ -596,7 +597,7 @@ ul { list-style: none; }
   border-radius: 8px;
   transition: background-image 0.3s ease;
   aspect-ratio: unset;
-  min-height: 220px;
+  min-height: 250px;
 }
 .lightbox-img-counter {
   position: absolute; bottom: 12px; right: 14px;
