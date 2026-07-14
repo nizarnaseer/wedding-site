@@ -2656,10 +2656,10 @@
 
   async function publishGallery() {
     const btn = document.getElementById('btn-save-gallery');
-    btn.textContent = '⏳ Deploying…'; btn.disabled = true;
+    btn.textContent = '⏳ Saving…'; btn.disabled = true;
 
     try {
-      const res = await fetch('/api/update-gallery', {
+      const res = await fetch('/api/gallery', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ albums: galleryAlbumsCache })
@@ -2667,15 +2667,15 @@
       
       const data = await res.json();
       if(data.ok) {
-        btn.textContent = '✅ Live in ~30s';
-        showToast('☁️ Gallery committed and deployed live!');
+        btn.textContent = '✅ Saved Live!';
+        showToast('☁️ Gallery saved live to database!');
         setTimeout(() => { btn.textContent = '☁️ Save & Deploy Gallery'; btn.disabled = false; }, 8000);
       } else {
         throw new Error(data.error || 'Server error');
       }
     } catch(err) {
       btn.textContent = '☁️ Save & Deploy Gallery'; btn.disabled = false;
-      alert('Deployment failed: ' + err.message + '\n\nEnsure GITHUB_TOKEN and GITHUB_REPO env variables are set on Vercel.');
+      alert('Saving failed: ' + err.message);
     }
   }
 
