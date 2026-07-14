@@ -190,21 +190,63 @@ function setElBgDirect(el, localSrc, fallbackSrc, gradient) {
 function buildGallery(filter = 'all') {
   const grid = document.getElementById('galleryGrid');
   grid.innerHTML = '';
+  
+  if (window.galleryIntervals) {
+    window.galleryIntervals.forEach(clearInterval);
+  }
+  window.galleryIntervals = [];
+
   ALBUMS
     .filter(a => filter === 'all' || a.category.toLowerCase() === filter)
     .forEach(album => {
-      const cover   = album.teasers[0];
+      const teasers = album.teasers || [];
       const div     = document.createElement('div');
       div.className = `gallery-item${album.layout ? ' ' + album.layout : ''}`;
+      
       div.innerHTML = `
-        <div class="gallery-placeholder">${album.title}</div>
-        <div class="gallery-overlay">
+        <div class="gallery-bg-layer layer-1" style="position:absolute;inset:0;background-size:cover;background-position:center;opacity:1;z-index:1;"></div>
+        <div class="gallery-bg-layer layer-2" style="position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;z-index:1;transition:opacity 1.2s ease-in-out;"></div>
+        <div class="gallery-placeholder" style="position:relative;z-index:2;">${album.title}</div>
+        <div class="gallery-overlay" style="z-index:3;">
           <div>
             <span style="display:block;font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">${album.category}${album.venue ? ' · ' + album.venue : ''}</span>
             <span style="font-size:0.9rem;color:var(--text);font-family:'Cormorant Garamond',serif;">${album.title}</span>
           </div>
         </div>`;
-      setElBg(div, cover.src, cover.fallback, cover.g);
+      
+      const layers = [div.querySelector('.layer-1'), div.querySelector('.layer-2')];
+      let currentTeaserIdx = 0;
+      let activeLayerIdx = 0;
+
+      if (teasers.length > 0) {
+        setElBgDirect(layers[0], teasers[0].src, teasers[0].fallback, teasers[0].g);
+      }
+
+      if (teasers.length > 1) {
+        const intervalId = setInterval(() => {
+          const nextTeaserIdx = (currentTeaserIdx + 1) % teasers.length;
+          const nextTeaser = teasers[nextTeaserIdx];
+          
+          const nextActiveLayerIdx = 1 - activeLayerIdx;
+          const nextActiveLayer = layers[nextActiveLayerIdx];
+          const prevActiveLayer = layers[activeLayerIdx];
+          
+          // Pre-load on the hidden layer
+          setElBgDirect(nextActiveLayer, nextTeaser.src, nextTeaser.fallback, nextTeaser.g);
+          
+          // Trigger crossfade transition
+          nextActiveLayer.style.transition = 'opacity 1.2s ease-in-out';
+          nextActiveLayer.style.opacity = 1;
+          prevActiveLayer.style.transition = 'opacity 1.2s ease-in-out';
+          prevActiveLayer.style.opacity = 0;
+          
+          activeLayerIdx = nextActiveLayerIdx;
+          currentTeaserIdx = nextTeaserIdx;
+        }, 3000 + Math.random() * 800);
+        
+        window.galleryIntervals.push(intervalId);
+      }
+
       div.style.cursor = 'pointer';
       div.addEventListener('click', () => openLightbox(album.id));
       addReveal(div);

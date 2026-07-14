@@ -1111,12 +1111,14 @@ ul { list-style: none; }
 }
 .gallery-item:hover::after { opacity: 1; }
 .gallery-item img,
-.gallery-item video {
-  transition: transform 0.55s cubic-bezier(0.22,1,0.36,1);
+.gallery-item video,
+.gallery-bg-layer {
+  transition: transform 0.85s cubic-bezier(0.22,1,0.36,1);
 }
 .gallery-item:hover img,
-.gallery-item:hover video {
-  transform: scale(1.07);
+.gallery-item:hover video,
+.gallery-item:hover .gallery-bg-layer {
+  transform: scale(1.06);
 }
 
 /* ── NAV SHADOW on scroll ── */
