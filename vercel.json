@@ -17,7 +17,7 @@
         {"key": "Referrer-Policy", "value": "strict-origin-when-cross-origin"},
         {"key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()"},
         {"key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload"},
-        {"key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.behold.so https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://*.behold.so https://weddingclicks.us https://res.cloudinary.com; connect-src 'self' https://api.web3forms.com https://www.googleapis.com https://*.behold.so https://api.cloudinary.com; media-src 'self' https://cdn.pixabay.com; frame-src 'self'; object-src 'none';"}
+        {"key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.behold.so https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://*.behold.so https://behold.pictures https://*.cdninstagram.com https://weddingclicks.us https://res.cloudinary.com; connect-src 'self' https://api.web3forms.com https://www.googleapis.com https://*.behold.so https://api.cloudinary.com; media-src 'self' https://cdn.pixabay.com https://archive.org https://*.archive.org; frame-src 'self'; object-src 'none';"}
       ]
     },
     {

@@ -1113,7 +1113,7 @@
 
       <div class="nav-header">System</div>
       <a class="nav-item" id="nav-whatsapp" onclick="switchSection('whatsapp')">
-        <span>💬</span> Notification Settings
+        <span>⚙️</span> System Settings
       </a>
     </nav>
 
@@ -1134,22 +1134,7 @@
 
     <div class="app-content">
       
-      <!-- ══════════════════ SECTION: OVERVIEW ══════════════════ -->
       <section id="section-overview" class="section-pane active">
-        <!-- Setup Notice -->
-        <div class="setup-block" id="netlifySetupBlock" style="display:none;">
-          <h3>⚙️ Netlify API Setup</h3>
-          <p style="font-size:0.8rem;color:var(--muted);margin-bottom:16px;">This is required once to fetch your incoming client enquiries from Netlify Forms. Stored locally in your browser.</p>
-          <div class="field-group">
-            <label>Netlify Site ID</label>
-            <input type="text" id="siteIdInput" placeholder="e.g. abcd1234-ab12-cd34-ef56-abcdef123456"/>
-          </div>
-          <div class="field-group" style="margin-top:10px;">
-            <label>Netlify Personal Access Token</label>
-            <input type="password" id="tokenInput" placeholder="Your Netlify personal access token"/>
-          </div>
-          <button class="btn-sm btn-sm-gold" onclick="saveNetlifySetup()" style="margin-top:12px;width:100%;justify-content:center">💾 Save & Load Bookings</button>
-        </div>
 
         <div class="overview-stats" id="statsGrid">
           <div class="stat-card">
@@ -1242,7 +1227,7 @@
       <!-- ══════════════════ SECTION: PACKAGES ══════════════════ -->
       <section id="section-packages" class="section-pane">
         <!-- Git setup notice -->
-        <div class="setup-block" id="ghSetupBlockPackages">
+        <div class="setup-block" id="ghSetupBlockPackages" style="display:none !important;">
           <h3>🔑 GitHub Authentication</h3>
           <p style="font-size:0.78rem;color:var(--muted);margin-bottom:12px;">This is required once to commit edits back to your code repository and trigger automatic deployment updates to Vercel.</p>
           <div class="setup-row">
@@ -1273,7 +1258,7 @@
 
       <!-- ══════════════════ SECTION: DISCOUNTS ══════════════════ -->
       <section id="section-discounts" class="section-pane">
-        <div class="setup-block" id="ghSetupBlockDiscounts" style="display:none;">
+        <div class="setup-block" id="ghSetupBlockDiscounts" style="display:none !important;">
           <h3>🔑 GitHub Authentication</h3>
           <div class="setup-row">
             <input type="password" class="ghTokenInput" placeholder="GitHub Personal Access Token (repo scope)" />
@@ -1376,7 +1361,7 @@
 
       <!-- ══════════════════ SECTION: STUDIO ══════════════════ -->
       <section id="section-studio" class="section-pane">
-        <div class="setup-block" id="ghSetupBlockStudio" style="display:none;">
+        <div class="setup-block" id="ghSetupBlockStudio" style="display:none !important;">
           <h3>🔑 GitHub Authentication</h3>
           <div class="setup-row">
             <input type="password" class="ghTokenInput" placeholder="GitHub Personal Access Token (repo scope)" />
@@ -1407,13 +1392,30 @@
         <div class="editor-grid" id="studioConceptsEditorGrid"></div>
       </section>
 
-      <!-- ══════════════════ SECTION: WHATSAPP ══════════════════ -->
+      <!-- ══════════════════ SECTION: SYSTEM SETTINGS ══════════════════ -->
       <section id="section-whatsapp" class="section-pane">
         <div class="notice-bar">
-          Configure contact email credentials and WhatsApp templates. Netlify forms trigger notifications using Web3Forms.
+          Configure system APIs, Web3Forms email notifications, and view communication settings. Stored locally in your browser session.
         </div>
 
         <div class="grid-2">
+          <!-- Netlify API Setup -->
+          <div class="card-box">
+            <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:12px;color:var(--gold)">Netlify API Setup</h3>
+            <p style="font-size:0.8rem;color:var(--muted);line-height:1.5;margin-bottom:16px;">
+              This is required once to fetch your incoming client enquiries from Netlify Forms. Stored locally in your browser.
+            </p>
+            <div class="field-group">
+              <label>Netlify Site ID</label>
+              <input type="text" id="siteIdInput" placeholder="e.g. abcd1234-ab12-cd34-ef56-abcdef123456"/>
+            </div>
+            <div class="field-group" style="margin-top:10px;">
+              <label>Netlify Personal Access Token</label>
+              <input type="password" id="tokenInput" placeholder="Your Netlify personal access token"/>
+            </div>
+            <button class="btn-sm btn-sm-gold" onclick="saveNetlifySetup()" style="margin-top:14px;width:100%;justify-content:center">💾 Save Netlify Settings</button>
+          </div>
+
           <!-- Web3Forms API Key -->
           <div class="card-box">
             <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:12px;color:var(--gold)">Email Notifications Setup</h3>
@@ -1439,7 +1441,7 @@
 
       <!-- ══════════════════ SECTION: CALENDAR ══════════════════ -->
       <section id="section-calendar" class="section-pane">
-        <div class="setup-block" id="ghSetupBlockCalendar" style="display:none;">
+        <div class="setup-block" id="ghSetupBlockCalendar" style="display:none !important;">
           <h3>🔑 GitHub Authentication</h3>
           <p style="font-size:0.78rem;color:var(--muted);margin-bottom:12px;">This is required once to commit edits back to your code repository and trigger automatic deployment updates to Vercel.</p>
           <div class="setup-row">
@@ -1626,7 +1628,7 @@
       discounts: 'Package Discounts & Promo Codes',
       gallery: 'Portfolio Gallery Manager',
       reviews: 'Client Testimonials',
-      whatsapp: 'Notification Alerts Setup',
+      whatsapp: 'System Settings & API Setup',
       studio: 'Raya Studio Concept Editor'
     };
     document.getElementById('screenTitle').textContent = titles[secId] || 'Admin Hub';
@@ -1698,13 +1700,19 @@
     showToast('🔑 GitHub Token saved successfully!');
   }
 
-  /* ─── DATA LOADER: OVERVIEW ─── */
   async function loadOverviewData() {
     const siteId = localStorage.getItem('netlify_site_id');
     const token = localStorage.getItem('netlify_token');
     
     if(!siteId || !token) {
-      document.getElementById('netlifySetupBlock').style.display = 'block';
+      setOverviewStats(0, 0, 0, 0);
+      document.getElementById('recentSubmissionsList').innerHTML = 
+        '<div style="text-align:center;padding:30px 20px;border:1px dashed rgba(201,169,110,0.2);border-radius:12px;margin-top:20px;">' +
+        '<span style="font-size:1.8rem;display:block;margin-bottom:10px;">⚙️</span>' +
+        '<h4 style="color:var(--gold);margin-bottom:8px;font-family:\'Cormorant Garamond\',serif;font-size:1.1rem;">API Integration Setup Required</h4>' +
+        '<p style="color:var(--muted);font-size:0.78rem;line-height:1.5;max-width:320px;margin:0 auto 16px;">Please configure your Netlify Site ID & Access Token under System Settings to sync and view live customer booking enquiries.</p>' +
+        '<button class="btn-sm btn-sm-gold" onclick="switchSection(\'whatsapp\')" style="margin:0 auto;font-size:0.75rem;padding:6px 14px;">Setup Connection →</button>' +
+        '</div>';
       return;
     }
     
@@ -1765,7 +1773,9 @@
         }).join('');
       }
     } catch(err) {
-      document.getElementById('netlifySetupBlock').style.display = 'block';
+      console.error(err);
+      setOverviewStats(0, 0, 0, 0);
+      document.getElementById('recentSubmissionsList').innerHTML = '<p style="color:var(--red);font-size:0.8rem;">Failed to fetch enquiries from Netlify API.</p>';
     }
   }
 
@@ -1781,7 +1791,7 @@
     const siteId = localStorage.getItem('netlify_site_id');
     const token = localStorage.getItem('netlify_token');
     if(!siteId || !token) {
-      document.getElementById('bookingsSplitList').innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px;">Setup Netlify credentials in Overview first.</div>';
+      document.getElementById('bookingsSplitList').innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px;">Setup Netlify credentials in System Settings first.</div>';
       return;
     }
     
@@ -1990,8 +2000,24 @@
 
     try {
       if(!packagesEditCache || forceRefresh) {
-        const res = await fetch('packages.json?v=' + Date.now());
-        packagesEditCache = await res.json();
+        let loaded = false;
+        try {
+          const res = await fetch('/api/settings?key=site_packages');
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              packagesEditCache = data;
+              loaded = true;
+            }
+          }
+        } catch(e) {
+          console.warn("Packages API failed", e);
+        }
+
+        if (!loaded) {
+          const res = await fetch('packages.json?v=' + Date.now());
+          packagesEditCache = await res.json();
+        }
       }
       
       renderPackagesEditor();
@@ -2121,48 +2147,27 @@
   }
 
   async function publishPackages() {
-    const token = localStorage.getItem('gh_admin_token');
-    if(!token) {
-      document.getElementById('ghSetupBlockPackages').style.display = 'block';
-      document.getElementById('ghSetupBlockPackages').scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-    
     const btn = document.getElementById('btn-publish-packages');
     btn.textContent = '⏳ Saving…'; btn.disabled = true;
 
     try {
-      const content = btoa(unescape(encodeURIComponent(JSON.stringify(packagesEditCache, null, 2))));
-      const FILE_PATH = 'packages.json';
-      
-      // Get current SHA
-      let sha = null;
-      const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, { headers: { Authorization: 'Bearer ' + token } });
-      if(check.ok) {
-        const j = await check.json();
-        sha = j.sha;
-      }
-
-      const body = { message: 'admin: publish package updates', content, branch: BRANCH };
-      if(sha) body.sha = sha;
-
-      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
-        method: 'PUT',
-        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'site_packages', value: packagesEditCache })
       });
 
+      const data = await res.json();
       if(res.ok) {
-        btn.textContent = '✅ Published! Live in ~30s';
-        showToast('☁️ Packages updated and committed live!');
+        btn.textContent = '✅ Published Live!';
+        showToast('☁️ Packages updated and saved live!');
         setTimeout(() => { btn.textContent = '☁️ Publish All Packages'; btn.disabled = false; }, 4000);
       } else {
-        const err = await res.json();
-        throw new Error(err.message);
+        throw new Error(data.error || 'Server error');
       }
     } catch(err) {
       btn.textContent = '☁️ Publish All Packages'; btn.disabled = false;
-      alert('Failed: ' + err.message + '\n\nEnsure your token is valid.');
+      alert('Failed: ' + err.message);
     }
   }
 
@@ -2173,8 +2178,22 @@
     
     try {
       if(!discountsEditCache || forceRefresh) {
-        const res = await fetch('discounts.json?v=' + Date.now());
-        discountsEditCache = await res.json();
+        let loaded = false;
+        try {
+          const res = await fetch('/api/settings?key=site_discounts');
+          const data = await res.json();
+          if (data && (Object.keys(data.pkg_discounts || {}).length > 0 || Object.keys(data.promo_codes || {}).length > 0)) {
+            discountsEditCache = data;
+            loaded = true;
+          }
+        } catch(e) {
+          console.warn("Discounts API failed, falling back to static", e);
+        }
+
+        if (!loaded) {
+          const res = await fetch('discounts.json?v=' + Date.now());
+          discountsEditCache = await res.json();
+        }
       }
       
       // Load packages if cache is null
@@ -2326,39 +2345,19 @@
   }
 
   async function publishDiscounts() {
-    const token = localStorage.getItem('gh_admin_token');
-    if(!token) {
-      document.getElementById('ghSetupBlockDiscounts').style.display = 'block';
-      document.getElementById('ghSetupBlockDiscounts').scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-    
     const btn = document.getElementById('btn-sync-discounts');
     btn.textContent = '⏳ Saving…'; btn.disabled = true;
 
     try {
-      const content = btoa(unescape(encodeURIComponent(JSON.stringify(discountsEditCache, null, 2))));
-      const FILE_PATH = 'discounts.json';
-      
-      // Get current SHA
-      let sha = null;
-      const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, { headers: { Authorization: 'Bearer ' + token } });
-      if(check.ok) {
-        const j = await check.json();
-        sha = j.sha;
-      }
-
-      const body = { message: 'admin: sync package discounts', content, branch: BRANCH };
-      if(sha) body.sha = sha;
-
-      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
-        method: 'PUT',
-        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'site_discounts', value: discountsEditCache })
       });
 
+      const data = await res.json();
       if(res.ok) {
-        btn.textContent = '✅ Synced! Live in ~30s';
+        btn.textContent = '✅ Synced Live!';
         showToast('☁️ Discounts saved and synced live!');
         
         // Save in localStorage too to keep in sync immediately
@@ -2368,8 +2367,7 @@
         
         setTimeout(() => { btn.textContent = '☁️ Save & Sync Discounts'; btn.disabled = false; }, 4000);
       } else {
-        const err = await res.json();
-        throw new Error(err.message);
+        throw new Error(data.error || 'Server error');
       }
     } catch(err) {
       btn.textContent = '☁️ Save & Sync Discounts'; btn.disabled = false;
@@ -2816,21 +2814,50 @@
     }
   }
 
-  /* ─── DATA LOADER: STUDIO CONCEPTS ─── */
   async function loadStudioData(forceRefresh = false) {
     const grid = document.getElementById('studioConceptsEditorGrid');
     grid.innerHTML = '<p style="color:var(--muted);font-size:0.8rem">Loading studio concepts…</p>';
 
     try {
       if(!studioConceptsCache.length || forceRefresh) {
-        const res = await fetch('studio-concepts.json?v=' + Date.now());
-        studioConceptsCache = await res.json();
+        let loaded = false;
+        try {
+          const res = await fetch('/api/settings?key=studio_concepts');
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              studioConceptsCache = data;
+              loaded = true;
+            }
+          }
+        } catch(e) {
+          console.warn("Studio concepts API failed", e);
+        }
+
+        if (!loaded) {
+          const res = await fetch('studio-concepts.json?v=' + Date.now());
+          studioConceptsCache = await res.json();
+        }
       }
       
-      // Load homepage banner status
-      const bannerRes = await fetch('gallery.json?v=' + Date.now());
-      const bannerData = await bannerRes.json();
-      studioBannerActive = !!bannerData.showStudioBanner;
+      // Load homepage banner status from database config first
+      let bannerLoaded = false;
+      try {
+        const bannerRes = await fetch('/api/gallery?action=banner-config');
+        if (bannerRes.ok) {
+          const bannerData = await bannerRes.json();
+          studioBannerActive = !!bannerData.studioVisible;
+          bannerLoaded = true;
+        }
+      } catch(e) {
+        console.warn("Banner config API failed", e);
+      }
+
+      if (!bannerLoaded) {
+        const bannerRes = await fetch('gallery.json?v=' + Date.now());
+        const bannerData = await bannerRes.json();
+        studioBannerActive = !!bannerData.showStudioBanner;
+      }
       
       document.getElementById('studioBannerToggle').checked = studioBannerActive;
       document.getElementById('studioBannerStatusLabel').textContent = studioBannerActive ? 'Active (Popup is visible on main homepage)' : 'Inactive (Popup is hidden)';
@@ -2905,65 +2932,31 @@
   }
 
   async function publishStudio() {
-    const token = localStorage.getItem('gh_admin_token');
-    if(!token) {
-      document.getElementById('ghSetupBlockStudio').style.display = 'block';
-      document.getElementById('ghSetupBlockStudio').scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-    
     const btn = document.getElementById('btn-sync-studio');
     btn.textContent = '⏳ Saving…'; btn.disabled = true;
 
     try {
-      // 1. Sync Concepts JSON
-      const conceptContent = btoa(unescape(encodeURIComponent(JSON.stringify(studioConceptsCache, null, 2))));
-      let conceptSha = null;
-      const conceptCheck = await fetch(`https://api.github.com/repos/${REPO}/contents/studio-concepts.json`, { headers: { Authorization: 'Bearer ' + token } });
-      if(conceptCheck.ok) {
-        const j = await conceptCheck.json();
-        conceptSha = j.sha;
-      }
-      
-      const conceptBody = { message: 'admin: publish studio concepts', content: conceptContent, branch: BRANCH };
-      if(conceptSha) conceptBody.sha = conceptSha;
-      
-      await fetch(`https://api.github.com/repos/${REPO}/contents/studio-concepts.json`, {
-        method: 'PUT',
-        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify(conceptBody)
+      // 1. Save concepts list
+      const resConcepts = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'studio_concepts', value: studioConceptsCache })
       });
+      const dataConcepts = await resConcepts.json();
+      if(!resConcepts.ok) throw new Error(dataConcepts.error || 'Failed to save concepts');
 
-      // 2. Sync Homepage Banner Visibility (via gallery.json updates)
-      let galleryData = { albums: [], showStudioBanner: false };
-      let gallerySha = null;
-      const galleryCheck = await fetch(`https://api.github.com/repos/${REPO}/contents/gallery.json`, { headers: { Authorization: 'Bearer ' + token } });
-      if(galleryCheck.ok) {
-        const j = await galleryCheck.json();
-        gallerySha = j.sha;
-        galleryData = JSON.parse(decodeURIComponent(escape(atob(j.content))));
-      }
-      
-      galleryData.showStudioBanner = studioBannerActive;
-      
-      const galleryContent = btoa(unescape(encodeURIComponent(JSON.stringify(galleryData, null, 2))));
-      const galleryBody = { message: 'admin: toggle studio banner', content: galleryContent, branch: BRANCH };
-      if(gallerySha) galleryBody.sha = gallerySha;
-      
-      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/gallery.json`, {
-        method: 'PUT',
-        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify(galleryBody)
+      // 2. Save banner visibility
+      const resBanner = await fetch('/api/gallery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'banner-config', studioVisible: studioBannerActive })
       });
+      const dataBanner = await resBanner.json();
+      if(!resBanner.ok) throw new Error(dataBanner.error || 'Failed to save banner config');
 
-      if(res.ok) {
-        btn.textContent = '✅ Published! Live in ~30s';
-        showToast('☁️ Studio concepts and banner toggled live!');
-        setTimeout(() => { btn.textContent = '☁️ Publish Studio Concepts'; btn.disabled = false; }, 4000);
-      } else {
-        const err = await res.json();
-        throw new Error(err.message);
-      }
+      btn.textContent = '✅ Published Live!';
+      showToast('☁️ Studio concepts and banner toggled live!');
+      setTimeout(() => { btn.textContent = '☁️ Publish Studio Concepts'; btn.disabled = false; }, 4000);
     } catch(err) {
       btn.textContent = '☁️ Publish Studio Concepts'; btn.disabled = false;
       alert('Failed: ' + err.message);
@@ -2979,21 +2972,29 @@
     const grid = document.getElementById('adminCalGrid');
     grid.innerHTML = '<p style="color:var(--muted);font-size:0.8rem;grid-column:1/-1">Loading calendar…</p>';
     
-    // Check Github Token
-    const savedGh = localStorage.getItem('gh_admin_token');
-    if (savedGh) {
-      document.getElementById('ghSetupBlockCalendar').style.display = 'none';
-    } else {
-      document.getElementById('ghSetupBlockCalendar').style.display = 'block';
-    }
-
     try {
       if (adminBlockedDates.length === 0 || forceRefresh) {
-        const res = await fetch('booked-dates.json?v=' + Date.now());
-        if (res.ok) {
-          adminBlockedDates = await res.json();
-        } else {
-          adminBlockedDates = [];
+        let loaded = false;
+        try {
+          const res = await fetch('/api/settings?key=booked_dates');
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              adminBlockedDates = data;
+              loaded = true;
+            }
+          }
+        } catch(e) {
+          console.warn("Booked dates API failed", e);
+        }
+
+        if (!loaded) {
+          const res = await fetch('booked-dates.json?v=' + Date.now());
+          if (res.ok) {
+            adminBlockedDates = await res.json();
+          } else {
+            adminBlockedDates = [];
+          }
         }
       }
       renderAdminCalendar();
@@ -3107,67 +3108,35 @@
   }
 
   async function backgroundPublishCalendar() {
-    const token = localStorage.getItem('gh_admin_token');
-    if (!token) return;
     try {
       const sortedDates = [...adminBlockedDates].sort();
-      const content = btoa(unescape(encodeURIComponent(JSON.stringify(sortedDates, null, 2))));
-      const FILE_PATH = 'booked-dates.json';
-      let sha = null;
-      const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, { headers: { Authorization: 'Bearer ' + token } });
-      if (check.ok) {
-        const j = await check.json();
-        sha = j.sha;
-      }
-      const body = { message: 'admin: auto-block date on booking approval', content, branch: BRANCH };
-      if (sha) body.sha = sha;
-      await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
-        method: 'PUT',
-        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'booked_dates', value: sortedDates })
       });
     } catch (e) {}
   }
 
   async function publishCalendar() {
-    const token = localStorage.getItem('gh_admin_token');
-    if (!token) {
-      document.getElementById('ghSetupBlockCalendar').style.display = 'block';
-      document.getElementById('ghSetupBlockCalendar').scrollIntoView({ behavior: 'smooth' });
-      return;
-    }
-    
     const btn = document.getElementById('btn-sync-calendar');
-    btn.textContent = '⏳ Publishing…'; btn.disabled = true;
+    btn.textContent = '⏳ Saving…'; btn.disabled = true;
 
     try {
       const sortedDates = [...adminBlockedDates].sort();
-      const content = btoa(unescape(encodeURIComponent(JSON.stringify(sortedDates, null, 2))));
-      const FILE_PATH = 'booked-dates.json';
-      
-      let sha = null;
-      const check = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, { headers: { Authorization: 'Bearer ' + token } });
-      if (check.ok) {
-        const j = await check.json();
-        sha = j.sha;
-      }
-
-      const body = { message: 'admin: publish availability schedule updates', content, branch: BRANCH };
-      if (sha) body.sha = sha;
-
-      const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
-        method: 'PUT',
-        headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'booked_dates', value: sortedDates })
       });
 
+      const data = await res.json();
       if (res.ok) {
-        btn.textContent = '✅ Published! Live in ~30s';
-        showToast('☁️ Calendar availability published live!');
+        btn.textContent = '✅ Saved Live!';
+        showToast('☁️ Calendar availability saved live!');
         setTimeout(() => { btn.textContent = '☁️ Save & Publish Calendar'; btn.disabled = false; }, 4000);
       } else {
-        const err = await res.json();
-        throw new Error(err.message);
+        throw new Error(data.error || 'Server error');
       }
     } catch (err) {
       btn.textContent = '☁️ Save & Publish Calendar'; btn.disabled = false;

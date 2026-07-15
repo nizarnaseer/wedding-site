@@ -391,13 +391,27 @@ async function loadCalendarBusy() {
     const savedBooked = JSON.parse(localStorage.getItem('bookedDates') || '[]');
     savedBooked.forEach(d => busyDates.add(d));
 
-    // Load database-driven booked dates from booked-dates.json
+    // Load database-driven booked dates
     try {
-      const dbRes = await fetch('booked-dates.json?v=' + Date.now());
-      if (dbRes.ok) {
-        const dbDates = await dbRes.json();
-        if (Array.isArray(dbDates)) {
-          dbDates.forEach(d => busyDates.add(d));
+      let loaded = false;
+      try {
+        const dbRes = await fetch('/api/settings?key=booked_dates');
+        if (dbRes.ok) {
+          const dbDates = await dbRes.json();
+          if (Array.isArray(dbDates) && dbDates.length > 0) {
+            dbDates.forEach(d => busyDates.add(d));
+            loaded = true;
+          }
+        }
+      } catch(e) {}
+
+      if (!loaded) {
+        const dbRes = await fetch('booked-dates.json?v=' + Date.now());
+        if (dbRes.ok) {
+          const dbDates = await dbRes.json();
+          if (Array.isArray(dbDates)) {
+            dbDates.forEach(d => busyDates.add(d));
+          }
         }
       }
     } catch (e) {
@@ -409,18 +423,32 @@ async function loadCalendarBusy() {
     renderCalendar();
   } catch (err) {
     console.warn('Calendar API error:', err.message);
-    // Try to load booked-dates.json even if GCAL fails
+    // Try to load booked-dates.json / api even if GCAL fails
     try {
-      const dbRes = await fetch('booked-dates.json?v=' + Date.now());
-      if (dbRes.ok) {
-        const dbDates = await dbRes.json();
-        if (Array.isArray(dbDates)) {
-          dbDates.forEach(d => busyDates.add(d));
+      let loaded = false;
+      try {
+        const dbRes = await fetch('/api/settings?key=booked_dates');
+        if (dbRes.ok) {
+          const dbDates = await dbRes.json();
+          if (Array.isArray(dbDates) && dbDates.length > 0) {
+            dbDates.forEach(d => busyDates.add(d));
+            loaded = true;
+          }
+        }
+      } catch(e) {}
+
+      if (!loaded) {
+        const dbRes = await fetch('booked-dates.json?v=' + Date.now());
+        if (dbRes.ok) {
+          const dbDates = await dbRes.json();
+          if (Array.isArray(dbDates)) {
+            dbDates.forEach(d => busyDates.add(d));
+          }
         }
       }
     } catch (e) {}
     gcalConnected = true;
-    renderCalendar(); // show available
+    renderCalendar();
   }
 }
 
@@ -651,10 +679,18 @@ function updateTotal() {
   const promoInput = document.getElementById('promoCodeInput');
   if (promoInput && promoInput.value.trim()) {
     const code       = promoInput.value.trim().toUpperCase();
-    const promoCodes = JSON.parse(localStorage.getItem('promo_codes') || '[]');
-    const match      = promoCodes.find(p => p.code === code);
-    if (match) {
-      promoAmt  = match.discount;
+    const promoCodes = JSON.parse(localStorage.getItem('promo_codes') || '{}');
+    
+    let discount = 0;
+    if (Array.isArray(promoCodes)) {
+      const match = promoCodes.find(p => p.code === code);
+      if (match) discount = match.discount;
+    } else if (promoCodes && typeof promoCodes === 'object') {
+      discount = promoCodes[code] || 0;
+    }
+
+    if (discount > 0) {
+      promoAmt  = discount;
       promoCode = code;
       document.getElementById('promoFeedback').textContent = `✅ "${code}" applied — RM ${promoAmt} off!`;
       document.getElementById('promoFeedback').style.color = '#4ade80';
@@ -1379,8 +1415,50 @@ function submitBooking(e) {
 ══════════════════════════════════════ */
 function handleContact(e) {
   e.preventDefault();
+  
+  const name = document.getElementById('cName').value;
+  const email = document.getElementById('cEmail').value;
+  const subject = document.getElementById('cSubject').value || 'No Subject';
+  const message = document.getElementById('cMessage').value;
+
   const s = document.getElementById('formSuccess');
   s.classList.add('show');
+  
+  // 1. Submit email notification via Web3Forms
+  const key = (window.STUDIO_CONFIG || {}).web3forms_key || '6be870cf-b9ec-42bd-a26f-8d5f09067bf3';
+  if (key) {
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        access_key: key,
+        subject: `✉️ [Contact Form] ${subject}`,
+        from_name: 'WeddingClicks Portfolio',
+        name,
+        email,
+        message
+      })
+    }).catch(err => console.error('Contact email submit failed:', err));
+  }
+
+  // 2. Submit to Netlify Form to display in Admin Dashboard
+  const ctRef = 'CT-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  fetch('/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      'form-name':   'booking-enquiry',
+      'ref':         ctRef,
+      'client_name': name,
+      'phone':       'Not provided',
+      'email':       email,
+      'package':     'Get in Touch Message',
+      'price':       'N/A',
+      'date':        'N/A',
+      'notes':       `Subject: ${subject}\n\nVision: ${message}`,
+    })
+  }).catch(() => {});
+
   e.target.reset();
   setTimeout(() => s.classList.remove('show'), 5000);
 }
@@ -1416,20 +1494,34 @@ document.addEventListener('DOMContentLoaded', () => {
    visitors see the same discounts everywhere.
 ══════════════════════════════════════ */
 function applyDiscountsToPkgCards() {
-  // Primary: fetch discounts.json from the same server (works on all devices)
-  fetch('discounts.json?v=' + Date.now())
+  fetch('/api/settings?key=site_discounts')
     .then(r => r.json())
     .then(data => {
-      const discounts = data.pkg_discounts || {};
-      const promos    = data.promo_codes   || {};
-      localStorage.setItem('pkg_discounts', JSON.stringify(discounts));
-      localStorage.setItem('promo_codes',   JSON.stringify(promos));
-      localStorage.setItem('combo_bundle_discount', String(data.combo_bundle_discount !== undefined ? data.combo_bundle_discount : 150));
-      _renderDiscountCards(discounts);
+      if (data && (Object.keys(data.pkg_discounts || {}).length > 0 || Object.keys(data.promo_codes || {}).length > 0)) {
+        const discounts = data.pkg_discounts || {};
+        const promos    = data.promo_codes   || {};
+        localStorage.setItem('pkg_discounts', JSON.stringify(discounts));
+        localStorage.setItem('promo_codes',   JSON.stringify(promos));
+        localStorage.setItem('combo_bundle_discount', String(data.combo_bundle_discount !== undefined ? data.combo_bundle_discount : 150));
+        _renderDiscountCards(discounts);
+      } else {
+        throw new Error("Empty DB");
+      }
     })
     .catch(() => {
-      // Fallback: use localStorage (works on localhost)
-      _renderDiscountCards(JSON.parse(localStorage.getItem('pkg_discounts') || '{}'));
+      fetch('discounts.json?v=' + Date.now())
+        .then(r => r.json())
+        .then(data => {
+          const discounts = data.pkg_discounts || {};
+          const promos    = data.promo_codes   || {};
+          localStorage.setItem('pkg_discounts', JSON.stringify(discounts));
+          localStorage.setItem('promo_codes',   JSON.stringify(promos));
+          localStorage.setItem('combo_bundle_discount', String(data.combo_bundle_discount !== undefined ? data.combo_bundle_discount : 150));
+          _renderDiscountCards(discounts);
+        })
+        .catch(() => {
+          _renderDiscountCards(JSON.parse(localStorage.getItem('pkg_discounts') || '{}'));
+        });
     });
 }
 
@@ -1557,10 +1649,21 @@ let aiSelBudget = 'standard';
 let packagesDataCache = { photography: [], videography: [] };
 
 // Fetch package configurations to match prices dynamically
-fetch('/packages.json?v=' + Date.now())
+fetch('/api/settings?key=site_packages')
   .then(r => r.json())
-  .then(data => { packagesDataCache = data; })
-  .catch(() => {});
+  .then(data => {
+    if (Array.isArray(data) || (data && (data.photography || data.videography))) {
+      packagesDataCache = data;
+    } else {
+      throw new Error("Empty DB packages");
+    }
+  })
+  .catch(() => {
+    fetch('/packages.json?v=' + Date.now())
+      .then(r => r.json())
+      .then(data => { packagesDataCache = data; })
+      .catch(() => {});
+  });
 
 const AI_LANG = {
   en: {
@@ -2057,7 +2160,6 @@ function calculateAiRecommendation() {
 
   content.innerHTML = resultHtml;
   showAiStep(8);
-  submitAiLeadToWeb3Forms(pkgNameCombined, totalPrice);
 }
 
 let aiConverted = false;
@@ -2078,6 +2180,9 @@ function closeAiAdvisor() {
 function closeAiAdvisorDirectly() {
   document.getElementById('aiAdvisorOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  if (!aiConverted) {
+    sendAiAdvisorSessionSummary("Just closed the widget");
+  }
 }
 
 function triggerExitSurvey() {
@@ -2138,7 +2243,7 @@ function submitExitFeedback(option) {
   };
   
   const chosenReason = aiLang === 'ms' ? reasonsMs[option] : reasonsEn[option];
-  sendExitFeedbackToWeb3Forms(chosenReason);
+  sendAiAdvisorSessionSummary(chosenReason);
 
   const content = document.getElementById('aiAdvisorContent');
   let replyHtml = '';
@@ -2248,39 +2353,96 @@ function submitExitFeedback(option) {
   content.innerHTML = replyHtml;
 }
 
-async function sendExitFeedbackToWeb3Forms(reason) {
+let aiLeadSent = false;
+
+async function sendAiAdvisorSessionSummary(exitReason = null) {
+  if (aiLeadSent) return;
+  if (!aiName) return;
+
   const key = (window.STUDIO_CONFIG || {}).web3forms_key || '6be870cf-b9ec-42bd-a26f-8d5f09067bf3';
   if (!key) return;
 
-  const formData = {
-    access_key: key,
-    subject: `⚠️ [AI Feedback] Exit Intent Survey`,
-    from_name: 'WeddingClicks AI Advisor',
-    client_name: aiName || 'Anonymous / Just Browsing',
-    client_phone: aiPhone || 'Not Provided',
-    client_date: aiDate || 'Not Provided',
-    client_venue: aiVenue || 'Not Provided',
-    exit_reason: reason,
-    language_selected: aiLang.toUpperCase()
-  };
+  const eventList = aiSelEvents.map(e => e.toUpperCase()).join(', ') || 'None selected';
+  
+  // Get recommended package details if they reached recommendation step
+  let pkgName = 'None (Exited early)';
+  let estPrice = 'N/A';
+  if (aiCurrentStep >= 7) {
+    const photoRec = getPhotoRecommendation();
+    const videoRec = getVideoRecommendation();
+    let names = [];
+    if (photoRec) names.push(photoRec.title);
+    if (videoRec) names.push(videoRec.title);
+    pkgName = names.join(' + ') || 'Custom List';
+    
+    let price = 0;
+    if (photoRec) price += photoRec.base;
+    if (videoRec) price += videoRec.base;
+    if (photoRec && videoRec) {
+      const comboDisc = parseInt(localStorage.getItem('combo_bundle_discount') || '150');
+      price -= comboDisc;
+    }
+    estPrice = 'RM ' + price;
+  }
 
+  const subject = exitReason 
+    ? `⚠️ [AI Exit] ${aiName} — ${exitReason}`
+    : `✨ [AI Lead] ${aiName} — ${pkgName}`;
+
+  const summaryNotes = `Service: ${aiSelService.toUpperCase()} | Budget: ${aiSelBudget.toUpperCase()}\nEvents: ${eventList}\nRecommended: ${pkgName} (${estPrice})\nStatus: ${exitReason ? 'Exited early: ' + exitReason : 'Converted / Booked'}`;
+
+  // 1. Submit email via Web3Forms (single unified email)
   try {
     await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(formData)
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        access_key: key,
+        subject: subject,
+        from_name: 'WeddingClicks AI Advisor',
+        name: aiName,
+        phone: aiPhone || 'Not provided',
+        email: 'Not provided (AI Advisor)',
+        date: aiDate || 'N/A',
+        venue: aiVenue || 'N/A',
+        events: eventList,
+        service: aiSelService.toUpperCase(),
+        budget_tier: aiSelBudget.toUpperCase(),
+        recommended_package: pkgName,
+        estimated_price: estPrice,
+        exit_reason: exitReason || 'None (Completed)',
+        language_selected: aiLang.toUpperCase()
+      })
     });
-    console.log('Exit feedback submitted to Web3Forms.');
+    console.log('AI Session summary email sent.');
   } catch (err) {
-    console.error('Failed to submit exit feedback:', err);
+    console.error('Failed to send AI session summary email:', err);
   }
+
+  // 2. Submit to Netlify Form to display in Admin Dashboard
+  const aiRef = 'AI-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  fetch('/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      'form-name':   'booking-enquiry',
+      'ref':         aiRef,
+      'client_name': aiName,
+      'phone':       aiPhone || 'Not provided',
+      'email':       'Not provided (AI Chat)',
+      'package':     `AI Advisor: ${pkgName}`,
+      'price':       estPrice,
+      'date':        aiDate || 'N/A',
+      'notes':       summaryNotes,
+    })
+  }).catch(() => {});
+
+  aiLeadSent = true;
 }
 
 function aiAdvisorBook(pkgId, price) {
   aiConverted = true;
+  sendAiAdvisorSessionSummary(null);
   closeAiAdvisorDirectly();
   
   let pkgName = '';
@@ -2330,6 +2492,7 @@ function aiAdvisorBook(pkgId, price) {
 
 function sendAiWhatsApp(pkgName, price) {
   aiConverted = true;
+  sendAiAdvisorSessionSummary(null);
   const targetPhone = '601187381984'; // WeddingClicks official WhatsApp number
   const eventList = aiSelEvents.map(e => e.toUpperCase()).join(', ');
   
@@ -2372,40 +2535,4 @@ Would love to discuss further and secure my date slot! Thank you!`;
   window.open(`https://wa.me/${targetPhone}?text=${encoded}`, '_blank');
 }
 
-async function submitAiLeadToWeb3Forms(pkgName, price) {
-  const key = (window.STUDIO_CONFIG || {}).web3forms_key || '6be870cf-b9ec-42bd-a26f-8d5f09067bf3';
-  if (!key) return;
-
-  const eventList = aiSelEvents.map(e => e.toUpperCase()).join(', ');
-
-  const formData = {
-    access_key: key,
-    subject: `✨ [AI Lead] ${aiName} — RM ${price}`,
-    from_name: 'WeddingClicks AI Advisor',
-    name: aiName,
-    phone: aiPhone,
-    date: aiDate,
-    venue: aiVenue,
-    events: eventList,
-    service: aiSelService.toUpperCase(),
-    budget_tier: aiSelBudget.toUpperCase(),
-    recommended_package: pkgName,
-    estimated_price: 'RM ' + price,
-    language_selected: aiLang.toUpperCase()
-  };
-
-  try {
-    await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(formData)
-    });
-    console.log('AI Lead submitted successfully to Web3Forms.');
-  } catch (err) {
-    console.error('Failed to submit AI Lead to Web3Forms:', err);
-  }
-}
 
