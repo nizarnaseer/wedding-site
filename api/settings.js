@@ -16,6 +16,19 @@ module.exports = async (req, res) => {
       body = JSON.parse(body);
     } catch (e) {}
   }
+
+  // Handle WhatsApp Notification requests from frontend
+  const { action, message } = body || {};
+  if (req.method === 'POST' && action === 'notify_whatsapp') {
+    if (!message) return res.status(400).json({ error: 'Missing message parameter' });
+    try {
+      const sent = await sendWhatsApp(message);
+      return res.status(200).json({ ok: sent });
+    } catch (e) {
+      return res.status(500).json({ error: e.message });
+    }
+  }
+
   const key = req.method === 'GET' ? req.query?.key : body?.key;
   if (!key) return res.status(400).json({ error: 'Missing config key parameter' });
 
@@ -70,3 +83,59 @@ module.exports = async (req, res) => {
 
   return res.status(405).json({ error: 'Method not allowed' });
 };
+
+async function sendWhatsApp(msg) {
+  const phone = process.env.PHOTOGRAPHER_PHONE; // e.g. 601187381984
+  if (!phone) {
+    console.warn("PHOTOGRAPHER_PHONE not set");
+    return false;
+  }
+
+  // --- Option A: OpenWA Integration ---
+  const openwaUrl = process.env.OPENWA_API_URL;
+  const openwaKey = process.env.OPENWA_API_KEY;
+  const openwaSession = process.env.OPENWA_SESSION_ID || 'default';
+
+  if (openwaUrl && openwaKey) {
+    try {
+      const chatId = phone.includes('@') ? phone : `${phone}@c.us`;
+      const endpoint = `${openwaUrl.replace(/\/$/, '')}/api/sessions/${openwaSession}/messages/send-text`;
+      const r = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'X-API-Key': openwaKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ chatId, text: msg })
+      });
+      if (r.ok) {
+        console.log("WhatsApp message sent successfully via OpenWA");
+        return true;
+      } else {
+        const txt = await r.text();
+        console.error("OpenWA returned error status:", r.status, txt);
+      }
+    } catch (e) {
+      console.error("OpenWA send error:", e.message);
+    }
+  }
+
+  // --- Option B: CallMeBot Fallback ---
+  const callmebotKey = process.env.CALLMEBOT_API_KEY;
+  if (callmebotKey) {
+    try {
+      const cleanPhone = phone.split('@')[0];
+      const url = `https://api.callmebot.com/whatsapp.php?phone=${cleanPhone}&text=${encodeURIComponent(msg)}&apikey=${callmebotKey}`;
+      const r = await fetch(url);
+      if (r.ok) {
+        console.log("WhatsApp message sent successfully via CallMeBot");
+        return true;
+      }
+    } catch (e) {
+      console.error("CallMeBot send error:", e.message);
+    }
+  }
+
+  console.warn("No WhatsApp provider (OpenWA or CallMeBot) succeeded or was configured");
+  return false;
+}

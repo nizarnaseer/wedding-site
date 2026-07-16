@@ -22,11 +22,45 @@ async function redis(...args) {
 }
 
 async function sendWhatsApp(msg) {
-  const phone  = process.env.PHOTOGRAPHER_PHONE;   // e.g. 601118736810 (no +)
-  const apiKey = process.env.CALLMEBOT_API_KEY;    // from callmebot.com
-  if (!phone || !apiKey) return;
-  const url = `https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${encodeURIComponent(msg)}&apikey=${apiKey}`;
-  await fetch(url).catch(() => {});
+  const phone = process.env.PHOTOGRAPHER_PHONE; // e.g. 601187381984
+  if (!phone) return false;
+
+  // --- Option A: OpenWA Integration ---
+  const openwaUrl = process.env.OPENWA_API_URL;
+  const openwaKey = process.env.OPENWA_API_KEY;
+  const openwaSession = process.env.OPENWA_SESSION_ID || 'default';
+
+  if (openwaUrl && openwaKey) {
+    try {
+      const chatId = phone.includes('@') ? phone : `${phone}@c.us`;
+      const endpoint = `${openwaUrl.replace(/\/$/, '')}/api/sessions/${openwaSession}/messages/send-text`;
+      const r = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'X-API-Key': openwaKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ chatId, text: msg })
+      });
+      if (r.ok) return true;
+    } catch (e) {
+      console.error("OpenWA send error:", e.message);
+    }
+  }
+
+  // --- Option B: CallMeBot Fallback ---
+  const callmebotKey = process.env.CALLMEBOT_API_KEY;
+  if (callmebotKey) {
+    try {
+      const cleanPhone = phone.split('@')[0];
+      const url = `https://api.callmebot.com/whatsapp.php?phone=${cleanPhone}&text=${encodeURIComponent(msg)}&apikey=${callmebotKey}`;
+      const r = await fetch(url);
+      if (r.ok) return true;
+    } catch (e) {
+      console.error("CallMeBot send error:", e.message);
+    }
+  }
+  return false;
 }
 
 module.exports = async (req, res) => {

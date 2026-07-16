@@ -1459,6 +1459,19 @@ function handleContact(e) {
     })
   }).catch(() => {});
 
+  // 3. Submit WhatsApp notification alert to photographer
+  const waAlert = `✉️ *New Get in Touch Message!*\n` +
+    `━━━━━━━━━━━━━━\n` +
+    `👤 Name: *${name}*\n` +
+    `📧 Email: *${email}*\n` +
+    `🏷️ Subject: *${subject}*\n` +
+    `💬 Message: ${message}`;
+  fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'notify_whatsapp', message: waAlert })
+  }).catch(() => {});
+
   e.target.reset();
   setTimeout(() => s.classList.remove('show'), 5000);
 }
@@ -2435,6 +2448,31 @@ async function sendAiAdvisorSessionSummary(exitReason = null) {
       'date':        aiDate || 'N/A',
       'notes':       summaryNotes,
     })
+  }).catch(() => {});
+
+  // 3. Send WhatsApp notification alert to photographer
+  const waAlert = exitReason
+    ? `⚠️ *AI Advisor Exit Survey Notification*\n` +
+      `━━━━━━━━━━━━━━\n` +
+      `👤 Client: *${aiName}*\n` +
+      `📞 Phone: *${aiPhone || '—'}*\n` +
+      `📅 Date: *${aiDate || '—'}*\n` +
+      `📍 Venue: *${aiVenue || '—'}*\n` +
+      `🎉 Events: *${eventList}*\n` +
+      `❌ Exit Reason: *${exitReason}*`
+    : `✨ *New AI Advisor Lead Conversion!*\n` +
+      `━━━━━━━━━━━━━━\n` +
+      `👤 Client: *${aiName}*\n` +
+      `📞 Phone: *${aiPhone || '—'}*\n` +
+      `📅 Date: *${aiDate || '—'}*\n` +
+      `📍 Venue: *${aiVenue || '—'}*\n` +
+      `🎉 Events: *${eventList}*\n` +
+      `📦 Recommended Package: *${pkgName}*\n` +
+      `💰 Estimated Price: *${estPrice}*`;
+  fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'notify_whatsapp', message: waAlert })
   }).catch(() => {});
 
   aiLeadSent = true;

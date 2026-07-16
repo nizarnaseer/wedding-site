@@ -1428,13 +1428,31 @@
             <button class="btn-sm" onclick="sendTestNotificationEmail()" style="margin-top:10px;width:100%;justify-content:center;background:transparent;">🧪 Send Test Email Alert</button>
           </div>
 
-          <!-- WhatsApp Details -->
+          <!-- WhatsApp Notifications Setup -->
           <div class="card-box">
-            <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:12px;color:var(--gold)">WhatsApp Alert Details</h3>
-            <p style="font-size:0.8rem;color:var(--muted);line-height:1.5;margin-bottom:16px;">WhatsApp notifications are triggered locally on the visitor's device. No configurations or external keys are needed.</p>
-            <div class="whatsapp-status-indicator">
-              ✓ WhatsApp Redirects are fully active on the booking form.
+            <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:12px;color:var(--gold)">WhatsApp API Setup (OpenWA)</h3>
+            <p style="font-size:0.8rem;color:var(--muted);line-height:1.5;margin-bottom:16px;">
+              Configure OpenWA gateway to receive instant WhatsApp notifications for orders, contacts, chatbot leads, and reviews. 
+              <br/><small style="color:var(--muted)">For production safety, configure Vercel variables: `OPENWA_API_URL`, `OPENWA_API_KEY`, `OPENWA_SESSION_ID`, `PHOTOGRAPHER_PHONE`, `CALLMEBOT_API_KEY`.</small>
+            </p>
+            <div class="field-group">
+              <label>OpenWA Gateway URL</label>
+              <input type="text" id="openwaUrlInput" placeholder="e.g. https://openwa.weddingclicks.us"/>
             </div>
+            <div class="field-group" style="margin-top:10px;">
+              <label>OpenWA API Key</label>
+              <input type="password" id="openwaKeyInput" placeholder="X-API-Key for access"/>
+            </div>
+            <div class="field-group" style="margin-top:10px;">
+              <label>OpenWA Session ID</label>
+              <input type="text" id="openwaSessionInput" placeholder="default"/>
+            </div>
+            <div class="field-group" style="margin-top:10px;">
+              <label>CallMeBot API Key (Fallback)</label>
+              <input type="password" id="callmebotKeyInput" placeholder="CallMeBot key (optional fallback)"/>
+            </div>
+            <button class="btn-sm btn-sm-gold" onclick="saveWhatsAppSettings()" style="margin-top:14px;width:100%;justify-content:center">💾 Save WhatsApp Credentials</button>
+            <button class="btn-sm" onclick="sendTestWhatsAppAlert()" style="margin-top:10px;width:100%;justify-content:center;background:transparent;">🧪 Send Test WhatsApp Alert</button>
           </div>
         </div>
       </section>
@@ -2777,6 +2795,10 @@
     if(saved) {
       document.getElementById('web3formsApiKeyInput').value = saved;
     }
+    document.getElementById('openwaUrlInput').value = localStorage.getItem('openwa_url') || '';
+    document.getElementById('openwaKeyInput').value = localStorage.getItem('openwa_key') || '';
+    document.getElementById('openwaSessionInput').value = localStorage.getItem('openwa_session') || 'default';
+    document.getElementById('callmebotKeyInput').value = localStorage.getItem('callmebot_key') || '';
   }
 
   function saveWeb3formsSettings() {
@@ -2785,6 +2807,39 @@
     localStorage.setItem('web3forms_key', key);
     localStorage.removeItem('formspree_id');
     showToast('💾 Web3Forms API key saved successfully!');
+  }
+
+  function saveWhatsAppSettings() {
+    const url = document.getElementById('openwaUrlInput').value.trim();
+    const key = document.getElementById('openwaKeyInput').value.trim();
+    const session = document.getElementById('openwaSessionInput').value.trim() || 'default';
+    const cmbKey = document.getElementById('callmebotKeyInput').value.trim();
+    
+    localStorage.setItem('openwa_url', url);
+    localStorage.setItem('openwa_key', key);
+    localStorage.setItem('openwa_session', session);
+    localStorage.setItem('callmebot_key', cmbKey);
+    showToast('💾 WhatsApp credentials saved locally!');
+  }
+
+  async function sendTestWhatsAppAlert() {
+    showToast('⏳ Dispatching test WhatsApp alert…');
+    try {
+      const message = `🧪 *WeddingClicks Test Notification*\nYour WhatsApp integration is configured correctly and works live!`;
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'notify_whatsapp', message })
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        showToast('✅ Test WhatsApp alert dispatched successfully!');
+      } else {
+        throw new Error(data.error || 'Check environment variables or connection.');
+      }
+    } catch(err) {
+      alert('Failed to send WhatsApp alert: ' + err.message);
+    }
   }
 
   async function sendTestNotificationEmail() {
