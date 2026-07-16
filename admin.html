@@ -1436,6 +1436,10 @@
               <br/><small style="color:var(--muted)">For production safety, configure Vercel variables: `OPENWA_API_URL`, `OPENWA_API_KEY`, `OPENWA_SESSION_ID`, `PHOTOGRAPHER_PHONE`, `CALLMEBOT_API_KEY`.</small>
             </p>
             <div class="field-group">
+              <label>Photographer Phone Number (e.g. 601187381984)</label>
+              <input type="text" id="whatsappPhoneInput" placeholder="Enter number with country code, no + or spaces"/>
+            </div>
+            <div class="field-group" style="margin-top:10px;">
               <label>OpenWA Gateway URL</label>
               <input type="text" id="openwaUrlInput" placeholder="e.g. https://openwa.weddingclicks.us"/>
             </div>
@@ -2790,15 +2794,50 @@
   }
 
   /* ─── DATA LOADER: WHATSAPP SETTINGS ─── */
-  function loadWhatsAppSettings() {
+  async function loadWhatsAppSettings() {
     const saved = localStorage.getItem('web3forms_key');
     if(saved) {
       document.getElementById('web3formsApiKeyInput').value = saved;
     }
+    
+    // Load local storage fallbacks first
+    document.getElementById('whatsappPhoneInput').value = localStorage.getItem('whatsapp_phone') || '';
     document.getElementById('openwaUrlInput').value = localStorage.getItem('openwa_url') || '';
     document.getElementById('openwaKeyInput').value = localStorage.getItem('openwa_key') || '';
     document.getElementById('openwaSessionInput').value = localStorage.getItem('openwa_session') || 'default';
     document.getElementById('callmebotKeyInput').value = localStorage.getItem('callmebot_key') || '';
+
+    // Fetch latest live credentials from Redis
+    try {
+      const res = await fetch('/api/settings?key=whatsapp_settings');
+      if (res.ok) {
+        const dbSettings = await res.json();
+        if (dbSettings && typeof dbSettings === 'object') {
+          if (dbSettings.phone) {
+            document.getElementById('whatsappPhoneInput').value = dbSettings.phone;
+            localStorage.setItem('whatsapp_phone', dbSettings.phone);
+          }
+          if (dbSettings.openwaUrl) {
+            document.getElementById('openwaUrlInput').value = dbSettings.openwaUrl;
+            localStorage.setItem('openwa_url', dbSettings.openwaUrl);
+          }
+          if (dbSettings.openwaKey) {
+            document.getElementById('openwaKeyInput').value = dbSettings.openwaKey;
+            localStorage.setItem('openwa_key', dbSettings.openwaKey);
+          }
+          if (dbSettings.openwaSession) {
+            document.getElementById('openwaSessionInput').value = dbSettings.openwaSession;
+            localStorage.setItem('openwa_session', dbSettings.openwaSession);
+          }
+          if (dbSettings.callmebotKey) {
+            document.getElementById('callmebotKeyInput').value = dbSettings.callmebotKey;
+            localStorage.setItem('callmebot_key', dbSettings.callmebotKey);
+          }
+        }
+      }
+    } catch(err) {
+      console.warn("Failed to fetch whatsapp_settings from database:", err);
+    }
   }
 
   function saveWeb3formsSettings() {
@@ -2809,17 +2848,40 @@
     showToast('💾 Web3Forms API key saved successfully!');
   }
 
-  function saveWhatsAppSettings() {
+  async function saveWhatsAppSettings() {
+    const phone = document.getElementById('whatsappPhoneInput').value.trim();
     const url = document.getElementById('openwaUrlInput').value.trim();
     const key = document.getElementById('openwaKeyInput').value.trim();
     const session = document.getElementById('openwaSessionInput').value.trim() || 'default';
     const cmbKey = document.getElementById('callmebotKeyInput').value.trim();
-    
+
+    if(!phone) { alert('Please enter your WhatsApp phone number.'); return; }
+
+    localStorage.setItem('whatsapp_phone', phone);
     localStorage.setItem('openwa_url', url);
     localStorage.setItem('openwa_key', key);
     localStorage.setItem('openwa_session', session);
     localStorage.setItem('callmebot_key', cmbKey);
-    showToast('💾 WhatsApp credentials saved locally!');
+
+    showToast('⏳ Syncing credentials to database…');
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          key: 'whatsapp_settings',
+          value: { phone, openwaUrl: url, openwaKey: key, openwaSession: session, callmebotKey: cmbKey }
+        })
+      });
+      if (res.ok) {
+        showToast('💾 WhatsApp settings saved and synced to database!');
+      } else {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Server returned error status.');
+      }
+    } catch(err) {
+      alert('Failed to sync settings to database: ' + err.message);
+    }
   }
 
   async function sendTestWhatsAppAlert() {

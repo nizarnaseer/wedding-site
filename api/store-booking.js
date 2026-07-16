@@ -22,14 +22,39 @@ async function redis(...args) {
 }
 
 async function sendWhatsApp(msg) {
-  const phone = process.env.PHOTOGRAPHER_PHONE; // e.g. 601187381984
+  let phone = process.env.PHOTOGRAPHER_PHONE;
+  let openwaUrl = process.env.OPENWA_API_URL;
+  let openwaKey = process.env.OPENWA_API_KEY;
+  let openwaSession = process.env.OPENWA_SESSION_ID || 'default';
+  let callmebotKey = process.env.CALLMEBOT_API_KEY;
+
+  // Try to load settings from Upstash Redis first
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (url && token) {
+    try {
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(['GET', 'whatsapp_settings']),
+      });
+      const j = await r.json();
+      if (j.result) {
+        const dbSettings = JSON.parse(j.result);
+        if (dbSettings.phone) phone = dbSettings.phone;
+        if (dbSettings.openwaUrl) openwaUrl = dbSettings.openwaUrl;
+        if (dbSettings.openwaKey) openwaKey = dbSettings.openwaKey;
+        if (dbSettings.openwaSession) openwaSession = dbSettings.openwaSession;
+        if (dbSettings.callmebotKey) callmebotKey = dbSettings.callmebotKey;
+      }
+    } catch (e) {
+      console.warn("Failed to load whatsapp_settings from Redis:", e.message);
+    }
+  }
+
   if (!phone) return false;
 
   // --- Option A: OpenWA Integration ---
-  const openwaUrl = process.env.OPENWA_API_URL;
-  const openwaKey = process.env.OPENWA_API_KEY;
-  const openwaSession = process.env.OPENWA_SESSION_ID || 'default';
-
   if (openwaUrl && openwaKey) {
     try {
       const chatId = phone.includes('@') ? phone : `${phone}@c.us`;
@@ -49,7 +74,6 @@ async function sendWhatsApp(msg) {
   }
 
   // --- Option B: CallMeBot Fallback ---
-  const callmebotKey = process.env.CALLMEBOT_API_KEY;
   if (callmebotKey) {
     try {
       const cleanPhone = phone.split('@')[0];
