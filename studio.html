@@ -483,6 +483,13 @@
 
     window.open('https://wa.me/' + PHOTOGRAPHER_WA + '?text=' + encodeURIComponent(ownerMsg), '_blank');
 
+    // 2a. Background automated WhatsApp dispatch
+    fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'notify_whatsapp', message: ownerMsg })
+    }).catch(e => console.error("Studio background WhatsApp failed:", e));
+
     // 2b. Auto-add to Google Calendar
     fetch('/api/add-calendar-event', {
       method: 'POST',

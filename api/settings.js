@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
   if (!key) return res.status(400).json({ error: 'Missing config key parameter' });
 
   // Whitelist of allowed keys to prevent arbitrary reads/writes
-  const allowedKeys = ['site_packages', 'site_discounts', 'booked_dates', 'studio_concepts', 'whatsapp_settings'];
+  const allowedKeys = ['site_packages', 'site_discounts', 'booked_dates', 'studio_concepts', 'whatsapp_settings', 'booking_statuses'];
   if (!allowedKeys.includes(key)) {
     return res.status(400).json({ error: 'Key not allowed' });
   }
@@ -55,6 +55,7 @@ module.exports = async (req, res) => {
         if (key === 'site_packages') return res.status(200).json([]);
         if (key === 'booked_dates') return res.status(200).json([]);
         if (key === 'studio_concepts') return res.status(200).json([]);
+        if (key === 'booking_statuses') return res.status(200).json({});
         if (key === 'site_discounts') return res.status(200).json({ pkg_discounts: {}, promo_codes: {}, combo_bundle_discount: 150 });
       }
       return res.status(200).json(data);

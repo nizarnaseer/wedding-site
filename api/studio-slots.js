@@ -26,10 +26,25 @@ module.exports = async (req, res) => {
     }
   }
 
-  // POST — book a slot
+  // POST — book a slot or sync slots list
   if (req.method === 'POST') {
     if (!url || !token) return res.status(500).json({ error: 'Upstash not configured' });
-    const { date, time, concept, ref, name } = req.body || {};
+    const { action, slots, date, time, concept, ref, name } = req.body || {};
+    
+    // Support saving full slots array (for deletions / cancellations)
+    if (action === 'save_all' && Array.isArray(slots)) {
+      try {
+        await fetch(url, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(['SET', 'studio_slots', JSON.stringify(slots)]),
+        });
+        return res.status(200).json({ ok: true });
+      } catch (err) {
+        return res.status(500).json({ error: err.message });
+      }
+    }
+
     if (!date || !time || !concept) return res.status(400).json({ error: 'Missing date, time or concept' });
     const slotKey = `${date}|${time}|${concept}`;
     try {
@@ -39,14 +54,14 @@ module.exports = async (req, res) => {
         body: JSON.stringify(['GET', 'studio_slots']),
       });
       const getJson = await getRes.json();
-      const slots = getJson.result ? JSON.parse(getJson.result) : [];
-      const taken = slots.find(s => s.key === slotKey);
+      const slotsList = getJson.result ? JSON.parse(getJson.result) : [];
+      const taken = slotsList.find(s => s.key === slotKey);
       if (taken) return res.status(409).json({ error: 'Slot already booked', takenBy: taken.name || 'Another client' });
-      slots.push({ key: slotKey, date, time, concept, ref, name, bookedAt: new Date().toISOString() });
+      slotsList.push({ key: slotKey, date, time, concept, ref, name, bookedAt: new Date().toISOString() });
       await fetch(url, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(['SET', 'studio_slots', JSON.stringify(slots)]),
+        body: JSON.stringify(['SET', 'studio_slots', JSON.stringify(slotsList)]),
       });
       return res.status(200).json({ ok: true, slot: slotKey });
     } catch (err) {

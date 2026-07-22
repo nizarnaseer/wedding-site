@@ -1070,9 +1070,62 @@
     .cal-grid-day.today {
       border-color: var(--gold);
     }
+
+    /* ─── RESPONSIVE ADMIN DESIGN ─── */
+    @media (max-width: 950px) {
+      .app-sidebar {
+        position: fixed;
+        left: -260px;
+        z-index: 1000;
+        transition: left 0.3s ease;
+      }
+      .app-sidebar.open {
+        left: 0;
+      }
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 999;
+      }
+      .sidebar-overlay.open {
+        display: block;
+      }
+      .nav-burger-admin {
+        display: block !important;
+      }
+      .app-header {
+        padding: 0 20px;
+      }
+      .app-content {
+        padding: 20px;
+      }
+      .overview-stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .overview-stats {
+        grid-template-columns: 1fr !important;
+      }
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+      }
+      .app-header {
+        height: 60px;
+      }
+      .screen-title {
+        font-size: 1.3rem;
+      }
+    }
   </style>
 </head>
 <body>
+
+<div class="sidebar-overlay" onclick="closeAdminSidebar()"></div>
 
 <div class="app-layout">
   <!-- ─── SIDEBAR ─── -->
@@ -1099,13 +1152,13 @@
         <span>📝</span> Packages Editor
       </a>
       <a class="nav-item" id="nav-discounts" onclick="switchSection('discounts')">
-        <span>🏷️</span> Discount Manager
+        <span>🏷️</span> Discounts & Promos
       </a>
       <a class="nav-item" id="nav-gallery" onclick="switchSection('gallery')">
-        <span>🖼️</span> Portfolio Gallery
+        <span>🖼️</span> Gallery Manager
       </a>
       <a class="nav-item" id="nav-reviews" onclick="switchSection('reviews')">
-        <span>⭐</span> Testimonials
+        <span>⭐️</span> Reviews Manager
       </a>
       <a class="nav-item" id="nav-studio" onclick="switchSection('studio')">
         <span>🌙</span> Raya Concepts
@@ -1125,7 +1178,10 @@
   <!-- ─── MAIN PANEL ─── -->
   <main class="app-main">
     <header class="app-header">
-      <div class="screen-title" id="screenTitle">Overview</div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="nav-burger-admin" onclick="toggleAdminSidebar()" style="display: none; background: transparent; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; outline: none; line-height: 1; padding: 0; margin-right: 4px;">☰</button>
+        <div class="screen-title" id="screenTitle">Overview</div>
+      </div>
       <div class="header-actions">
         <span class="live-clock" id="liveClock"></span>
         <button class="btn-sm" id="btn-global-refresh" onclick="refreshCurrentSection()">⟳ Refresh</button>
@@ -1390,6 +1446,15 @@
         </div>
 
         <div class="editor-grid" id="studioConceptsEditorGrid"></div>
+
+        <!-- Raya Studio Session Bookings Manager Card -->
+        <div class="card-box" style="margin-top:32px;">
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;margin-bottom:6px;color:var(--gold)">Raya Studio Bookings List</h3>
+          <p style="font-size:0.75rem;color:var(--muted);margin:0 0 16px;">View all booked Raya Studio sessions and cancel/release slots as needed.</p>
+          <div id="studioBookingsContainer" style="overflow-x:auto;margin-top:16px;">
+            <!-- Booked slots will be rendered here dynamically -->
+          </div>
+        </div>
       </section>
 
       <!-- ══════════════════ SECTION: SYSTEM SETTINGS ══════════════════ -->
@@ -1632,8 +1697,22 @@
     }
   });
 
+  /* ─── SIDEBAR TOGGLES (RESPONSIVE) ─── */
+  function toggleAdminSidebar() {
+    document.querySelector('.app-sidebar').classList.toggle('open');
+    document.querySelector('.sidebar-overlay').classList.toggle('open');
+  }
+
+  function closeAdminSidebar() {
+    const sidebar = document.querySelector('.app-sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('open');
+  }
+
   /* ─── ROUTING ─── */
   function switchSection(secId) {
+    closeAdminSidebar();
     activeSection = secId;
     document.querySelectorAll('.section-pane').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
@@ -1752,6 +1831,20 @@
       
       const subsRes = await fetch(`https://api.netlify.com/api/v1/forms/${form.id}/submissions?per_page=100`, { headers: { Authorization: `Bearer ${token}` } });
       const subs = await subsRes.json();
+      
+      // Fetch booking statuses from Redis database to sync across devices
+      try {
+        const dbRes = await fetch('/api/settings?key=booking_statuses');
+        if (dbRes.ok) {
+          const dbStatuses = await dbRes.json();
+          if (dbStatuses && typeof dbStatuses === 'object') {
+            localStorage.setItem('booking_statuses', JSON.stringify(dbStatuses));
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to fetch booking_statuses from database:", e);
+      }
+      
       const statuses = JSON.parse(localStorage.getItem('booking_statuses') || '{}');
       
       bookingsData = subs.map(s => ({
@@ -1828,6 +1921,20 @@
       
       const subsRes = await fetch(`https://api.netlify.com/api/v1/forms/${form.id}/submissions?per_page=100`, { headers: { Authorization: `Bearer ${token}` } });
       const subs = await subsRes.json();
+      
+      // Fetch booking statuses from Redis database to sync across devices
+      try {
+        const dbRes = await fetch('/api/settings?key=booking_statuses');
+        if (dbRes.ok) {
+          const dbStatuses = await dbRes.json();
+          if (dbStatuses && typeof dbStatuses === 'object') {
+            localStorage.setItem('booking_statuses', JSON.stringify(dbStatuses));
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to fetch booking_statuses from database:", e);
+      }
+      
       const statuses = JSON.parse(localStorage.getItem('booking_statuses') || '{}');
       
       bookingsData = subs.map(s => ({
@@ -1965,6 +2072,13 @@
     statuses[refId] = status;
     localStorage.setItem('booking_statuses', JSON.stringify(statuses));
     booking.status = status;
+    
+    // Sync to Upstash Redis database for cross-device persistence
+    fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'booking_statuses', value: statuses })
+    }).catch(e => console.error("Failed to sync booking status to database:", e));
 
     const waPhone = booking.phone.replace(/[\s\-\+\(\)]/g,'');
 
@@ -2981,8 +3095,107 @@
       document.getElementById('studioBannerStatusLabel').style.color = studioBannerActive ? 'var(--green)' : 'var(--muted)';
 
       renderStudioEditor();
+      loadStudioBookedSlots();
     } catch(err) {
       grid.innerHTML = '<p style="color:var(--red);font-size:0.8rem">Failed to load studio concepts.</p>';
+    }
+  }
+
+  let studioSlotsCache = [];
+
+  async function loadStudioBookedSlots() {
+    const container = document.getElementById('studioBookingsContainer');
+    if (!container) return;
+    container.innerHTML = '<p style="color:var(--muted);font-size:0.8rem">Loading booked slots…</p>';
+    
+    try {
+      const res = await fetch('/api/studio-slots');
+      if (res.ok) {
+        const data = await res.json();
+        studioSlotsCache = data.slots || [];
+        renderStudioSlots(studioSlotsCache);
+      } else {
+        throw new Error("Failed to load");
+      }
+    } catch (e) {
+      container.innerHTML = '<p style="color:var(--red);font-size:0.8rem">Failed to load booked slots from database.</p>';
+    }
+  }
+
+  function renderStudioSlots(slots) {
+    const container = document.getElementById('studioBookingsContainer');
+    if (!container) return;
+    if (slots.length === 0) {
+      container.innerHTML = '<p style="color:var(--muted);font-size:0.82rem;text-align:center;padding:24px 0;">No booked slots found.</p>';
+      return;
+    }
+    
+    // Sort slots by date and time
+    const sorted = [...slots].sort((a,b) => {
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      return a.time.localeCompare(b.time);
+    });
+
+    let html = `
+      <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.8rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border); color:var(--gold);">
+            <th style="padding:10px 8px;">Ref ID</th>
+            <th style="padding:10px 8px;">Client</th>
+            <th style="padding:10px 8px;">Concept</th>
+            <th style="padding:10px 8px;">Date</th>
+            <th style="padding:10px 8px;">Time Slot</th>
+            <th style="padding:10px 8px; text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    sorted.forEach(s => {
+      html += `
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+          <td style="padding:12px 8px; font-weight:600; color:var(--text);">${s.ref || '—'}</td>
+          <td style="padding:12px 8px;">
+            <div style="font-weight:500;">${s.name || '—'}</div>
+            <div style="font-size:0.7rem; color:var(--muted);">${s.phone || ''}</div>
+          </td>
+          <td style="padding:12px 8px;"><span class="badge" style="background:rgba(201,169,110,0.1); color:var(--gold); border:1px solid rgba(201,169,110,0.2);">${s.concept}</span></td>
+          <td style="padding:12px 8px;">${s.date}</td>
+          <td style="padding:12px 8px; font-weight:500;">${s.time}</td>
+          <td style="padding:12px 8px; text-align:right;">
+            <button class="btn-sm" onclick="cancelStudioSlot('${s.key}')" style="background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:var(--red); padding:4px 10px; font-size:0.7rem;">Cancel Slot</button>
+          </td>
+        </tr>
+      `;
+    });
+
+    html += `
+        </tbody>
+      </table>
+    `;
+    container.innerHTML = html;
+  }
+
+  async function cancelStudioSlot(slotKey) {
+    if (!confirm('Are you sure you want to cancel this booking and release the time slot?')) return;
+    
+    const updated = studioSlotsCache.filter(s => s.key !== slotKey);
+    
+    try {
+      const res = await fetch('/api/studio-slots', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save_all', slots: updated })
+      });
+      if (res.ok) {
+        showToast('🗑️ Slot cancelled and slot released successfully!');
+        loadStudioBookedSlots();
+      } else {
+        const err = await res.json();
+        throw new Error(err.error || "Failed to cancel");
+      }
+    } catch(e) {
+      alert("Failed to cancel studio slot: " + e.message);
     }
   }
 

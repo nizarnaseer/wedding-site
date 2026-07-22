@@ -2171,6 +2171,9 @@ function calculateAiRecommendation() {
     </div>
   `;
 
+  window.lastAiPhotoRec = photoRec;
+  window.lastAiVideoRec = videoRec;
+
   content.innerHTML = resultHtml;
   showAiStep(8);
 }
@@ -2381,16 +2384,16 @@ async function sendAiAdvisorSessionSummary(exitReason = null) {
   let pkgName = 'None (Exited early)';
   let estPrice = 'N/A';
   if (aiCurrentStep >= 7) {
-    const photoRec = getPhotoRecommendation();
-    const videoRec = getVideoRecommendation();
+    const photoRec = window.lastAiPhotoRec;
+    const videoRec = window.lastAiVideoRec;
     let names = [];
-    if (photoRec) names.push(photoRec.title);
-    if (videoRec) names.push(videoRec.title);
+    if (photoRec) names.push(photoRec.name);
+    if (videoRec) names.push(videoRec.name);
     pkgName = names.join(' + ') || 'Custom List';
     
     let price = 0;
-    if (photoRec) price += photoRec.base;
-    if (videoRec) price += videoRec.base;
+    if (photoRec) price += photoRec.price;
+    if (videoRec) price += videoRec.price;
     if (photoRec && videoRec) {
       const comboDisc = parseInt(localStorage.getItem('combo_bundle_discount') || '150');
       price -= comboDisc;
